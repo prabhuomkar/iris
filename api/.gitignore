@@ -1,0 +1,12 @@
+# Golang
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Others
+.DS_Store
+cmd/iris/api/api

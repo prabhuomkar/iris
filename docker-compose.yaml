@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  # applications
+  frontend:
+    build: frontend
+    restart: always
+    container_name: frontend
+    ports:
+      - '5000:80'
+    depends_on:
+      - api
+  api:
+    build: api
+    restart: always
+    container_name: api
+    ports:
+      - '5001:5001'
+    links:
+      - 'database:database'
+    depends_on:
+      - storage-master
+      - database
+  # infra components
+  database:
+    image: mongo
+    restart: always
+    container_name: database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: iris
+    command: 'mongod --port 5010'
+    ports:
+      - '5010:5010'
+  storage-master:
+    container_name: storage-master
+    image: chrislusf/seaweedfs
+    ports:
+      - '5020:5020'
+    command: "master -ip=storage-master -port=5020"
+  storage-volume:
+    container_name: storage-volume
+    image: chrislusf/seaweedfs
+    ports:
+      - '5021:5021'
+    command: 'volume -mserver="storage-master:5020" -port=5021'
+    depends_on:
+      - storage-master
+networks:
+  iris:
+    driver: bridge

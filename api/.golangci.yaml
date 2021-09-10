@@ -1,0 +1,9 @@
+linters:
+  enable-all: true
+  disable:
+   - whitespace
+   - godot
+   - wrapcheck
+   - gofumpt
+   - gci
+   - exhaustivestruct

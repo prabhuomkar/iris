@@ -1,0 +1,52 @@
+scalar Upload
+
+type MediaItem {
+  id: String!
+  description: String!
+  imageUrl: String!
+  mimeType: String!
+  fileName: String!
+  mediaMetadata: MediaMetaData!
+}
+
+type MediaMetaData {
+  createdAt: String!
+  width: Int!
+  height: Int!
+  photo: Photo
+}
+
+type Photo  {
+  cameraMake: String
+  cameraModel: String
+  focalLength: Int
+  apertureFNumber: Float
+  isoEquivalent: Int
+  exposureTime: String
+}
+
+type Entity {
+  id: String!
+  name: String!
+  imageUrl: String!
+  entityType: String!
+}
+
+type ExploreResponse {
+  people: [Entity!]
+  places: [Entity!]
+  things: [Entity!]
+}
+
+type Query {
+  mediaItem(id: String!): MediaItem!
+  mediaItems(page: Int!, limit: Int!): [MediaItem!]
+  search(q: String!): [MediaItem!]
+  explore: ExploreResponse!
+  entity(id: String!): [MediaItem!]
+}
+
+type Mutation {
+  upload(file: Upload!): Boolean!
+  updateEntity(id: String!, name: String!): Boolean!
+}
