@@ -7,10 +7,12 @@ type MediaItem {
   mimeType: String!
   fileName: String!
   mediaMetadata: MediaMetaData!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type MediaMetaData {
-  createdAt: String!
+  creationTime: String!
   width: Int!
   height: Int!
   photo: Photo
@@ -38,12 +40,17 @@ type ExploreResponse {
   things: [Entity!]
 }
 
+type MediaItemConnection {
+  nodes: [MediaItem!]
+  totalCount: Int!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
-  mediaItems(page: Int!, limit: Int!): [MediaItem!]
-  search(q: String!): [MediaItem!]
+  mediaItems(page: Int, limit: Int): MediaItemConnection!
+  search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
-  entity(id: String!): [MediaItem!]
+  entity(id: String!, page: Int, limit: Int): MediaItemConnection!
 }
 
 type Mutation {

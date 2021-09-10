@@ -1,12 +1,6 @@
 package models
 
-import (
-	database "iris/api/pkg/mongo"
-
-	"go.mongodb.org/mongo-driver/mongo"
-)
-
-const collectionMediaItems = "mediaitems"
+const ColMediaItems = "mediaitems"
 
 type (
 	MediaItem struct {
@@ -21,10 +15,10 @@ type (
 	}
 
 	MediaMetaData struct {
-		CreatedTime string `json:"createdTime"`
-		Width       int    `json:"width"`
-		Height      int    `json:"height"`
-		Photo       *Photo `json:"photo"`
+		CreationTime string `json:"creationTime"`
+		Width        int    `json:"width"`
+		Height       int    `json:"height"`
+		Photo        *Photo `json:"photo"`
 	}
 
 	Photo struct {
@@ -36,7 +30,3 @@ type (
 		ExposureTime    *string  `json:"exposureTime"`
 	}
 )
-
-func Mediaitems(db *database.Connection) *mongo.Collection {
-	return db.Collection(collectionMediaItems)
-}

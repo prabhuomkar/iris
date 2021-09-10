@@ -35,7 +35,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	MediaMetaData() MediaMetaDataResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -58,19 +57,26 @@ type ComplexityRoot struct {
 	}
 
 	MediaItem struct {
+		CreatedAt     func(childComplexity int) int
 		Description   func(childComplexity int) int
 		FileName      func(childComplexity int) int
 		ID            func(childComplexity int) int
 		ImageURL      func(childComplexity int) int
 		MediaMetadata func(childComplexity int) int
 		MimeType      func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
+	MediaItemConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	MediaMetaData struct {
-		CreatedAt func(childComplexity int) int
-		Height    func(childComplexity int) int
-		Photo     func(childComplexity int) int
-		Width     func(childComplexity int) int
+		CreationTime func(childComplexity int) int
+		Height       func(childComplexity int) int
+		Photo        func(childComplexity int) int
+		Width        func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -88,27 +94,24 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Entity     func(childComplexity int, id string) int
+		Entity     func(childComplexity int, id string, page *int, limit *int) int
 		Explore    func(childComplexity int) int
 		MediaItem  func(childComplexity int, id string) int
-		MediaItems func(childComplexity int, page int, limit int) int
-		Search     func(childComplexity int, q string) int
+		MediaItems func(childComplexity int, page *int, limit *int) int
+		Search     func(childComplexity int, q string, page *int, limit *int) int
 	}
 }
 
-type MediaMetaDataResolver interface {
-	CreatedAt(ctx context.Context, obj *models.MediaMetaData) (string, error)
-}
 type MutationResolver interface {
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
 }
 type QueryResolver interface {
 	MediaItem(ctx context.Context, id string) (*models.MediaItem, error)
-	MediaItems(ctx context.Context, page int, limit int) ([]*models.MediaItem, error)
-	Search(ctx context.Context, q string) ([]*models.MediaItem, error)
+	MediaItems(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
+	Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error)
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
-	Entity(ctx context.Context, id string) ([]*models.MediaItem, error)
+	Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 
 type executableSchema struct {
@@ -175,6 +178,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ExploreResponse.Things(childComplexity), true
 
+	case "MediaItem.createdAt":
+		if e.complexity.MediaItem.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.CreatedAt(childComplexity), true
+
 	case "MediaItem.description":
 		if e.complexity.MediaItem.Description == nil {
 			break
@@ -217,12 +227,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MediaItem.MimeType(childComplexity), true
 
-	case "MediaMetaData.createdAt":
-		if e.complexity.MediaMetaData.CreatedAt == nil {
+	case "MediaItem.updatedAt":
+		if e.complexity.MediaItem.UpdatedAt == nil {
 			break
 		}
 
-		return e.complexity.MediaMetaData.CreatedAt(childComplexity), true
+		return e.complexity.MediaItem.UpdatedAt(childComplexity), true
+
+	case "MediaItemConnection.nodes":
+		if e.complexity.MediaItemConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.MediaItemConnection.Nodes(childComplexity), true
+
+	case "MediaItemConnection.totalCount":
+		if e.complexity.MediaItemConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MediaItemConnection.TotalCount(childComplexity), true
+
+	case "MediaMetaData.creationTime":
+		if e.complexity.MediaMetaData.CreationTime == nil {
+			break
+		}
+
+		return e.complexity.MediaMetaData.CreationTime(childComplexity), true
 
 	case "MediaMetaData.height":
 		if e.complexity.MediaMetaData.Height == nil {
@@ -321,7 +352,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Entity(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Entity(childComplexity, args["id"].(string), args["page"].(*int), args["limit"].(*int)), true
 
 	case "Query.explore":
 		if e.complexity.Query.Explore == nil {
@@ -352,7 +383,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.MediaItems(childComplexity, args["page"].(int), args["limit"].(int)), true
+		return e.complexity.Query.MediaItems(childComplexity, args["page"].(*int), args["limit"].(*int)), true
 
 	case "Query.search":
 		if e.complexity.Query.Search == nil {
@@ -364,7 +395,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Search(childComplexity, args["q"].(string)), true
+		return e.complexity.Query.Search(childComplexity, args["q"].(string), args["page"].(*int), args["limit"].(*int)), true
 
 	}
 	return 0, false
@@ -439,10 +470,12 @@ type MediaItem {
   mimeType: String!
   fileName: String!
   mediaMetadata: MediaMetaData!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type MediaMetaData {
-  createdAt: String!
+  creationTime: String!
   width: Int!
   height: Int!
   photo: Photo
@@ -470,12 +503,17 @@ type ExploreResponse {
   things: [Entity!]
 }
 
+type MediaItemConnection {
+  nodes: [MediaItem!]
+  totalCount: Int!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
-  mediaItems(page: Int!, limit: Int!): [MediaItem!]
-  search(q: String!): [MediaItem!]
+  mediaItems(page: Int, limit: Int): MediaItemConnection!
+  search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
-  entity(id: String!): [MediaItem!]
+  entity(id: String!, page: Int, limit: Int): MediaItemConnection!
 }
 
 type Mutation {
@@ -556,6 +594,24 @@ func (ec *executionContext) field_Query_entity_args(ctx context.Context, rawArgs
 		}
 	}
 	args["id"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg2
 	return args, nil
 }
 
@@ -577,19 +633,19 @@ func (ec *executionContext) field_Query_mediaItem_args(ctx context.Context, rawA
 func (ec *executionContext) field_Query_mediaItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 *int
 	if tmp, ok := rawArgs["page"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["page"] = arg0
-	var arg1 int
+	var arg1 *int
 	if tmp, ok := rawArgs["limit"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -610,6 +666,24 @@ func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs
 		}
 	}
 	args["q"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg2
 	return args, nil
 }
 
@@ -1097,7 +1171,144 @@ func (ec *executionContext) _MediaItem_mediaMetadata(ctx context.Context, field 
 	return ec.marshalNMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MediaMetaData_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
+func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItem_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItemConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *models.MediaItemConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItemConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.MediaItem)
+	fc.Result = res
+	return ec.marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItemConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *models.MediaItemConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItemConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaMetaData_creationTime(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1108,14 +1319,14 @@ func (ec *executionContext) _MediaMetaData_createdAt(ctx context.Context, field 
 		Object:     "MediaMetaData",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.MediaMetaData().CreatedAt(rctx, obj)
+		return obj.CreationTime, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1577,18 +1788,21 @@ func (ec *executionContext) _Query_mediaItems(ctx context.Context, field graphql
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().MediaItems(rctx, args["page"].(int), args["limit"].(int))
+		return ec.resolvers.Query().MediaItems(rctx, args["page"].(*int), args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.MediaItem)
+	res := resTmp.(*models.MediaItemConnection)
 	fc.Result = res
-	return ec.marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1616,18 +1830,21 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Search(rctx, args["q"].(string))
+		return ec.resolvers.Query().Search(rctx, args["q"].(string), args["page"].(*int), args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.MediaItem)
+	res := resTmp.(*models.MediaItemConnection)
 	fc.Result = res
-	return ec.marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_explore(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1690,18 +1907,21 @@ func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Entity(rctx, args["id"].(string))
+		return ec.resolvers.Query().Entity(rctx, args["id"].(string), args["page"].(*int), args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.MediaItem)
+	res := resTmp.(*models.MediaItemConnection)
 	fc.Result = res
-	return ec.marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2981,6 +3201,45 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createdAt":
+			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._MediaItem_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var mediaItemConnectionImplementors = []string{"MediaItemConnection"}
+
+func (ec *executionContext) _MediaItemConnection(ctx context.Context, sel ast.SelectionSet, obj *models.MediaItemConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mediaItemConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MediaItemConnection")
+		case "nodes":
+			out.Values[i] = ec._MediaItemConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._MediaItemConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3003,29 +3262,20 @@ func (ec *executionContext) _MediaMetaData(ctx context.Context, sel ast.Selectio
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MediaMetaData")
-		case "createdAt":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._MediaMetaData_createdAt(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+		case "creationTime":
+			out.Values[i] = ec._MediaMetaData_creationTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "width":
 			out.Values[i] = ec._MediaMetaData_width(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "height":
 			out.Values[i] = ec._MediaMetaData_height(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "photo":
 			out.Values[i] = ec._MediaMetaData_photo(ctx, field, obj)
@@ -3148,6 +3398,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_mediaItems(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "search":
@@ -3159,6 +3412,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_search(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "explore":
@@ -3184,6 +3440,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_entity(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":
@@ -3512,6 +3771,20 @@ func (ec *executionContext) marshalNMediaItem2ᚖirisᚋapiᚋinternalᚋmodels�
 		return graphql.Null
 	}
 	return ec._MediaItem(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMediaItemConnection2irisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx context.Context, sel ast.SelectionSet, v models.MediaItemConnection) graphql.Marshaler {
+	return ec._MediaItemConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx context.Context, sel ast.SelectionSet, v *models.MediaItemConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MediaItemConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx context.Context, sel ast.SelectionSet, v *models.MediaMetaData) graphql.Marshaler {

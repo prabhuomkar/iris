@@ -7,3 +7,8 @@ type ExploreResponse struct {
 	Places []*Entity `json:"places"`
 	Things []*Entity `json:"things"`
 }
+
+type MediaItemConnection struct {
+	Nodes      []*MediaItem `json:"nodes"`
+	TotalCount int          `json:"totalCount"`
+}
