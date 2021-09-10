@@ -3,6 +3,8 @@ $primary-color: #ffffff;
 $secondary-color: #812ce5;
 $font-color: #000000;
 $link-color: #4c959a;
+$primary-light-color: #eadafb;
+$primary-dark-color: #4800b2;
 
 body {
   margin: 0;
@@ -93,17 +95,27 @@ p {
 }
 
 .nav-link:hover {
-  background: #822ce518;
+  background: $primary-light-color;
+  color: $primary-dark-color !important;
   border-radius: 4px;
 }
 
 .nav-link:active {
-  background: #bdbdbd;
+  background: $primary-light-color;
   border-radius: 4px;
 }
 
 .activated {
   border-radius: 4px;
-  background: #822ce541;
+  background: $primary-light-color;
+}
+
+.activated > * {
+  color: $primary-dark-color !important;
+  font-weight: bold;
+}
+
+.activated .side-nav-icon {
+  color: $primary-dark-color !important;
 }
 /* sidenav styles end */
