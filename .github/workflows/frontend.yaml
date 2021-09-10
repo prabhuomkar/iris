@@ -19,6 +19,6 @@ jobs:
           node-version: 14.x
       - run: npm -v
       - run: npm ci
-      - run: npm run build
       - run: npm run lint
       - run: npm test
+      - run: npm run build
