@@ -12,6 +12,7 @@
     "sourceType": "module"
   },
   "plugins": ["react"],
+  "ignorePatterns": ["*.test.js"],
   "rules": {
     "react/jsx-filename-extension": "off"
   }
