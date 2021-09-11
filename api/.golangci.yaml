@@ -7,4 +7,3 @@ linters:
    - gofumpt
    - gci
    - exhaustivestruct
-   - govet

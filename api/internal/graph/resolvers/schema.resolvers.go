@@ -29,7 +29,7 @@ func (r *queryResolver) MediaItem(ctx context.Context, id string) (*models.Media
 		return nil, err
 	}
 
-	filter := bson.D{{"_id", oid}}
+	filter := bson.D{{Key: "_id", Value: oid}}
 
 	var result *models.MediaItem
 
@@ -60,9 +60,16 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	skip := int64(*limit * (*page - 1))
 	itemsPerPage := int64(*limit)
 
-	colQuery := bson.A{bson.D{{"$sort", bson.D{{"date", -1}}}}, bson.D{{"$skip", skip}}, bson.D{{"$limit", itemsPerPage}}}
-	cntQuery := bson.A{bson.D{{"$count", "count"}}}
-	facetStage := bson.D{{"$facet", bson.D{{"mediaItems", colQuery}, {"totalCount", cntQuery}}}}
+	colQuery := bson.A{
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "date", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{bson.D{{Key: "$count", Value: "count"}}}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
 
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
