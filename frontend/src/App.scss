@@ -119,3 +119,25 @@ p {
   color: $primary-dark-color !important;
 }
 /* sidenav styles end */
+
+.link-link {
+  text-decoration: none;
+  color: $primary-dark-color;
+}
+
+.search-bar-section {
+  width: 100%;
+}
+
+.search-bar {
+  border-radius: 4px !important;
+  background-color: white !important;
+  height: 40px;
+  width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .search-bar-section {
+    width: 180px;
+  }
+}
