@@ -120,11 +120,6 @@ p {
 }
 /* sidenav styles end */
 
-.link-link {
-  text-decoration: none;
-  color: $primary-dark-color;
-}
-
 .search-bar-section {
   width: 100%;
 }
@@ -138,6 +133,6 @@ p {
 
 @media only screen and (max-width: 600px) {
   .search-bar-section {
-    width: 180px;
+    max-width: 180px;
   }
 }

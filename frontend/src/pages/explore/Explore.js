@@ -7,25 +7,31 @@ const Explore = () => {
   return (
     <>
       <Grid>
-        <GridCell span={11}>People</GridCell>
-        <GridCell span={1}>
-          <Link to="/explore/people" className="link-link">
+        <GridCell desktop={11} tablet={7} phone={3}>
+          People
+        </GridCell>
+        <GridCell desktop={1} tablet={1} phone={1}>
+          <Link to="/explore/people" className="link">
             SEE ALL
           </Link>
         </GridCell>
       </Grid>
       <Grid>
-        <GridCell span={11}>Places</GridCell>
-        <GridCell span={1}>
-          <Link to="/explore/places" className="link-link">
+        <GridCell desktop={11} tablet={7} phone={3}>
+          Places
+        </GridCell>
+        <GridCell desktop={1} tablet={1} phone={1}>
+          <Link to="/explore/places" className="link">
             SEE ALL
           </Link>
         </GridCell>
       </Grid>
       <Grid>
-        <GridCell span={11}>Things</GridCell>
-        <GridCell span={1}>
-          <Link to="/explore/things" className="link-link">
+        <GridCell desktop={11} tablet={7} phone={3}>
+          Things
+        </GridCell>
+        <GridCell desktop={1} tablet={1} phone={1}>
+          <Link to="/explore/things" className="link">
             SEE ALL
           </Link>
         </GridCell>
