@@ -119,3 +119,29 @@ p {
   color: $primary-dark-color !important;
 }
 /* sidenav styles end */
+
+.search-bar-section {
+  width: 100%;
+}
+
+.search-bar > .mdc-text-field__input {
+  padding-top: 16px;
+}
+
+.search-bar {
+  border-radius: 4px !important;
+  background-color: white !important;
+  height: 40px;
+  width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .search-bar-section {
+    max-width: 180px;
+  }
+}
+
+.grid-cols > .mdc-layout-grid__inner {
+  display: flex;
+  justify-content: space-between;
+}
