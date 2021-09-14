@@ -6,31 +6,31 @@ import '@rmwc/grid/styles';
 const Explore = () => {
   return (
     <>
-      <Grid>
-        <GridCell desktop={11} tablet={7} phone={3}>
+      <Grid className="grid-cols">
+        <GridCell desktop={10} tablet={6} phone={3}>
           People
         </GridCell>
-        <GridCell desktop={1} tablet={1} phone={1}>
+        <GridCell desktop={2} tablet={2} phone={1}>
           <Link to="/explore/people" className="link">
             SEE ALL
           </Link>
         </GridCell>
       </Grid>
-      <Grid>
-        <GridCell desktop={11} tablet={7} phone={3}>
+      <Grid className="grid-cols">
+        <GridCell desktop={10} tablet={6} phone={3}>
           Places
         </GridCell>
-        <GridCell desktop={1} tablet={1} phone={1}>
+        <GridCell desktop={2} tablet={2} phone={1}>
           <Link to="/explore/places" className="link">
             SEE ALL
           </Link>
         </GridCell>
       </Grid>
-      <Grid>
-        <GridCell desktop={11} tablet={7} phone={3}>
+      <Grid className="grid-cols">
+        <GridCell desktop={10} tablet={6} phone={3}>
           Things
         </GridCell>
-        <GridCell desktop={1} tablet={1} phone={1}>
+        <GridCell desktop={2} tablet={2} phone={1}>
           <Link to="/explore/things" className="link">
             SEE ALL
           </Link>

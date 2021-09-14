@@ -37,9 +37,13 @@ const SideNav = (props) => {
         <List>
           {sideNavItems.map((section) => (
             <div key={section.subtitle}>
-              <DrawerSubtitle className="drawer-subtitle">
-                {section.subtitle}
-              </DrawerSubtitle>
+              {
+                section.subtitle ? (
+                  <DrawerSubtitle className="drawer-subtitle">
+                    {section.subtitle}
+                  </DrawerSubtitle>
+                ) : <></>
+              }
               {section.items.map((item) => (
                 <NavLink
                   key={item.link_to}
