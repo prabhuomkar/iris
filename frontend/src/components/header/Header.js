@@ -30,6 +30,7 @@ const Header = ({ toggleSideNav }) => {
             <SearchBar />
           </TopAppBarSection>
           <TopAppBarSection alignEnd>
+            <TopAppBarActionItem icon="file_upload" />
             <TopAppBarActionItem icon="help" />
             <TopAppBarActionItem icon="settings" />
           </TopAppBarSection>
