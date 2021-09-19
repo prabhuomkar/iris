@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 const ColMediaItems = "mediaitems"
 
 type (
@@ -9,9 +11,10 @@ type (
 		ImageURL      string         `json:"imageUrl"`
 		MimeType      string         `json:"mimeType"`
 		FileName      string         `json:"fileName"`
+		FileSize      int64          `json:"fileSize"`
 		MediaMetadata *MediaMetaData `json:"mediaMetadata"`
-		CreatedAt     string         `json:"createdAt"`
-		UpdatedAt     string         `json:"updatedAt"`
+		CreatedAt     time.Time      `json:"createdAt"`
+		UpdatedAt     time.Time      `json:"updatedAt"`
 	}
 
 	MediaMetaData struct {

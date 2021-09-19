@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"iris/api/internal/config"
 	"iris/api/internal/graph/generated"
@@ -16,6 +17,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/linxGnu/goseaweedfs"
 	"github.com/rs/cors"
 )
 
@@ -32,6 +34,13 @@ func main() {
 		panic(err)
 	}
 
+	seaweed, err := goseaweedfs.NewSeaweed(
+		cfg.CDN.URL, nil, cfg.CDN.ChunkSize,
+		&http.Client{Timeout: time.Duration(cfg.CDN.Timeout) * time.Minute})
+	if err != nil {
+		panic(err)
+	}
+
 	router := chi.NewRouter()
 	router.Use(cors.Default().Handler)
 
@@ -39,6 +48,7 @@ func main() {
 		Resolvers: &resolvers.Resolver{
 			Config: &cfg,
 			DB:     db,
+			CDN:    seaweed,
 		},
 	}
 
@@ -46,6 +56,7 @@ func main() {
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.MultipartForm{})
 	srv.Use(extension.Introspection{})
 
 	router.Handle("/", playground.Handler("graphql playground", "/graphql"))

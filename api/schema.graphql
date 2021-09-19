@@ -1,4 +1,5 @@
 scalar Upload
+scalar Time
 
 type MediaItem {
   id: String!
@@ -6,9 +7,10 @@ type MediaItem {
   imageUrl: String!
   mimeType: String!
   fileName: String!
+  fileSize: Int!
   mediaMetadata: MediaMetaData!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type MediaMetaData {

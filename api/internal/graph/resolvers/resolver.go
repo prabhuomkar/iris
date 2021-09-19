@@ -3,6 +3,8 @@ package resolvers
 import (
 	"iris/api/internal/config"
 	"iris/api/pkg/mongo"
+
+	"github.com/linxGnu/goseaweedfs"
 )
 
 // This file will not be regenerated automatically.
@@ -12,4 +14,5 @@ import (
 type Resolver struct {
 	Config *config.Config
 	DB     *mongo.Connection
+	CDN    *goseaweedfs.Seaweed
 }
