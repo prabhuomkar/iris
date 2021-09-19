@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -60,6 +61,7 @@ type ComplexityRoot struct {
 		CreatedAt     func(childComplexity int) int
 		Description   func(childComplexity int) int
 		FileName      func(childComplexity int) int
+		FileSize      func(childComplexity int) int
 		ID            func(childComplexity int) int
 		ImageURL      func(childComplexity int) int
 		MediaMetadata func(childComplexity int) int
@@ -198,6 +200,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MediaItem.FileName(childComplexity), true
+
+	case "MediaItem.fileSize":
+		if e.complexity.MediaItem.FileSize == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.FileSize(childComplexity), true
 
 	case "MediaItem.id":
 		if e.complexity.MediaItem.ID == nil {
@@ -462,6 +471,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "schema.graphql", Input: `scalar Upload
+scalar Time
 
 type MediaItem {
   id: String!
@@ -469,9 +479,10 @@ type MediaItem {
   imageUrl: String!
   mimeType: String!
   fileName: String!
+  fileSize: Int!
   mediaMetadata: MediaMetaData!
-  createdAt: String!
-  updatedAt: String!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type MediaMetaData {
@@ -1136,6 +1147,41 @@ func (ec *executionContext) _MediaItem_fileName(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MediaItem_fileSize(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FileSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MediaItem_mediaMetadata(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1201,9 +1247,9 @@ func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_updatedAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -1236,9 +1282,9 @@ func (ec *executionContext) _MediaItem_updatedAt(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItemConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *models.MediaItemConnection) (ret graphql.Marshaler) {
@@ -3196,6 +3242,11 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "fileSize":
+			out.Values[i] = ec._MediaItem_fileSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "mediaMetadata":
 			out.Values[i] = ec._MediaItem_mediaMetadata(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3759,6 +3810,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	res, err := graphql.UnmarshalInt64(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNMediaItem2irisᚋapiᚋinternalᚋmodelsᚐMediaItem(ctx context.Context, sel ast.SelectionSet, v models.MediaItem) graphql.Marshaler {
 	return ec._MediaItem(ctx, sel, &v)
 }
@@ -3804,6 +3870,21 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

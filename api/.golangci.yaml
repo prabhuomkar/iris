@@ -7,3 +7,7 @@ linters:
    - gofumpt
    - gci
    - exhaustivestruct
+linters-settings:
+  lll:
+    line-length: 128
+    tab-width: 2

@@ -6,8 +6,10 @@ package resolvers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +18,28 @@ import (
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (bool, error) {
-	return false, nil
+	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
+	if err != nil {
+		return false, err
+	}
+
+	// later(omkar): Calculate media metadata
+
+	_, err = r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
+		{Key: "imageUrl", Value: fmt.Sprintf("http://%s/%s", result.Server, result.FileID)},
+		{Key: "description", Value: nil},
+		{Key: "mimeType", Value: result.MimeType},
+		{Key: "fileName", Value: result.FileName},
+		{Key: "fileSize", Value: result.FileSize},
+		{Key: "mediaMetadata", Value: nil},
+		{Key: "createdAt", Value: time.Now()},
+		{Key: "updatedAt", Value: time.Now()},
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name string) (bool, error) {
@@ -98,8 +121,7 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	}, nil
 }
 
-func (r *queryResolver) Search(ctx context.Context, q string,
-	page *int, limit *int) (*models.MediaItemConnection, error) {
+func (r *queryResolver) Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error) {
 	return nil, nil
 }
 
@@ -107,8 +129,7 @@ func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, e
 	return nil, nil
 }
 
-func (r *queryResolver) Entity(ctx context.Context, id string,
-	page *int, limit *int) (*models.MediaItemConnection, error) {
+func (r *queryResolver) Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error) {
 	return nil, nil
 }
 

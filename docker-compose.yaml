@@ -37,13 +37,15 @@ services:
     image: chrislusf/seaweedfs
     ports:
       - '5020:5020'
-    command: "master -ip=storage-master -port=5020"
+      - '15020:15020'
+    command: 'master -ip=storage-master -port=5020'
   storage-volume:
     container_name: storage-volume
     image: chrislusf/seaweedfs
     ports:
       - '5021:5021'
-    command: 'volume -mserver="storage-master:5020" -port=5021'
+      - '15021:15021'
+    command: 'volume -ip=storage-volume -mserver="storage-master:5020" -port=5021'
     depends_on:
       - storage-master
 networks:
