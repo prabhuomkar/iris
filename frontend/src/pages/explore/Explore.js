@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
-import { ExploreImageList } from '../../components';
+import { ExploreEntityList } from '../../components';
 import '@rmwc/grid/styles';
 
 const peopleList = [
@@ -37,6 +37,18 @@ const thingsList = [
 ];
 
 const Explore = () => {
+  const stylePeopleList = {
+    listRadius: '50%',
+    listWidth: '10%',
+    listMargin: '0px 6px 6px 6px',
+  };
+
+  const stylePlacesThigsList = {
+    listRadius: '6px',
+    listWidth: '13%',
+    listMargin: '0px 6px 12px 6px',
+  };
+
   return (
     <>
       <Grid className="grid-cols">
@@ -51,12 +63,7 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList
-            listRadius="50%"
-            listWidth="10%"
-            listMargin="0px 6px 6px 6px"
-            data={peopleList}
-          />
+          <ExploreEntityList {...stylePeopleList} data={peopleList} />
         </GridCell>
       </Grid>
       <Grid className="grid-cols">
@@ -71,12 +78,7 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList
-            listRadius="6px"
-            listWidth="13%"
-            listMargin="0px 6px 12px 6px"
-            data={placesList}
-          />
+          <ExploreEntityList {...stylePlacesThigsList} data={placesList} />
         </GridCell>
       </Grid>
       <Grid className="grid-cols">
@@ -91,12 +93,7 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList
-            listRadius="6px"
-            listWidth="13%"
-            listMargin="0px 6px 12px 6px"
-            data={thingsList}
-          />
+          <ExploreEntityList {...stylePlacesThigsList} data={thingsList} />
         </GridCell>
       </Grid>
     </>

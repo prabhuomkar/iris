@@ -8,7 +8,7 @@ import {
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
 
-const ExploreImageList = ({ listRadius, listWidth, listMargin, data }) => {
+const ExploreEntityList = ({ listRadius, listWidth, listMargin, data }) => {
   return (
     <>
       <ImageList>
@@ -30,11 +30,11 @@ const ExploreImageList = ({ listRadius, listWidth, listMargin, data }) => {
   );
 };
 
-ExploreImageList.propTypes = {
+ExploreEntityList.propTypes = {
   listRadius: PropTypes.string,
   listWidth: PropTypes.string,
   listMargin: PropTypes.string,
   data: PropTypes.array,
 };
 
-export default ExploreImageList;
+export default ExploreEntityList;
