@@ -39,6 +39,16 @@ npm install
 npm start
 ```
 
+**For Local Setup**
+- Add the below line in your `/etc/hosts`
+```
+127.0.0.1 storage-master storage-volume database api frontend
+```
+- Build and start the containers
+```
+docker-compose up -d
+```
+
 ### Deployment
 TODO: Add Docker related notes
 
@@ -47,6 +57,7 @@ Issues are managed via GitHub Issues [here](https://github.com/prabhuomkar/iris/
 
 ## Maintainers
 - [Omkar Prabhu](https://github.com/prabhuomkar)
+- [Akshay Pithadiya](https://github.com/akshaypithadiya)
 
 ## License
 TODO: Add license
