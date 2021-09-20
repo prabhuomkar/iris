@@ -8,14 +8,20 @@ import {
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
 
-const ExploreImageList = ({ listRadius, data }) => {
+const ExploreImageList = ({ listRadius, listWidth, listMargin, data }) => {
   return (
     <>
       <ImageList>
         {data.map((src) => (
-          <ImageListItem key={src} style={{ width: '10%', margin: '0px 6px' }}>
+          <ImageListItem
+            key={src}
+            style={{ width: listWidth, margin: listMargin }}
+          >
             <ImageListImageAspectContainer>
-              <ImageListImage src={src} style={{ borderRadius: listRadius }} />
+              <ImageListImage
+                src={src}
+                style={{ borderRadius: listRadius, cursor: 'pointer' }}
+              />
             </ImageListImageAspectContainer>
           </ImageListItem>
         ))}
@@ -26,6 +32,8 @@ const ExploreImageList = ({ listRadius, data }) => {
 
 ExploreImageList.propTypes = {
   listRadius: PropTypes.string,
+  listWidth: PropTypes.string,
+  listMargin: PropTypes.string,
   data: PropTypes.array,
 };
 

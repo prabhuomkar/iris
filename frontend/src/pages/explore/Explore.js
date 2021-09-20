@@ -24,13 +24,9 @@ const placesList = [
   '/places.jpg',
   '/places.jpg',
   '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
 ];
 
 const thingsList = [
-  '/things.jpeg',
-  '/things.jpeg',
   '/things.jpeg',
   '/things.jpeg',
   '/things.jpeg',
@@ -55,7 +51,12 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList listRadius="50%" data={peopleList} />
+          <ExploreImageList
+            listRadius="50%"
+            listWidth="10%"
+            listMargin="0px 6px 6px 6px"
+            data={peopleList}
+          />
         </GridCell>
       </Grid>
       <Grid className="grid-cols">
@@ -70,7 +71,12 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList listRadius="8px" data={placesList} />
+          <ExploreImageList
+            listRadius="6px"
+            listWidth="13%"
+            listMargin="0px 6px 12px 6px"
+            data={placesList}
+          />
         </GridCell>
       </Grid>
       <Grid className="grid-cols">
@@ -85,7 +91,12 @@ const Explore = () => {
       </Grid>
       <Grid>
         <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreImageList listRadius="8px" data={thingsList} />
+          <ExploreImageList
+            listRadius="6px"
+            listWidth="13%"
+            listMargin="0px 6px 12px 6px"
+            data={thingsList}
+          />
         </GridCell>
       </Grid>
     </>
