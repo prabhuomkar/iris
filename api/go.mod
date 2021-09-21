@@ -10,7 +10,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/klauspost/compress v1.13.5 // indirect
-	github.com/linxGnu/goseaweedfs v0.1.5 // indirect
+	github.com/linxGnu/goseaweedfs v0.1.5
 	github.com/rs/cors v1.8.0
 	github.com/vektah/gqlparser/v2 v2.1.0
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
