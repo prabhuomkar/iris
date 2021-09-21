@@ -11,6 +11,7 @@ import (
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/graph/resolvers"
 	"iris/api/pkg/mongo"
+	"iris/api/pkg/rabbitmq"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -34,6 +35,11 @@ func main() {
 		panic(err)
 	}
 
+	queue, err := rabbitmq.Init(cfg.Queue.URI, cfg.Queue.Exchange)
+	if err != nil {
+		panic(err)
+	}
+
 	seaweed, err := goseaweedfs.NewSeaweed(
 		cfg.CDN.URL, nil, cfg.CDN.ChunkSize,
 		&http.Client{Timeout: time.Duration(cfg.CDN.Timeout) * time.Minute})
@@ -48,6 +54,7 @@ func main() {
 		Resolvers: &resolvers.Resolver{
 			Config: &cfg,
 			DB:     db,
+			Queue:  queue,
 			CDN:    seaweed,
 		},
 	}

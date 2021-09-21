@@ -16,9 +16,15 @@ type (
 		Timeout   int64  `envconfig:"CDN_TIMEOUT" default:"5"`
 	}
 
+	Queue struct {
+		URI      string `envconfig:"QUEUE_URI" default:"amqp://root:root@queue:5030"`
+		Exchange string `envconfig:"QUEUE_EXCHANGE" default:"iris"`
+	}
+
 	Config struct {
 		Database
 		CDN
+		Queue
 		Port int `envconfig:"PORT" default:"5001"`
 	}
 )
