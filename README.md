@@ -1,7 +1,7 @@
 # iris
 
 ## About
-WIP
+![Iris Architecture](images/iris.jpeg)
 
 ## Components
 - [API](api/README.md)
