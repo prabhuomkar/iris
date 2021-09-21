@@ -47,11 +47,17 @@ type MediaItemConnection {
   totalCount: Int!
 }
 
+type EntityItemConnection {
+  nodes: [Entity!]
+  totalCount: Int!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
   search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
+  entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!, page: Int, limit: Int): MediaItemConnection!
 }
 

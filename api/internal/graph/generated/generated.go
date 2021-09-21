@@ -51,6 +51,11 @@ type ComplexityRoot struct {
 		Name       func(childComplexity int) int
 	}
 
+	EntityItemConnection struct {
+		Nodes      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	ExploreResponse struct {
 		People func(childComplexity int) int
 		Places func(childComplexity int) int
@@ -96,6 +101,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Entities   func(childComplexity int, entityType string, page *int, limit *int) int
 		Entity     func(childComplexity int, id string, page *int, limit *int) int
 		Explore    func(childComplexity int) int
 		MediaItem  func(childComplexity int, id string) int
@@ -113,6 +119,7 @@ type QueryResolver interface {
 	MediaItems(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
 	Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error)
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
+	Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error)
 	Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 
@@ -158,6 +165,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.Name(childComplexity), true
+
+	case "EntityItemConnection.nodes":
+		if e.complexity.EntityItemConnection.Nodes == nil {
+			break
+		}
+
+		return e.complexity.EntityItemConnection.Nodes(childComplexity), true
+
+	case "EntityItemConnection.totalCount":
+		if e.complexity.EntityItemConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.EntityItemConnection.TotalCount(childComplexity), true
 
 	case "ExploreResponse.people":
 		if e.complexity.ExploreResponse.People == nil {
@@ -351,6 +372,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Photo.IsoEquivalent(childComplexity), true
 
+	case "Query.entities":
+		if e.complexity.Query.Entities == nil {
+			break
+		}
+
+		args, err := ec.field_Query_entities_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Entities(childComplexity, args["entityType"].(string), args["page"].(*int), args["limit"].(*int)), true
+
 	case "Query.entity":
 		if e.complexity.Query.Entity == nil {
 			break
@@ -519,11 +552,17 @@ type MediaItemConnection {
   totalCount: Int!
 }
 
+type EntityItemConnection {
+  nodes: [Entity!]
+  totalCount: Int!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
   search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
+  entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!, page: Int, limit: Int): MediaItemConnection!
 }
 
@@ -590,6 +629,39 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_entities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["entityType"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("entityType"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["entityType"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg2
 	return args, nil
 }
 
@@ -874,6 +946,73 @@ func (ec *executionContext) _Entity_entityType(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _EntityItemConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *models.EntityItemConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "EntityItemConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nodes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Entity)
+	fc.Result = res
+	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _EntityItemConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *models.EntityItemConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "EntityItemConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ExploreResponse_people(ctx context.Context, field graphql.CollectedField, obj *models.ExploreResponse) (ret graphql.Marshaler) {
@@ -1926,6 +2065,48 @@ func (ec *executionContext) _Query_explore(ctx context.Context, field graphql.Co
 	res := resTmp.(*models.ExploreResponse)
 	fc.Result = res
 	return ec.marshalNExploreResponse2ᚖirisᚋapiᚋinternalᚋmodelsᚐExploreResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_entities(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_entities_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Entities(rctx, args["entityType"].(string), args["page"].(*int), args["limit"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.EntityItemConnection)
+	fc.Result = res
+	return ec.marshalNEntityItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐEntityItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3178,6 +3359,35 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var entityItemConnectionImplementors = []string{"EntityItemConnection"}
+
+func (ec *executionContext) _EntityItemConnection(ctx context.Context, sel ast.SelectionSet, obj *models.EntityItemConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, entityItemConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("EntityItemConnection")
+		case "nodes":
+			out.Values[i] = ec._EntityItemConnection_nodes(ctx, field, obj)
+		case "totalCount":
+			out.Values[i] = ec._EntityItemConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var exploreResponseImplementors = []string{"ExploreResponse"}
 
 func (ec *executionContext) _ExploreResponse(ctx context.Context, sel ast.SelectionSet, obj *models.ExploreResponse) graphql.Marshaler {
@@ -3482,6 +3692,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "entities":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_entities(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "entity":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -3779,6 +4003,20 @@ func (ec *executionContext) marshalNEntity2ᚖirisᚋapiᚋinternalᚋmodelsᚐE
 		return graphql.Null
 	}
 	return ec._Entity(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEntityItemConnection2irisᚋapiᚋinternalᚋmodelsᚐEntityItemConnection(ctx context.Context, sel ast.SelectionSet, v models.EntityItemConnection) graphql.Marshaler {
+	return ec._EntityItemConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEntityItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐEntityItemConnection(ctx context.Context, sel ast.SelectionSet, v *models.EntityItemConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._EntityItemConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNExploreResponse2irisᚋapiᚋinternalᚋmodelsᚐExploreResponse(ctx context.Context, sel ast.SelectionSet, v models.ExploreResponse) graphql.Marshaler {
