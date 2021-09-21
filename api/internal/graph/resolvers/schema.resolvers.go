@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"iris/api/internal/utils"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -84,7 +85,7 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "date", Value: -1}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
@@ -126,7 +127,78 @@ func (r *queryResolver) Search(ctx context.Context, q string, page *int, limit *
 }
 
 func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, error) {
-	return nil, nil
+	// later(omkar): move entityType to enums
+	people, err := utils.GetEntitiesByType(ctx, r.DB, "people")
+	if err != nil {
+		return nil, err
+	}
+
+	places, err := utils.GetEntitiesByType(ctx, r.DB, "places")
+	if err != nil {
+		return nil, err
+	}
+
+	things, err := utils.GetEntitiesByType(ctx, r.DB, "things")
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.ExploreResponse{
+		People: people, Places: places, Things: things,
+	}, nil
+}
+
+func (r *queryResolver) Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error) {
+	defaultEnitiesLimit := 20
+	defaultEnitiesPage := 1
+
+	if limit == nil {
+		limit = &defaultEnitiesLimit
+	}
+
+	if page == nil {
+		page = &defaultEnitiesPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	colQuery := bson.A{
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{bson.D{{Key: "$count", Value: "count"}}}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "entities", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+
+	cur, err := r.DB.Collection(models.ColEntity).Aggregate(ctx, mongo.Pipeline{facetStage})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		Entities   []*models.Entity `bson:"entities"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.EntityItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].Entities,
+	}, nil
 }
 
 func (r *queryResolver) Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error) {

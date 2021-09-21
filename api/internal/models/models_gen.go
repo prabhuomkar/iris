@@ -2,6 +2,11 @@
 
 package models
 
+type EntityItemConnection struct {
+	Nodes      []*Entity `json:"nodes"`
+	TotalCount int       `json:"totalCount"`
+}
+
 type ExploreResponse struct {
 	People []*Entity `json:"people"`
 	Places []*Entity `json:"places"`
