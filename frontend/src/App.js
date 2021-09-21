@@ -20,7 +20,7 @@ const App = () => {
         options={{
           primary: '#812ce5',
           secondary: '#ffffff',
-          onPrimary: '#ffffff',
+          onPrimary: '#812ce5',
           textPrimaryOnBackground: '#000',
         }}
       >
