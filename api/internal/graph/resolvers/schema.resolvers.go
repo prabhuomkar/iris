@@ -44,8 +44,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (boo
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if ok {
 		go func(insertedID, imageUrl string) {
-			err := r.Queue.Publish("",
-				[]byte(fmt.Sprintf(`{"id":"%s","imageUrl":"%s"}`, insertedID, imageUrl)))
+			err := r.Queue.Publish([]byte(fmt.Sprintf(`{"id":"%s","imageUrl":"%s"}`, insertedID, imageUrl)))
 			if err != nil {
 				log.Printf("error while pushing event to rabbitmq: %v", err)
 			}

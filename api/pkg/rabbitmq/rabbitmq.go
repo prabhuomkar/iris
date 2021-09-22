@@ -36,10 +36,10 @@ func (c *Connection) Disconnect() error {
 	return nil
 }
 
-// Publish will send a message to queue
-func (c *Connection) Publish(routingKey string, message []byte) error {
+// Publish will send a message to rabbitmq exchange
+func (c *Connection) Publish(message []byte) error {
 	return c.Channel.Publish(
-		c.Exchange, routingKey, false, false,
+		c.Exchange, "", false, false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        message,
