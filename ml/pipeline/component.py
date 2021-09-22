@@ -20,6 +20,7 @@ class Component:
 
   def download(self, oid, image_url):
     urllib.request.urlretrieve(image_url, f'image-{oid}')
+    print(f'downloaded file image-{oid}')
 
   def update(self, oid, data):
     self.db['mediaitems'].update_one({'_id': ObjectId(oid)}, {'$set': data})

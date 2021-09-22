@@ -513,7 +513,7 @@ type MediaItem {
   mimeType: String!
   fileName: String!
   fileSize: Int!
-  mediaMetadata: MediaMetaData!
+  mediaMetadata: MediaMetaData
   createdAt: Time!
   updatedAt: Time!
 }
@@ -1346,14 +1346,11 @@ func (ec *executionContext) _MediaItem_mediaMetadata(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*models.MediaMetaData)
 	fc.Result = res
-	return ec.marshalNMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx, field.Selections, res)
+	return ec.marshalOMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -3459,9 +3456,6 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			}
 		case "mediaMetadata":
 			out.Values[i] = ec._MediaItem_mediaMetadata(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "createdAt":
 			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4091,16 +4085,6 @@ func (ec *executionContext) marshalNMediaItemConnection2ᚖirisᚋapiᚋinternal
 	return ec._MediaItemConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx context.Context, sel ast.SelectionSet, v *models.MediaMetaData) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._MediaMetaData(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4492,6 +4476,13 @@ func (ec *executionContext) marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmode
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalOMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx context.Context, sel ast.SelectionSet, v *models.MediaMetaData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MediaMetaData(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOPhoto2ᚖirisᚋapiᚋinternalᚋmodelsᚐPhoto(ctx context.Context, sel ast.SelectionSet, v *models.Photo) graphql.Marshaler {
