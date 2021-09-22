@@ -8,7 +8,7 @@ type MediaItem {
   mimeType: String!
   fileName: String!
   fileSize: Int!
-  mediaMetadata: MediaMetaData!
+  mediaMetadata: MediaMetaData
   createdAt: Time!
   updatedAt: Time!
 }
@@ -23,8 +23,8 @@ type MediaMetaData {
 type Photo  {
   cameraMake: String
   cameraModel: String
-  focalLength: Int
-  apertureFNumber: Float
+  focalLength: String
+  apertureFNumber: String
   isoEquivalent: Int
   exposureTime: String
 }

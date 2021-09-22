@@ -5,3 +5,4 @@ ignore=CVS, .svn, .git
 disable=missing-module-docstring,invalid-name
 
 indent-string='  '
+max-line-length=160
