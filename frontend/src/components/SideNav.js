@@ -50,7 +50,7 @@ const SideNav = (props) => {
                   className="nav-link"
                   activeClassName="activated"
                   exact
-                  to={item.link_to}
+                  to={`/${item.link_to}`}
                 >
                   <ListItem className="list-item">
                     <Icon className="side-nav-icon" icon={item.icon} />

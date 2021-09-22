@@ -14,11 +14,21 @@ const Places = () => {
     { image: '/places.jpg', label: 'Places' },
     { image: '/places.jpg', label: 'Places' },
     { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
+    { image: '/places.jpg', label: 'Places' },
   ];
 
   return (
     <>
-      <Grid className="grid-cols" style={{ marginBottom: '10px' }}>
+      <Grid className="grid-cols">
         <GridCell desktop={10} tablet={6} phone={3}>
           Places
         </GridCell>
