@@ -57,6 +57,9 @@ services:
     ports:
       - '5030:5030'
       - '15030:15672'
+    volumes:
+      - ./infra/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+      - ./infra/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
 networks:
   iris:
     driver: bridge
