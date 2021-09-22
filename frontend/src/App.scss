@@ -2,7 +2,7 @@ $font: 'Inter', sans-serif !important;
 $primary-color: #ffffff;
 $secondary-color: #812ce5;
 $font-color: #000000;
-$link-color: #4c959a;
+$link-color: #4800b2;
 $primary-light-color: #eadafb;
 $primary-dark-color: #4800b2;
 
@@ -45,13 +45,14 @@ p {
 }
 
 .top-app-bar {
-  background-color: $secondary-color;
+  background-color: $primary-color;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .header-title {
   display: flex;
   text-decoration: none;
-  color: #ffffff !important;
+  color: #812ce5 !important;
   align-content: space-between;
 }
 
@@ -65,6 +66,7 @@ p {
 /* sidenav styles start */
 .drawer {
   position: fixed;
+  margin: 1px 0px !important;
 }
 
 .drawer-content {
@@ -130,9 +132,13 @@ p {
 
 .search-bar {
   border-radius: 4px !important;
-  background-color: white !important;
+  background-color: #f1f3f4 !important;
   height: 40px;
   width: 100%;
+}
+
+.search-bar:focus {
+  outline: none !important;
 }
 
 @media only screen and (max-width: 600px) {
