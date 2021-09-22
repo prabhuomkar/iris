@@ -1,57 +1,79 @@
 {
-  "rabbit_version": "3.6.6",
-  "users": [],
-  "vhosts": [
+	"rabbit_version": "3.6.6",
+	"users": [],
+	"vhosts": [{
+		"name": "/"
+	}],
+	"permissions": [{
+		"user": "root",
+		"vhost": "/",
+		"configure": ".*",
+		"write": ".*",
+		"read": ".*"
+	}],
+	"parameters": [],
+	"policies": [],
+	"queues": [{
+			"name": "pipeline.metadata",
+			"vhost": "/",
+			"durable": true,
+			"auto_delete": false
+		},
+		{
+			"name": "pipeline.people",
+			"vhost": "/",
+			"durable": true,
+			"auto_delete": false
+		},
+		{
+			"name": "pipeline.places",
+			"vhost": "/",
+			"durable": true,
+			"auto_delete": false
+		},
+		{
+			"name": "pipeline.things",
+			"vhost": "/",
+			"durable": true,
+			"auto_delete": false
+		}
+	],
+	"exchanges": [{
+		"name": "iris",
+		"vhost": "/",
+		"type": "fanout",
+		"durable": true,
+		"auto_delete": false,
+		"internal": false
+	}],
+	"bindings": [
     {
-      "name": "/"
-    }
-  ],
-  "permissions": [
+			"source": "iris",
+			"vhost": "/",
+			"destination": "pipeline.metadata",
+			"destination_type": "queue",
+			"routing_key": ""
+		},
+		{
+			"source": "iris",
+			"vhost": "/",
+			"destination": "pipeline.people",
+			"destination_type": "queue",
+			"routing_key": ""
+		},
     {
-      "user": "root",
-      "vhost": "/",
-      "configure": ".*",
-      "write": ".*",
-      "read": ".*"
-    }
-  ],
-  "parameters": [],
-  "policies": [],
-  "queues": [
-    {
-      "name": "pipeline.metadata",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false
-    },
-    {
-      "name": "pipeline.people",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false
-    },
-    {
-      "name": "pipeline.place",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false
-    },
-    {
-      "name": "pipeline.things",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false
-    }
-  ],
-  "exchanges": [
-    {
-      "name": "iris",
-      "vhost": "/",
-      "type": "fanout",
-      "durable": true,
-      "auto_delete": false,
-      "internal": false
-    }
-  ],
-  "bindings": []
+			"source": "iris",
+			"vhost": "/",
+			"destination": "pipeline.places",
+			"destination_type": "queue",
+			"routing_key": ""
+		},
+		{
+			"source": "iris",
+			"vhost": "/",
+			"destination": "pipeline.things",
+			"destination_type": "queue",
+			"routing_key": ""
+		}
+	]
 }
