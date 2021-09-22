@@ -15,11 +15,16 @@ services:
     container_name: api
     ports:
       - '5001:5001'
-    links:
-      - 'database:database'
     depends_on:
       - storage-master
       - database
+      - queue
+  ml:
+    build: ml
+    restart: always
+    container_name: ml
+    depends_on:
+      - queue
   # infra components
   database:
     image: mongo
@@ -48,6 +53,19 @@ services:
     command: 'volume -ip=storage-volume -mserver="storage-master:5020" -port=5021'
     depends_on:
       - storage-master
+  queue:
+    container_name: queue
+    image: rabbitmq:3.9.5-management
+    environment:
+      RABBITMQ_NODE_PORT: 5030
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+    ports:
+      - '5030:5030'
+      - '15030:15672'
+    volumes:
+      - ./infra/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+      - ./infra/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
 networks:
   iris:
     driver: bridge

@@ -10,6 +10,7 @@ import (
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
+	"log"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -24,10 +25,10 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (boo
 		return false, err
 	}
 
-	// later(omkar): Calculate media metadata
+	imageURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
 
-	_, err = r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
-		{Key: "imageUrl", Value: fmt.Sprintf("http://%s/%s", result.Server, result.FileID)},
+	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
+		{Key: "imageUrl", Value: imageURL},
 		{Key: "description", Value: nil},
 		{Key: "mimeType", Value: result.MimeType},
 		{Key: "fileName", Value: result.FileName},
@@ -38,6 +39,20 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (boo
 	})
 	if err != nil {
 		return false, err
+	}
+
+	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
+	if ok {
+		go func(insertedID, imageURL string) {
+			err := r.Queue.Publish([]byte(fmt.Sprintf(`{"id":"%s","imageUrl":"%s"}`, insertedID, imageURL)))
+			if err != nil {
+				log.Printf("error while publishing event to rabbitmq: %v", err)
+			} else {
+				log.Printf("published event to rabbitmq for image: %s", imageURL)
+			}
+		}(insertedID.Hex(), imageURL)
+	} else {
+		return false, nil
 	}
 
 	return true, nil

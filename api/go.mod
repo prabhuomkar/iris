@@ -12,6 +12,7 @@ require (
 	github.com/klauspost/compress v1.13.5 // indirect
 	github.com/linxGnu/goseaweedfs v0.1.5
 	github.com/rs/cors v1.8.0
+	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.mongodb.org/mongo-driver v1.7.2
