@@ -1,9 +1,12 @@
 """ML Worker"""
 import pika
+from pymongo import MongoClient
 from pipeline import Metadata, People, Places, Things
 
+client = MongoClient('mongodb://root:root@database:5010/iris?authSource=admin')
+db = client['iris']
 
-pipeline = [Metadata(), People(), Places(), Things()]
+pipeline = [Metadata(db), People(db), Places(db), Things(db)]
 
 def start_consumers():
   """Init rabbitmq connection and start consumers"""

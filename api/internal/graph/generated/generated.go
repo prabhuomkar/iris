@@ -528,8 +528,8 @@ type MediaMetaData {
 type Photo  {
   cameraMake: String
   cameraModel: String
-  focalLength: Int
-  apertureFNumber: Float
+  focalLength: String
+  apertureFNumber: String
   isoEquivalent: Int
   exposureTime: String
 }
@@ -1805,9 +1805,9 @@ func (ec *executionContext) _Photo_focalLength(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Photo_apertureFNumber(ctx context.Context, field graphql.CollectedField, obj *models.Photo) (ret graphql.Marshaler) {
@@ -1837,9 +1837,9 @@ func (ec *executionContext) _Photo_apertureFNumber(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*float64)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Photo_isoEquivalent(ctx context.Context, field graphql.CollectedField, obj *models.Photo) (ret graphql.Marshaler) {
@@ -4437,21 +4437,6 @@ func (ec *executionContext) marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodels�
 	}
 	wg.Wait()
 	return ret
-}
-
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalFloat(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalFloat(*v)
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
