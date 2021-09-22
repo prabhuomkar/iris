@@ -1,8 +1,7 @@
 """Component"""
 import json
+import urllib.request
 from bson.objectid import ObjectId
-import urllib.request 
-
 
 
 class Component:
@@ -18,11 +17,13 @@ class Component:
     print(f'[{self.name}]: {data}')
     self.process(data['id'], data['imageUrl'])
 
-  def download(self, oid, image_url):
+  def download(self, oid, image_url): # pylint: disable=no-self-use
+    """Downloads the file for processing"""
     urllib.request.urlretrieve(image_url, f'image-{oid}')
     print(f'downloaded file image-{oid}')
 
   def update(self, oid, data):
+    """Updates database with the pipeline result"""
     self.db['mediaitems'].update_one({'_id': ObjectId(oid)}, {'$set': data})
 
   def process(self, oid, image_url):
