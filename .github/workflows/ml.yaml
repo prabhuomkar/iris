@@ -1,0 +1,28 @@
+name: ML CI
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ml/**
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ml/**
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ml
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          go-version: '3.x'
+      - run: python -c "import sys; print(sys.version)"
+      - run: pip install -r requirements.txt
+      - run: |
+        pip install pylint
+        pylint ./...
