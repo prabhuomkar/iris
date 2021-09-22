@@ -1,0 +1,7 @@
+[MASTER]
+ignore=CVS, .svn, .git
+
+[MESSAGES CONTROL]
+disable=missing-module-docstring,invalid-name
+
+indent-string='  '
