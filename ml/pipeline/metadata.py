@@ -21,8 +21,8 @@ class Metadata(Component):
             'width': tags['EXIF ExifImageLength'].values[0] if 'EXIF ExifImageLength' in tags else None,
             'height': tags['EXIF ExifImageWidth'].values[0] if 'EXIF ExifImageWidth' in tags else None,
             'location': {
-              'latitude': coords[0] if len(coords) == 2 else None,
-              'longitude': coords[1] if len(coords) == 2 else None,
+              'latitude': coords[0] if coords is not None and len(coords) == 2 else None,
+              'longitude': coords[1] if coords is not None and len(coords) == 2 else None,
             },
             'photo': {
               'cameraMake': str(tags['Image Make']) if 'Image Make' in tags else None,
