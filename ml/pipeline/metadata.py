@@ -1,5 +1,6 @@
 """Metadata"""
 import exifread
+from exifread import utils
 from .component import Component
 
 
@@ -13,11 +14,16 @@ class Metadata(Component):
     with open(f'image-{oid}', 'rb') as f:
       tags = exifread.process_file(f)
       if len(tags.keys()) > 0:
+        coords = utils.get_gps_coords(tags)
         self.update(oid, {
           'mediaMetadata': {
             'creationTime': str(tags['EXIF DateTimeOriginal']) if 'EXIF DateTimeOriginal' in tags else None,
             'width': tags['EXIF ExifImageLength'].values[0] if 'EXIF ExifImageLength' in tags else None,
             'height': tags['EXIF ExifImageWidth'].values[0] if 'EXIF ExifImageWidth' in tags else None,
+            'location': {
+              'latitude': coords[0] if coords is not None and len(coords) == 2 else None,
+              'longitude': coords[1] if coords is not None and len(coords) == 2 else None,
+            },
             'photo': {
               'cameraMake': str(tags['Image Make']) if 'Image Make' in tags else None,
               'cameraModel': str(tags['Image Model']) if 'Image Model' in tags else None,

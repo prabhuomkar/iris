@@ -14,10 +14,11 @@ type MediaItem {
 }
 
 type MediaMetaData {
-  creationTime: String!
-  width: Int!
-  height: Int!
+  creationTime: String
+  width: Int
+  height: Int
   photo: Photo
+  location: Location
 }
 
 type Photo  {
@@ -27,6 +28,11 @@ type Photo  {
   apertureFNumber: String
   isoEquivalent: Int
   exposureTime: String
+}
+
+type Location {
+  latitude: Float
+  longitude: Float
 }
 
 type Entity {
