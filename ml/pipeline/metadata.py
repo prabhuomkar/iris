@@ -6,16 +6,15 @@ from .component import Component
 
 class Metadata(Component):
   """Metadata Component"""
-  def __init__(self, db):
-    super().__init__('metadata', 'pipeline.metadata', db)
+  def __init__(self, db, oid, image_url):
+    super().__init__('metadata', db, oid, image_url)
 
-  def process(self, oid, image_url):
-    self.download(oid, image_url)
-    with open(f'image-{oid}', 'rb') as f:
+  def process(self):
+    with open(self.file_name, 'rb') as f:
       tags = exifread.process_file(f)
       if len(tags.keys()) > 0:
         coords = utils.get_gps_coords(tags)
-        self.update(oid, {
+        self.update({'$set': {
           'mediaMetadata': {
             'creationTime': str(tags['EXIF DateTimeOriginal']) if 'EXIF DateTimeOriginal' in tags else None,
             'width': tags['EXIF ExifImageLength'].values[0] if 'EXIF ExifImageLength' in tags else None,
@@ -33,4 +32,4 @@ class Metadata(Component):
               'exposureTime': str(tags['EXIF ExposureTime']) if 'EXIF ExposureTime' in tags else None,
             },
           }
-        })
+        }})

@@ -179,11 +179,15 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
-	cntQuery := bson.A{bson.D{{Key: "$count", Value: "count"}}}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
 	facetStage := bson.D{{
 		Key:   "$facet",
 		Value: bson.D{{Key: "entities", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},

@@ -1,31 +1,24 @@
 """Component"""
-import json
-import urllib.request
 from bson.objectid import ObjectId
 
 
 class Component:
   """Component"""
-  def __init__(self, name, queue, db):
+  def __init__(self, name, db, oid, image_url):
     self.name = name
-    self.queue = queue
     self.db = db
+    self.oid = oid
+    self.image_url = image_url
 
-  def callback(self, _, __, ___, body):
-    """RabbitMQ Callback"""
-    data = json.loads(body)
-    print(f'[{self.name}]: {data}')
-    self.process(data['id'], data['imageUrl'])
+  @property
+  def file_name(self):
+    """Returns the downloaded file name"""
+    return f'image-{self.oid}'
 
-  def download(self, oid, image_url): # pylint: disable=no-self-use
-    """Downloads the file for processing"""
-    urllib.request.urlretrieve(image_url, f'image-{oid}')
-    print(f'downloaded file image-{oid}')
-
-  def update(self, oid, data):
+  def update(self, data):
     """Updates database with the pipeline result"""
-    self.db['mediaitems'].update_one({'_id': ObjectId(oid)}, {'$set': data})
+    self.db['mediaitems'].update_one({'_id': ObjectId(self.oid)}, data)
 
-  def process(self, oid, image_url):
+  def process(self):
     """Component Process"""
     raise NotImplementedError
