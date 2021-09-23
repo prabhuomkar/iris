@@ -62,6 +62,11 @@ type ComplexityRoot struct {
 		Things func(childComplexity int) int
 	}
 
+	Location struct {
+		Latitude  func(childComplexity int) int
+		Longitude func(childComplexity int) int
+	}
+
 	MediaItem struct {
 		CreatedAt     func(childComplexity int) int
 		Description   func(childComplexity int) int
@@ -82,6 +87,7 @@ type ComplexityRoot struct {
 	MediaMetaData struct {
 		CreationTime func(childComplexity int) int
 		Height       func(childComplexity int) int
+		Location     func(childComplexity int) int
 		Photo        func(childComplexity int) int
 		Width        func(childComplexity int) int
 	}
@@ -201,6 +207,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ExploreResponse.Things(childComplexity), true
 
+	case "Location.latitude":
+		if e.complexity.Location.Latitude == nil {
+			break
+		}
+
+		return e.complexity.Location.Latitude(childComplexity), true
+
+	case "Location.longitude":
+		if e.complexity.Location.Longitude == nil {
+			break
+		}
+
+		return e.complexity.Location.Longitude(childComplexity), true
+
 	case "MediaItem.createdAt":
 		if e.complexity.MediaItem.CreatedAt == nil {
 			break
@@ -291,6 +311,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MediaMetaData.Height(childComplexity), true
+
+	case "MediaMetaData.location":
+		if e.complexity.MediaMetaData.Location == nil {
+			break
+		}
+
+		return e.complexity.MediaMetaData.Location(childComplexity), true
 
 	case "MediaMetaData.photo":
 		if e.complexity.MediaMetaData.Photo == nil {
@@ -519,10 +546,11 @@ type MediaItem {
 }
 
 type MediaMetaData {
-  creationTime: String!
-  width: Int!
-  height: Int!
+  creationTime: String
+  width: Int
+  height: Int
   photo: Photo
+  location: Location
 }
 
 type Photo  {
@@ -532,6 +560,11 @@ type Photo  {
   apertureFNumber: String
   isoEquivalent: Int
   exposureTime: String
+}
+
+type Location {
+  latitude: Float
+  longitude: Float
 }
 
 type Entity {
@@ -1111,6 +1144,70 @@ func (ec *executionContext) _ExploreResponse_things(ctx context.Context, field g
 	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Location_latitude(ctx context.Context, field graphql.CollectedField, obj *models.Location) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Location",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Latitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Location_longitude(ctx context.Context, field graphql.CollectedField, obj *models.Location) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Location",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Longitude, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MediaItem_id(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1515,14 +1612,11 @@ func (ec *executionContext) _MediaMetaData_creationTime(ctx context.Context, fie
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaMetaData_width(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
@@ -1550,14 +1644,11 @@ func (ec *executionContext) _MediaMetaData_width(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaMetaData_height(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
@@ -1585,14 +1676,11 @@ func (ec *executionContext) _MediaMetaData_height(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaMetaData_photo(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
@@ -1625,6 +1713,38 @@ func (ec *executionContext) _MediaMetaData_photo(ctx context.Context, field grap
 	res := resTmp.(*models.Photo)
 	fc.Result = res
 	return ec.marshalOPhoto2ᚖirisᚋapiᚋinternalᚋmodelsᚐPhoto(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaMetaData_location(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaMetaData",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Location)
+	fc.Result = res
+	return ec.marshalOLocation2ᚖirisᚋapiᚋinternalᚋmodelsᚐLocation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3413,6 +3533,32 @@ func (ec *executionContext) _ExploreResponse(ctx context.Context, sel ast.Select
 	return out
 }
 
+var locationImplementors = []string{"Location"}
+
+func (ec *executionContext) _Location(ctx context.Context, sel ast.SelectionSet, obj *models.Location) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, locationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Location")
+		case "latitude":
+			out.Values[i] = ec._Location_latitude(ctx, field, obj)
+		case "longitude":
+			out.Values[i] = ec._Location_longitude(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mediaItemImplementors = []string{"MediaItem"}
 
 func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet, obj *models.MediaItem) graphql.Marshaler {
@@ -3519,21 +3665,14 @@ func (ec *executionContext) _MediaMetaData(ctx context.Context, sel ast.Selectio
 			out.Values[i] = graphql.MarshalString("MediaMetaData")
 		case "creationTime":
 			out.Values[i] = ec._MediaMetaData_creationTime(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "width":
 			out.Values[i] = ec._MediaMetaData_width(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "height":
 			out.Values[i] = ec._MediaMetaData_height(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "photo":
 			out.Values[i] = ec._MediaMetaData_photo(ctx, field, obj)
+		case "location":
+			out.Values[i] = ec._MediaMetaData_location(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4436,6 +4575,13 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 		return graphql.Null
 	}
 	return graphql.MarshalInt(*v)
+}
+
+func (ec *executionContext) marshalOLocation2ᚖirisᚋapiᚋinternalᚋmodelsᚐLocation(ctx context.Context, sel ast.SelectionSet, v *models.Location) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Location(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.MediaItem) graphql.Marshaler {

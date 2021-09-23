@@ -18,10 +18,11 @@ type (
 	}
 
 	MediaMetaData struct {
-		CreationTime string `json:"creationTime"`
-		Width        int    `json:"width"`
-		Height       int    `json:"height"`
-		Photo        *Photo `json:"photo"`
+		CreationTime string    `json:"creationTime"`
+		Width        *int      `json:"width"`
+		Height       *int      `json:"height"`
+		Photo        *Photo    `json:"photo"`
+		Location     *Location `json:"location"`
 	}
 
 	Photo struct {
@@ -31,5 +32,10 @@ type (
 		ApertureFNumber *string `json:"apertureFNumber"`
 		IsoEquivalent   *int    `json:"isoEquivalent"`
 		ExposureTime    *string `json:"exposureTime"`
+	}
+
+	Location struct {
+		Latitude  *float64 `json:"latitude"`
+		Longitude *float64 `json:"longitude"`
 	}
 )
