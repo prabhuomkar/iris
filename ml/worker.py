@@ -36,7 +36,7 @@ def start_consumers():
   channel = connection.channel()
   for queue in queues:
     channel.basic_consume(queue=queue,
-                        auto_ack=False,
+                        auto_ack=True,
                         on_message_callback=message_callback)
   channel.start_consuming()
 
