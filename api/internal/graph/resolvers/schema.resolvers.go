@@ -221,7 +221,66 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 }
 
 func (r *queryResolver) Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error) {
-	return nil, nil
+	defaultEnityMediaItemsLimit := 20
+	defaultEnityMediaItemsPage := 1
+
+	if limit == nil {
+		limit = &defaultEnityMediaItemsLimit
+	}
+
+	if page == nil {
+		page = &defaultEnityMediaItemsPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	entityID, _ := primitive.ObjectIDFromHex(id)
+
+	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
+		}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
+		}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		MediaItems []*models.MediaItem `bson:"mediaItems"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.MediaItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].MediaItems,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
