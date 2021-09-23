@@ -36,6 +36,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Entity() EntityResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -48,6 +49,7 @@ type ComplexityRoot struct {
 		EntityType func(childComplexity int) int
 		ID         func(childComplexity int) int
 		ImageURL   func(childComplexity int) int
+		MediaItems func(childComplexity int, page *int, limit *int) int
 		Name       func(childComplexity int) int
 	}
 
@@ -108,7 +110,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Entities   func(childComplexity int, entityType string, page *int, limit *int) int
-		Entity     func(childComplexity int, id string, page *int, limit *int) int
+		Entity     func(childComplexity int, id string) int
 		Explore    func(childComplexity int) int
 		MediaItem  func(childComplexity int, id string) int
 		MediaItems func(childComplexity int, page *int, limit *int) int
@@ -116,6 +118,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type EntityResolver interface {
+	MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error)
+}
 type MutationResolver interface {
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
@@ -126,7 +131,7 @@ type QueryResolver interface {
 	Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error)
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
 	Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error)
-	Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error)
+	Entity(ctx context.Context, id string) (*models.Entity, error)
 }
 
 type executableSchema struct {
@@ -164,6 +169,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.ImageURL(childComplexity), true
+
+	case "Entity.mediaItems":
+		if e.complexity.Entity.MediaItems == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_mediaItems_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.MediaItems(childComplexity, args["page"].(*int), args["limit"].(*int)), true
 
 	case "Entity.name":
 		if e.complexity.Entity.Name == nil {
@@ -421,7 +438,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Entity(childComplexity, args["id"].(string), args["page"].(*int), args["limit"].(*int)), true
+		return e.complexity.Query.Entity(childComplexity, args["id"].(string)), true
 
 	case "Query.explore":
 		if e.complexity.Query.Explore == nil {
@@ -572,6 +589,7 @@ type Entity {
   name: String!
   imageUrl: String!
   entityType: String!
+  mediaItems(page: Int, limit: Int): MediaItemConnection!
 }
 
 type ExploreResponse {
@@ -596,7 +614,7 @@ type Query {
   search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
-  entity(id: String!, page: Int, limit: Int): MediaItemConnection!
+  entity(id: String!): Entity!
 }
 
 type Mutation {
@@ -610,6 +628,30 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Entity_mediaItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_updateEntity_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -710,24 +752,6 @@ func (ec *executionContext) field_Query_entity_args(ctx context.Context, rawArgs
 		}
 	}
 	args["id"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["page"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["page"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg2
 	return args, nil
 }
 
@@ -979,6 +1003,48 @@ func (ec *executionContext) _Entity_entityType(ctx context.Context, field graphq
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Entity_mediaItems(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Entity",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Entity_mediaItems_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Entity().MediaItems(rctx, obj, args["page"].(*int), args["limit"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.MediaItemConnection)
+	fc.Result = res
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _EntityItemConnection_nodes(ctx context.Context, field graphql.CollectedField, obj *models.EntityItemConnection) (ret graphql.Marshaler) {
@@ -2251,7 +2317,7 @@ func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Entity(rctx, args["id"].(string), args["page"].(*int), args["limit"].(*int))
+		return ec.resolvers.Query().Entity(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2263,9 +2329,9 @@ func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.MediaItemConnection)
+	res := resTmp.(*models.Entity)
 	fc.Result = res
-	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
+	return ec.marshalNEntity2ᚖirisᚋapiᚋinternalᚋmodelsᚐEntity(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3448,23 +3514,37 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Entity_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Entity_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "imageUrl":
 			out.Values[i] = ec._Entity_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "entityType":
 			out.Values[i] = ec._Entity_entityType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "mediaItems":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_mediaItems(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4126,6 +4206,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNEntity2irisᚋapiᚋinternalᚋmodelsᚐEntity(ctx context.Context, sel ast.SelectionSet, v models.Entity) graphql.Marshaler {
+	return ec._Entity(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNEntity2ᚖirisᚋapiᚋinternalᚋmodelsᚐEntity(ctx context.Context, sel ast.SelectionSet, v *models.Entity) graphql.Marshaler {

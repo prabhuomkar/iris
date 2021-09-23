@@ -40,6 +40,7 @@ type Entity {
   name: String!
   imageUrl: String!
   entityType: String!
+  mediaItems(page: Int, limit: Int): MediaItemConnection!
 }
 
 type ExploreResponse {
@@ -64,7 +65,7 @@ type Query {
   search(q: String!, page: Int, limit: Int): MediaItemConnection!
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
-  entity(id: String!, page: Int, limit: Int): MediaItemConnection!
+  entity(id: String!): Entity!
 }
 
 type Mutation {

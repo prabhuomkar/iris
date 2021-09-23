@@ -19,6 +19,69 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
+	defaultEnityMediaItemsLimit := 20
+	defaultEnityMediaItemsPage := 1
+
+	if limit == nil {
+		limit = &defaultEnityMediaItemsLimit
+	}
+
+	if page == nil {
+		page = &defaultEnityMediaItemsPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
+
+	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
+		}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
+		}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		MediaItems []*models.MediaItem `bson:"mediaItems"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.MediaItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].MediaItems,
+	}, nil
+}
+
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (bool, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
@@ -179,11 +242,15 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
-	cntQuery := bson.A{bson.D{{Key: "$count", Value: "count"}}}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
 	facetStage := bson.D{{
 		Key:   "$facet",
 		Value: bson.D{{Key: "entities", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
@@ -216,9 +283,24 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	}, nil
 }
 
-func (r *queryResolver) Entity(ctx context.Context, id string, page *int, limit *int) (*models.MediaItemConnection, error) {
-	return nil, nil
+func (r *queryResolver) Entity(ctx context.Context, id string) (*models.Entity, error) {
+	entityID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var entity models.Entity
+
+	err = r.DB.Collection(models.ColEntity).FindOne(ctx, bson.D{{Key: "_id", Value: entityID}}).Decode(&entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
 }
+
+// Entity returns generated.EntityResolver implementation.
+func (r *Resolver) Entity() generated.EntityResolver { return &entityResolver{r} }
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
@@ -226,5 +308,6 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type entityResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
