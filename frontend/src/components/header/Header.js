@@ -12,6 +12,7 @@ import {
 import { NavLink } from 'react-router-dom';
 import '@rmwc/top-app-bar/styles';
 import SearchBar from './SearchBar';
+import Upload from './Upload';
 
 const Header = ({ toggleSideNav }) => {
   return (
@@ -30,7 +31,7 @@ const Header = ({ toggleSideNav }) => {
             <SearchBar />
           </TopAppBarSection>
           <TopAppBarSection alignEnd>
-            <TopAppBarActionItem icon="file_upload" />
+            <Upload />
             <TopAppBarActionItem icon="help" />
             <TopAppBarActionItem icon="settings" />
           </TopAppBarSection>

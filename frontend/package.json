@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.4.11",
+    "@rmwc/dialog": "^6.1.4",
     "@rmwc/drawer": "^6.1.4",
     "@rmwc/grid": "^6.1.4",
     "@rmwc/icon": "^6.1.4",
@@ -16,6 +17,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "apollo-upload-client": "^16.0.0",
     "graphql": "^15.5.3",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
