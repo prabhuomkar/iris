@@ -3,10 +3,15 @@
 ## About
 ![Iris Architecture](images/iris.jpeg)
 
-## Components
+## Services
 - [API](api/README.md)
 - [Frontend](frontend/README.md)
 - [Worker](worker/README.md)
+
+**Infrastructure Services:**  
+- [Database](https://www.mongodb.com)
+- [CDN](http://github.com/chrislusf/seaweedfs)
+- [Queue](https://www.rabbitmq.com)
 
 ## Deployment
 TODO: Add Docker related notes

@@ -25,7 +25,7 @@ services:
     container_name: worker
     depends_on:
       - queue
-  # infra components
+  # infra services
   database:
     image: mongo
     restart: always
