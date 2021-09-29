@@ -11,7 +11,7 @@ Following are the softwares requried to get everything up and running.
 **For Local Setup**
 - Add the below line in your `/etc/hosts`
 ```
-127.0.0.1 storage-master storage-volume database api queue frontend worker ml
+127.0.0.1 cdn-master cdn-volume database api queue frontend worker ml
 ```
 - Build and start the containers
 ```

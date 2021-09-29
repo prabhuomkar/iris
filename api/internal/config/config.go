@@ -11,7 +11,7 @@ type (
 	}
 
 	CDN struct {
-		URL       string `envconfig:"CDN_URL" default:"http://storage-master:5020"`
+		URL       string `envconfig:"CDN_URL" default:"http://cdn-master:5020"`
 		ChunkSize int64  `envconfig:"CDN_CHUNK_SIZE" default:"1048576"`
 		Timeout   int64  `envconfig:"CDN_TIMEOUT" default:"5"`
 	}

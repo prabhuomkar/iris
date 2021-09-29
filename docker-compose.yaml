@@ -16,7 +16,7 @@ services:
     ports:
       - '5001:5001'
     depends_on:
-      - storage-master
+      - cdn-master
       - database
       - queue
   worker:
@@ -37,22 +37,22 @@ services:
     command: 'mongod --port 5010'
     ports:
       - '5010:5010'
-  storage-master:
-    container_name: storage-master
+  cdn-master:
+    container_name: cdn-master
     image: chrislusf/seaweedfs
     ports:
       - '5020:5020'
       - '15020:15020'
-    command: 'master -ip=storage-master -port=5020'
-  storage-volume:
-    container_name: storage-volume
+    command: 'master -ip=cdn-master -port=5020'
+  cdn-volume:
+    container_name: cdn-volume
     image: chrislusf/seaweedfs
     ports:
       - '5021:5021'
       - '15021:15021'
-    command: 'volume -ip=storage-volume -mserver="storage-master:5020" -port=5021'
+    command: 'volume -ip=cdn-volume -mserver="cdn-master:5020" -port=5021'
     depends_on:
-      - storage-master
+      - cdn-master
   queue:
     container_name: queue
     image: rabbitmq:3.9.5-management
