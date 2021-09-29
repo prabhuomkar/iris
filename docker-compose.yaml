@@ -19,10 +19,10 @@ services:
       - storage-master
       - database
       - queue
-  ml:
-    build: ml
+  worker:
+    build: worker
     restart: always
-    container_name: ml
+    container_name: worker
     depends_on:
       - queue
   # infra components

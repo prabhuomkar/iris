@@ -1,4 +1,4 @@
-"""ML Worker"""
+"""Worker"""
 import json
 import urllib.request
 import pika

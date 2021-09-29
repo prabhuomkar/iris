@@ -6,7 +6,7 @@
 ## Components
 - [API](api/README.md)
 - [Frontend](frontend/README.md)
-- [ML](ml/README.md)
+- [Worker](worker/README.md)
 
 ## Deployment
 TODO: Add Docker related notes

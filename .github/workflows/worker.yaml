@@ -1,21 +1,21 @@
-name: ML CI
+name: Worker CI
 on:
   push:
     branches:
       - master
     paths:
-      - ml/**
+      - worker/**
   pull_request:
     branches:
       - master
     paths:
-      - ml/**
+      - worker/**
 jobs:
   ci:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./ml
+        working-directory: ./worker
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
