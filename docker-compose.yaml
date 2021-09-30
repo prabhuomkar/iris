@@ -25,6 +25,17 @@ services:
     container_name: worker
     depends_on:
       - queue
+  ml:
+    image: pytorch/torchserve
+    restart: always
+    container_name: ml
+    command: './start.sh'
+    ports:
+      - '5002:5002'
+    volumes:
+      - ./ml/models:/home/model-server/models:ro
+      - ./ml/start.sh:/home/model-server/start.sh:ro
+      - ./ml/config.properties:/home/model-server/config.properties:ro
   # infra services
   database:
     image: mongo
