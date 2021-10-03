@@ -9,6 +9,7 @@
     "@rmwc/grid": "^6.1.4",
     "@rmwc/icon": "^6.1.4",
     "@rmwc/image-list": "^6.1.4",
+    "@rmwc/linear-progress": "^6.1.4",
     "@rmwc/list": "^6.1.4",
     "@rmwc/textfield": "^6.1.4",
     "@rmwc/theme": "^6.1.4",

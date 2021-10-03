@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import {
   Dialog,
@@ -9,6 +10,8 @@ import {
   DialogButton,
 } from '@rmwc/dialog';
 import '@rmwc/dialog/styles';
+import { LinearProgress } from '@rmwc/linear-progress';
+import '@rmwc/linear-progress/styles';
 
 const MUTATION = gql`
   mutation ($file: Upload!) {
@@ -17,25 +20,31 @@ const MUTATION = gql`
 `;
 
 const UploadDialog = ({ open, setOpen }) => {
-  const [mutate, { data, loading }] = useMutation(MUTATION);
+  const [mutate, { data, loading, error }] = useMutation(MUTATION);
+  let history = useHistory();
 
-  function onChange({
+  const onChange = ({
     target: {
       validity,
       files: [file],
     },
-  }) {
+  }) => {
     if (validity.valid) mutate({ variables: { file } });
-  }
+  };
 
-  console.log(data);
-  console.log(loading);
-  if (loading) {
-    console.log('Uploading...');
-    setOpen(false);
-  }
   if (data && data.upload) {
-    console.log('Photo Uploaded!');
+    // console.log(data.upload);
+    setTimeout(() => {
+      history.push('/');
+      history.go(0);
+      setOpen(false);
+    }, 2000);
+  }
+  if (loading) {
+    console.log(loading);
+  }
+  if (error) {
+    console.log(error);
   }
 
   return (
@@ -50,6 +59,16 @@ const UploadDialog = ({ open, setOpen }) => {
       <DialogTitle>Upload Photo</DialogTitle>
       <DialogContent>
         <input type="file" required onChange={onChange} />
+        <br />
+        {loading && (
+          <>
+            <br />
+            <LinearProgress />
+          </>
+        )}
+        {data && data.upload && (
+          <span style={{ color: 'green' }}>Photo uploaded successfully!</span>
+        )}
       </DialogContent>
       <DialogActions>
         <DialogButton action="close">Close</DialogButton>
