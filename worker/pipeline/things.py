@@ -1,4 +1,6 @@
 """Things"""
+import json
+import urllib.request
 from .component import Component
 
 
@@ -7,8 +9,10 @@ class Things(Component):
   def __init__(self, db, oid, image_url):
     super().__init__('things', db, oid, image_url)
     self.INFERENCE_TYPES = [
-      'object_detection',
-      'image_classification'
+      'object_detection', 'image_classification'
+    ]
+    self.MODELS = [
+      'maskrcnn', 'resnet152'
     ]
     self.CONTENT_CATEGORIES = [
       'ANIMALS', 'FOOD', 'GARDENS', 'SPORT', 'PEOPLE', 'TRAVEL', 'WEDDINGS',
@@ -51,14 +55,32 @@ class Things(Component):
       return self.IMAGE_CLASSIFICATION_CLASSES_TO_CATEGORY[class_name]
     return None
 
+  def get_inference_results(self, inference_type, model_name):
+    """Calls torchserve inference api and returns response"""
+    result_classes = []
+    with urllib.request.urlopen(f'http://ml:5002/predictions/{model_name}') as url:
+      data = json.loads(url.read().decode('utf-8'))
+      if inference_type == self.INFERENCE_TYPES[0]:
+        for item in data:
+          keys = item.keys()
+          if 'score' in keys and item['score'] > 0.90:
+            result_classes.append(item[keys[0]])
+        return result_classes
+      if inference_type == self.INFERENCE_TYPES[1]:
+        for item in data:
+          if data[item] > 0.90:
+            result_classes.append(item)
+        return result_classes
+    return result_classes
+
   def process(self):
     result_categories = []
-    # make gRPC inference call for object detection
+    # make inference call for object detection
     od_classes = [''] # later(omkar): get object detection classes with 90% and above
     for od_class in od_classes:
       result_categories.append(self.class_to_category(self.INFERENCE_TYPES[0], od_class))
 
-    # make gRPC inference call for image classification
+    # make inference call for image classification
     ic_classes = [''] # later(omkar): get image classification classes with 90% and above
     for ic_class in ic_classes:
       result_categories.append(self.class_to_category(self.INFERENCE_TYPES[1], ic_class))
