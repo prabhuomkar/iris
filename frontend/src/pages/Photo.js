@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import { useParams } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
 import {
@@ -66,9 +67,12 @@ const Photo = () => {
                 <ListItemGraphic icon="today" />
                 <ListItemText>
                   <ListItemPrimaryText>
-                    {data.mediaItem.createdAt}
+                    {moment(data.mediaItem.createdAt).format('MMMM D, YYYY')}
                   </ListItemPrimaryText>
-                  <ListItemSecondaryText>Sat, 6:30</ListItemSecondaryText>
+                  <ListItemSecondaryText>
+                    {moment(data.mediaItem.createdAt).format('dddd')},{' '}
+                    {moment(data.mediaItem.createdAt).format('h:mm a')}
+                  </ListItemSecondaryText>
                 </ListItemText>
               </ListItem>
               <ListItem>
@@ -78,28 +82,42 @@ const Photo = () => {
                     {data.mediaItem.fileName}
                   </ListItemPrimaryText>
                   <ListItemSecondaryText>
-                    {data.mediaItem.mediaMetadata?.width}x
-                    {data.mediaItem.mediaMetadata?.height}{' '}
+                    {data.mediaItem.mediaMetadata?.width &&
+                      data.mediaItem.mediaMetadata?.height && (
+                        <>
+                          {data.mediaItem.mediaMetadata?.width}x
+                          {data.mediaItem.mediaMetadata?.height}{' '}
+                        </>
+                      )}
                     {data.mediaItem.fileSize / 1000} KB
                   </ListItemSecondaryText>
                 </ListItemText>
               </ListItem>
-              <ListItem>
-                <ListItemGraphic icon="camera" />
-                <ListItemText>
-                  <ListItemPrimaryText>
-                    {data.mediaItem.mediaMetadata?.photo?.cameraMake || 'NA'}{' '}
-                    {data.mediaItem.mediaMetadata?.photo?.cameraModel}
-                  </ListItemPrimaryText>
-                  <ListItemSecondaryText>
-                    f/{data.mediaItem.mediaMetadata?.photo?.focalLength}{' '}
-                    {data.mediaItem.mediaMetadata?.photo?.apertureFNumber}{' '}
-                    {data.mediaItem.mediaMetadata?.photo?.focalLength}
-                    mm ISO{''}
-                    {data.mediaItem.mediaMetadata?.photo?.isoEquivalent}
-                  </ListItemSecondaryText>
-                </ListItemText>
-              </ListItem>
+              {data.mediaItem.mediaMetadata?.photo?.cameraMake &&
+                data.mediaItem.mediaMetadata?.photo?.cameraModel &&
+                data.mediaItem.mediaMetadata?.photo?.focalLength &&
+                data.mediaItem.mediaMetadata?.photo?.apertureFNumber &&
+                data.mediaItem.mediaMetadata?.photo?.focalLength &&
+                data.mediaItem.mediaMetadata?.photo?.isoEquivalent && (
+                  <>
+                    <ListItem>
+                      <ListItemGraphic icon="camera" />
+                      <ListItemText>
+                        <ListItemPrimaryText>
+                          {data.mediaItem.mediaMetadata?.photo?.cameraMake}{' '}
+                          {data.mediaItem.mediaMetadata?.photo?.cameraModel}
+                        </ListItemPrimaryText>
+                        <ListItemSecondaryText>
+                          f/{data.mediaItem.mediaMetadata?.photo?.focalLength}{' '}
+                          {data.mediaItem.mediaMetadata?.photo?.apertureFNumber}{' '}
+                          {data.mediaItem.mediaMetadata?.photo?.focalLength}
+                          mm ISO{''}
+                          {data.mediaItem.mediaMetadata?.photo?.isoEquivalent}
+                        </ListItemSecondaryText>
+                      </ListItemText>
+                    </ListItem>
+                  </>
+                )}
               <ListItem>
                 <ListItemGraphic icon="location_on" />
                 <ListItemText>
