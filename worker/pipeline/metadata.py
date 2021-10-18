@@ -1,7 +1,5 @@
 """Metadata"""
 import exiftool
-import exifread
-from exifread import utils
 from .component import Component
 from .utils import get_creation_time
 
