@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
 import { reducePhotos } from '../utils';
@@ -48,12 +49,15 @@ const Photos = () => {
                         tablet={4}
                         phone={12}
                       >
-                        <img
-                          key={image.id[index]}
-                          src={img}
-                          width="100%"
-                          onClick={() => console.log(imageId)}
-                        />
+                        <Link to={`photo/${image.id[index]}`}>
+                          <img
+                            key={image.id[index]}
+                            src={img}
+                            width="100%"
+                            onClick={() => console.log(imageId)}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </Link>
                       </GridCell>
                     );
                   })}
