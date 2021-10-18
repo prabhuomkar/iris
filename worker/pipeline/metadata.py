@@ -14,12 +14,17 @@ class Metadata(Component):
       metadata = et.get_metadata(self.file_name)
       if len(metadata.keys()) > 0:
         media_metadata = {
-          'creationTime': get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata else None,
-          'width': metadata['EXIF:ExifImageHeight'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageHeight'] if 'File:ImageHeight' in metadata else None,
-          'height': metadata['EXIF:ExifImageWidth'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageWidth'] if 'File:ImageWidth' in metadata else None,
+          'creationTime': get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata \
+            else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata else None,
+          'width': metadata['EXIF:ExifImageHeight'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageHeight'] \
+            if 'File:ImageHeight' in metadata else None,
+          'height': metadata['EXIF:ExifImageWidth'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageWidth'] \
+            if 'File:ImageWidth' in metadata else None,
           'location': {
-            'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
-            'longitude': metadata['EXIF:GPSLongitude'] if 'EXIF:GPSLongitude' in metadata else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
+            'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata \
+              else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
+            'longitude': metadata['EXIF:GPSLongitude'] if 'EXIF:GPSLongitude' in metadata \
+              else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
           },
           'photo': {
             'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else None,

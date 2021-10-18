@@ -30,9 +30,12 @@ class Places(Component):
     with exiftool.ExifTool() as et:
       metadata = et.get_metadata(self.file_name)
       coords = []
-      if len(metadata.keys()) > 0:
-        coords.append(metadata['EXIF:GPSLatitude']) if 'EXIF:GPSLatitude' in metadata else coords.append(metadata['Composite:GPSLatitude']) if 'Composite:GPSLatitude' in metadata else None
-        coords.append(metadata['EXIF:GPSLongitude']) if 'EXIF:GPSLongitude' in metadata else coords.append(metadata['Composite:GPSLongitude']) if 'Composite:GPSLongitude' in metadata else None
+      if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
+        coords.append(metadata['EXIF:GPSLatitude'])
+        coords.append(metadata['EXIF:GPSLongitude'])
+      elif 'Composite:GPSLatitude' in metadata and 'Composite:GPSLongitude' in metadata:
+        coords.append(metadata['Composite:GPSLatitude'])
+        coords.append(metadata['Composite:GPSLongitude'])
       address = {}
       address_filter = {}
       name = ''
