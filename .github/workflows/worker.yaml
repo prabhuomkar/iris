@@ -12,6 +12,7 @@ on:
       - worker/**
 jobs:
   ci:
+    name: Integration Check
     runs-on: ubuntu-latest
     defaults:
       run:

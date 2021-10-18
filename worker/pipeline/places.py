@@ -1,8 +1,7 @@
 """Places"""
 import json
 import urllib.request
-import exifread
-from exifread import utils
+import exiftool
 from pymongo import ReturnDocument
 from .component import Component
 
@@ -28,15 +27,21 @@ class Places(Component):
     return result['_id']
 
   def process(self):
-    with open(self.file_name, 'rb') as f:
-      tags = exifread.process_file(f)
-      coords = utils.get_gps_coords(tags)
+    with exiftool.ExifTool() as et:
+      metadata = et.get_metadata(self.file_name)
+      coords = []
+      if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
+        coords.append(metadata['EXIF:GPSLatitude'])
+        coords.append(metadata['EXIF:GPSLongitude'])
+      elif 'Composite:GPSLatitude' in metadata and 'Composite:GPSLongitude' in metadata:
+        coords.append(metadata['Composite:GPSLatitude'])
+        coords.append(metadata['Composite:GPSLongitude'])
       address = {}
       address_filter = {}
       name = ''
 
       # get address from open street map API
-      if len(tags.keys()) > 0 and (coords is not None and len(coords) == 2):
+      if len(coords) == 2:
         lat, lon = coords[0], coords[1]
         with urllib.request.urlopen(f'https://nominatim.openstreetmap.org/reverse.php?lat={lat}&lon={lon}&zoom=12&format=jsonv2') as url:
           data = json.loads(url.read().decode('utf-8'))

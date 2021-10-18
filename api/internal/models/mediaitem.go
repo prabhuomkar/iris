@@ -26,12 +26,12 @@ type (
 	}
 
 	Photo struct {
-		CameraMake      *string `json:"cameraMake"`
-		CameraModel     *string `json:"cameraModel"`
-		FocalLength     *string `json:"focalLength"`
-		ApertureFNumber *string `json:"apertureFNumber"`
-		IsoEquivalent   *int    `json:"isoEquivalent"`
-		ExposureTime    *string `json:"exposureTime"`
+		CameraMake      *string  `json:"cameraMake"`
+		CameraModel     *string  `json:"cameraModel"`
+		FocalLength     *float64 `json:"focalLength"`
+		ApertureFNumber *float64 `json:"apertureFNumber"`
+		IsoEquivalent   *int     `json:"isoEquivalent"`
+		ExposureTime    *float64 `json:"exposureTime"`
 	}
 
 	Location struct {

@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { Fraction } from 'fractional';
 import { useParams } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
 import {
@@ -108,8 +109,8 @@ const Photo = () => {
                           {data.mediaItem.mediaMetadata?.photo?.cameraModel}
                         </ListItemPrimaryText>
                         <ListItemSecondaryText>
-                          f/{data.mediaItem.mediaMetadata?.photo?.focalLength}{' '}
-                          {data.mediaItem.mediaMetadata?.photo?.apertureFNumber}{' '}
+                          f/{data.mediaItem.mediaMetadata?.photo?.apertureFNumber}{' '}
+                          {new Fraction(data.mediaItem.mediaMetadata?.photo?.exposureTime?.toFixed(2)).toString()}{' '}
                           {data.mediaItem.mediaMetadata?.photo?.focalLength}
                           mm ISO{''}
                           {data.mediaItem.mediaMetadata?.photo?.isoEquivalent}
