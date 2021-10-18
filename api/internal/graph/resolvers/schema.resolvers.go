@@ -40,7 +40,7 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 		bson.D{{Key: "$match", Value: bson.D{
 			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
 		}}},
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}

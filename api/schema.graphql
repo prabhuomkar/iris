@@ -24,10 +24,10 @@ type MediaMetaData {
 type Photo  {
   cameraMake: String
   cameraModel: String
-  focalLength: String
-  apertureFNumber: String
+  focalLength: Float
+  apertureFNumber: Float
   isoEquivalent: Int
-  exposureTime: String
+  exposureTime: Float
 }
 
 type Location {

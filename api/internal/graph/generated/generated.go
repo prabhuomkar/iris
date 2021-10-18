@@ -573,10 +573,10 @@ type MediaMetaData {
 type Photo  {
   cameraMake: String
   cameraModel: String
-  focalLength: String
-  apertureFNumber: String
+  focalLength: Float
+  apertureFNumber: Float
   isoEquivalent: Int
-  exposureTime: String
+  exposureTime: Float
 }
 
 type Location {
@@ -1988,9 +1988,9 @@ func (ec *executionContext) _Photo_focalLength(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*float64)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Photo_apertureFNumber(ctx context.Context, field graphql.CollectedField, obj *models.Photo) (ret graphql.Marshaler) {
@@ -2020,9 +2020,9 @@ func (ec *executionContext) _Photo_apertureFNumber(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*float64)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Photo_isoEquivalent(ctx context.Context, field graphql.CollectedField, obj *models.Photo) (ret graphql.Marshaler) {
@@ -2084,9 +2084,9 @@ func (ec *executionContext) _Photo_exposureTime(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(*float64)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_mediaItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {

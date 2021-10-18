@@ -1,7 +1,9 @@
 """Metadata"""
+import exiftool
 import exifread
 from exifread import utils
 from .component import Component
+from .utils import get_creation_time
 
 
 class Metadata(Component):
@@ -10,25 +12,24 @@ class Metadata(Component):
     super().__init__('metadata', db, oid, image_url)
 
   def process(self):
-    with open(self.file_name, 'rb') as f:
-      tags = exifread.process_file(f)
-      if len(tags.keys()) > 0:
-        coords = utils.get_gps_coords(tags)
+    with exiftool.ExifTool() as et:
+      metadata = et.get_metadata(self.file_name)
+      if len(metadata.keys()) > 0:
         media_metadata = {
-          'creationTime': str(tags['EXIF DateTimeOriginal']) if 'EXIF DateTimeOriginal' in tags else None,
-          'width': tags['EXIF ExifImageLength'].values[0] if 'EXIF ExifImageLength' in tags else None,
-          'height': tags['EXIF ExifImageWidth'].values[0] if 'EXIF ExifImageWidth' in tags else None,
+          'creationTime': get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata else None,
+          'width': metadata['EXIF:ExifImageHeight'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageHeight'] if 'File:ImageHeight' in metadata else None,
+          'height': metadata['EXIF:ExifImageWidth'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageWidth'] if 'File:ImageWidth' in metadata else None,
           'location': {
-            'latitude': coords[0] if coords is not None and len(coords) == 2 else None,
-            'longitude': coords[1] if coords is not None and len(coords) == 2 else None,
+            'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
+            'longitude': metadata['EXIF:GPSLongitude'] if 'EXIF:GPSLongitude' in metadata else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
           },
           'photo': {
-            'cameraMake': str(tags['Image Make']) if 'Image Make' in tags else None,
-            'cameraModel': str(tags['Image Model']) if 'Image Model' in tags else None,
-            'focalLength': str(tags['EXIF FocalLength'].values[0].decimal()) if 'EXIF FocalLength' in tags else None,
-            'apertureFNumber': str(tags['EXIF FNumber'].values[0].decimal()) if 'EXIF FNumber' in tags else None,
-            'isoEquivalent': tags['EXIF ISOSpeedRatings'].values[0] if 'EXIF ISOSpeedRatings' in tags else None,
-            'exposureTime': str(tags['EXIF ExposureTime']) if 'EXIF ExposureTime' in tags else None,
+            'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else None,
+            'cameraModel': metadata['EXIF:Model'] if 'EXIF:Model' in metadata else None,
+            'focalLength': metadata['EXIF:FocalLength'] if 'EXIF:FocalLength' in metadata else None,
+            'apertureFNumber': metadata['EXIF:FNumber'] if 'EXIF:FNumber' in metadata else None,
+            'isoEquivalent': metadata['EXIF:ISO'] if 'EXIF:ISO' in metadata else None,
+            'exposureTime': metadata['EXIF:ExposureTime'] if 'EXIF:ExposureTime' in metadata else None,
           },
         }
         print(f'[metadata]: {media_metadata}')
