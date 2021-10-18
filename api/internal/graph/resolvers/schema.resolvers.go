@@ -82,6 +82,27 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 	}, nil
 }
 
+func (r *mediaItemResolver) Entities(ctx context.Context, obj *models.MediaItem) ([]*models.Entity, error) {
+	entityIDs := make([]primitive.ObjectID, len(obj.Entities))
+
+	for idx, strID := range obj.Entities {
+		oid, _ := primitive.ObjectIDFromHex(strID)
+		entityIDs[idx] = oid
+	}
+
+	cur, err := r.DB.Collection(models.ColEntity).Find(ctx, bson.M{"_id": bson.M{"$in": entityIDs}})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.Entity
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (bool, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
@@ -302,6 +323,9 @@ func (r *queryResolver) Entity(ctx context.Context, id string) (*models.Entity, 
 // Entity returns generated.EntityResolver implementation.
 func (r *Resolver) Entity() generated.EntityResolver { return &entityResolver{r} }
 
+// MediaItem returns generated.MediaItemResolver implementation.
+func (r *Resolver) MediaItem() generated.MediaItemResolver { return &mediaItemResolver{r} }
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -309,5 +333,6 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type entityResolver struct{ *Resolver }
+type mediaItemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -13,6 +13,7 @@ type (
 		FileName      string         `json:"fileName"`
 		FileSize      int64          `json:"fileSize"`
 		MediaMetadata *MediaMetaData `json:"mediaMetadata"`
+		Entities      []string       `json:"entities"`
 		CreatedAt     time.Time      `json:"createdAt"`
 		UpdatedAt     time.Time      `json:"updatedAt"`
 	}

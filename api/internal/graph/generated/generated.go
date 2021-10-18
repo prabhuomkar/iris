@@ -37,6 +37,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Entity() EntityResolver
+	MediaItem() MediaItemResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -72,6 +73,7 @@ type ComplexityRoot struct {
 	MediaItem struct {
 		CreatedAt     func(childComplexity int) int
 		Description   func(childComplexity int) int
+		Entities      func(childComplexity int) int
 		FileName      func(childComplexity int) int
 		FileSize      func(childComplexity int) int
 		ID            func(childComplexity int) int
@@ -120,6 +122,9 @@ type ComplexityRoot struct {
 
 type EntityResolver interface {
 	MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error)
+}
+type MediaItemResolver interface {
+	Entities(ctx context.Context, obj *models.MediaItem) ([]*models.Entity, error)
 }
 type MutationResolver interface {
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
@@ -251,6 +256,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MediaItem.Description(childComplexity), true
+
+	case "MediaItem.entities":
+		if e.complexity.MediaItem.Entities == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.Entities(childComplexity), true
 
 	case "MediaItem.fileName":
 		if e.complexity.MediaItem.FileName == nil {
@@ -558,6 +570,7 @@ type MediaItem {
   fileName: String!
   fileSize: Int!
   mediaMetadata: MediaMetaData
+  entities: [Entity!]
   createdAt: Time!
   updatedAt: Time!
 }
@@ -1514,6 +1527,38 @@ func (ec *executionContext) _MediaItem_mediaMetadata(ctx context.Context, field 
 	res := resTmp.(*models.MediaMetaData)
 	fc.Result = res
 	return ec.marshalOMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItem_entities(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MediaItem().Entities(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Entity)
+	fc.Result = res
+	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -3653,44 +3698,55 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 		case "id":
 			out.Values[i] = ec._MediaItem_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._MediaItem_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "imageUrl":
 			out.Values[i] = ec._MediaItem_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "mimeType":
 			out.Values[i] = ec._MediaItem_mimeType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "fileName":
 			out.Values[i] = ec._MediaItem_fileName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "fileSize":
 			out.Values[i] = ec._MediaItem_fileSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "mediaMetadata":
 			out.Values[i] = ec._MediaItem_mediaMetadata(ctx, field, obj)
+		case "entities":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MediaItem_entities(ctx, field, obj)
+				return res
+			})
 		case "createdAt":
 			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "updatedAt":
 			out.Values[i] = ec._MediaItem_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

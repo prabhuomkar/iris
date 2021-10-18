@@ -2,6 +2,7 @@
 import json
 import urllib.request
 import exiftool
+from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 from .component import Component
 
@@ -22,6 +23,10 @@ class Places(Component):
       {'$set': data},
       upsert=True,
       return_document=ReturnDocument.AFTER
+    )
+    self.db['entities'].update_one(
+      {'_id': result['_id']},
+      {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
     )
     print(f'[place]: {result}')
     return result['_id']
