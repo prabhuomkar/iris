@@ -1,3 +1,4 @@
 pika==1.2.0
 pymongo==3.11.3
 PyExifTool==0.4.11
+requests==2.25.1

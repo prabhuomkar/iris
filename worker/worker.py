@@ -16,16 +16,16 @@ def message_callback(ch, method, ___, body):
   print(f'[message]: {data}')
 
   # download the file for usage
-  oid, image_url = data['id'], data['imageUrl']
+  oid, image_url, mime_type = data['id'], data['imageUrl'], data['mimeType']
   urllib.request.urlretrieve(image_url, f'image-{oid}')
-  print(f'[worker]: downloaded file: image-{oid} from url: {image_url}')
+  print(f'[worker]: downloaded file: image-{oid} from url: {image_url} mime: {mime_type}')
 
   # initialize the pipeline
   pipeline = [Metadata, People, Places, Things]
 
   # start the pipeline
   for _component in pipeline:
-    component = _component(db, oid, image_url)
+    component = _component(db, oid, image_url, mime_type)
     component.process()
 
   # manually acknowledge the message

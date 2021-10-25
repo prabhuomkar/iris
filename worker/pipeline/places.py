@@ -9,8 +9,8 @@ from .component import Component
 
 class Places(Component):
   """Places Component"""
-  def __init__(self, db, oid, image_url):
-    super().__init__('places', db, oid, image_url)
+  def __init__(self, db, oid, image_url, mime_type):
+    super().__init__('places', db, oid, image_url, mime_type)
 
   def upsert_place(self, address_filter, address):
     """Upserts place for future usage"""

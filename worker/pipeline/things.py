@@ -1,13 +1,14 @@
 """Things"""
 import json
-import urllib.request
+import requests
+from requests.api import head
 from .component import Component
 
 
 class Things(Component):
   """Things Component"""
-  def __init__(self, db, oid, image_url):
-    super().__init__('things', db, oid, image_url)
+  def __init__(self, db, oid, image_url, mime_type):
+    super().__init__('things', db, oid, image_url, mime_type)
     self.INFERENCE_TYPES = [
       'object_detection', 'image_classification'
     ]
@@ -59,17 +60,22 @@ class Things(Component):
     """Calls torchserve inference api and returns response"""
     result_classes = []
     model_name = self.MODELS[0] if inference_type == self.INFERENCE_TYPES[0] else self.MODELS[1]
-    with urllib.request.urlopen(f'http://ml:5002/predictions/{model_name}') as url:
-      data = json.loads(url.read().decode('utf-8'))
+    data = None
+    with open(self.file_name, 'rb') as f:
+      data = f.read()
+    headers = {'Content-Type': self.mime_type}
+    res = requests.post(f'http://ml:5002/predictions/{model_name}', data=data, headers=headers)
+    if res.status_code == 200:
+      data = res.json()
       if inference_type == self.INFERENCE_TYPES[0]:
         for item in data:
-          keys = item.keys()
-          if 'score' in keys and item['score'] > 0.90:
-            result_classes.append(item[keys[0]])
+          keys = list(item.keys())
+          if 'score' in keys and item['score'] > 0.7:
+            result_classes.append(keys[0])
         return result_classes
       if inference_type == self.INFERENCE_TYPES[1]:
         for item in data:
-          if data[item] > 0.90:
+          if data[item] > 0.7:
             result_classes.append(item)
         return result_classes
     return result_classes

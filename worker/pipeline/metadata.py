@@ -6,8 +6,8 @@ from .utils import get_creation_time
 
 class Metadata(Component):
   """Metadata Component"""
-  def __init__(self, db, oid, image_url):
-    super().__init__('metadata', db, oid, image_url)
+  def __init__(self, db, oid, image_url, mime_type):
+    super().__init__('metadata', db, oid, image_url, mime_type)
 
   def process(self):
     with exiftool.ExifTool() as et:
