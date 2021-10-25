@@ -6,3 +6,4 @@ disable=missing-module-docstring,invalid-name
 
 indent-string='  '
 max-line-length=160
+max-args=6
