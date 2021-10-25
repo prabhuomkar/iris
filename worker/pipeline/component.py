@@ -4,11 +4,12 @@ from bson.objectid import ObjectId
 
 class Component:
   """Component"""
-  def __init__(self, name, db, oid, image_url):
+  def __init__(self, name, db, oid, image_url, mime_type):
     self.name = name
     self.db = db
     self.oid = oid
     self.image_url = image_url
+    self.mime_type = mime_type
 
   @property
   def file_name(self):
