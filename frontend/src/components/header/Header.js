@@ -7,7 +7,6 @@ import {
   TopAppBarTitle,
   TopAppBarFixedAdjust,
   TopAppBarNavigationIcon,
-  TopAppBarActionItem,
 } from '@rmwc/top-app-bar';
 import { NavLink } from 'react-router-dom';
 import '@rmwc/top-app-bar/styles';
@@ -30,10 +29,13 @@ const Header = ({ toggleSideNav }) => {
           <TopAppBarSection>
             <SearchBar />
           </TopAppBarSection>
+
           <TopAppBarSection alignEnd>
             <Upload />
+            {/*
             <TopAppBarActionItem icon="help" />
             <TopAppBarActionItem icon="settings" />
+            */}
           </TopAppBarSection>
         </TopAppBarRow>
       </TopAppBar>
