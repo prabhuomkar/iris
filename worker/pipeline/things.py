@@ -1,5 +1,6 @@
 """Things"""
 import requests
+from bson.objectid import ObjectId
 from .component import Component
 
 
@@ -536,6 +537,7 @@ class Things(Component):
     res = requests.post(f'http://ml:5002/predictions/{model_name}', data=data, headers=headers)
     if res.status_code == 200:
       data = res.json()
+      print(data)
       if inference_type == self.INFERENCE_TYPES[0]:
         for item in data:
           keys = list(item.keys())
@@ -548,6 +550,21 @@ class Things(Component):
             result_classes.append(item)
         return result_classes
     return result_classes
+
+  def upsert_entity(self, data):
+    """Upserts things entity"""
+    result = self.db['entities'].find(
+      {'name': {'$in': data}},
+    )
+    entity_oids = []
+    for entity in result:
+      self.db['entities'].update_one(
+        {'_id': entity['_id']},
+        {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
+      )
+      entity_oids.append(entity['_id'])
+    print(f'[things]: {data} {entity_oids}')
+    return entity_oids
 
   def process(self):
     result_categories = []
@@ -565,4 +582,5 @@ class Things(Component):
       if category not in result_categories:
         result_categories.append(category)
 
-    print(f'[things]: {result_categories}')
+    entity_oids = self.upsert_entity(result_categories)
+    self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
