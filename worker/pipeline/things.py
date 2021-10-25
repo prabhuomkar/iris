@@ -4,8 +4,6 @@ from bson.objectid import ObjectId
 from .component import Component
 
 
-MIN_SCORE = 0.8
-
 class Things(Component):
   """Things Component"""
   def __init__(self, db, oid, image_url, mime_type):
@@ -539,15 +537,27 @@ class Things(Component):
       data = res.json()
       print(data)
       if inference_type == self.INFERENCE_TYPES[0]:
+        max_score = 0
+        max_score_category = ''
         for item in data:
           keys = list(item.keys())
-          if 'score' in keys and item['score'] > MIN_SCORE:
+          if 'score' in keys and item['score'] > max_score:
+            max_score_category = keys[0]
+          elif 'score' in keys and item['score'] > 0.8:
             result_classes.append(keys[0])
+        if max_score_category not in result_classes:
+          result_classes.append(max_score_category)
         return result_classes
       if inference_type == self.INFERENCE_TYPES[1]:
+        max_score = 0
+        max_score_category = ''
         for item in data:
-          if data[item] > MIN_SCORE:
+          if data[item] > max_score:
+            max_score_category = item
+          if data[item] > 0.8:
             result_classes.append(item)
+        if max_score_category not in result_classes:
+          result_classes.append(max_score_category)
         return result_classes
     return result_classes
 
