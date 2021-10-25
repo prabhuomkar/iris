@@ -48,6 +48,8 @@ services:
     command: 'mongod --port 5010'
     ports:
       - '5010:5010'
+    volumes:
+      - ./infra/mongodb/import_entities.js:/docker-entrypoint-initdb.d/import_entities.js:ro
   cdn-master:
     container_name: cdn-master
     image: chrislusf/seaweedfs
