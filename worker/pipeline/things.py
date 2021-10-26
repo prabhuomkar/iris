@@ -1,6 +1,9 @@
 """Things"""
 import requests
 from bson.objectid import ObjectId
+from pymongo import ReturnDocument
+
+from .utils import get_image_classification_classes, get_object_detection_classes
 from .component import Component
 
 
@@ -537,60 +540,45 @@ class Things(Component):
       data = res.json()
       print(data)
       if inference_type == self.INFERENCE_TYPES[0]:
-        max_score = 0
-        max_score_category = ''
-        for item in data:
-          keys = list(item.keys())
-          if 'score' in keys and item['score'] > max_score:
-            max_score_category = keys[0]
-          elif 'score' in keys and item['score'] > 0.8:
-            result_classes.append(keys[0])
-        if max_score_category not in result_classes:
-          result_classes.append(max_score_category)
-        return result_classes
+        return get_object_detection_classes(data)
       if inference_type == self.INFERENCE_TYPES[1]:
-        max_score = 0
-        max_score_category = ''
-        for item in data:
-          if data[item] > max_score:
-            max_score_category = item
-          if data[item] > 0.8:
-            result_classes.append(item)
-        if max_score_category not in result_classes:
-          result_classes.append(max_score_category)
-        return result_classes
+        return get_image_classification_classes(data)
+    else:
+      print(f'error while making inference request, status code: {res.status_code}')
     return result_classes
 
   def upsert_entity(self, data):
     """Upserts things entity"""
-    result = self.db['entities'].find(
-      {'name': {'$in': data}},
-    )
     entity_oids = []
-    for entity in result:
+    for cat_class in data:
+      result = self.db['entities'].find_one_and_update(
+        {'name': cat_class, 'entityType': 'things'},
+        {'$set': { 'name': cat_class, 'imageUrl': self.image_url }},
+        upsert=True,
+        return_document=ReturnDocument.AFTER
+      )
       self.db['entities'].update_one(
-        {'_id': entity['_id']},
+        {'_id': result['_id']},
         {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
       )
-      entity_oids.append(entity['_id'])
-    print(f'[things]: {data} {entity_oids}')
+      entity_oids.append(result['_id'])
     return entity_oids
 
   def process(self):
-    result_categories = []
+    content_categories = []
     # make inference call for object detection
     od_classes = self.get_inference_results(self.INFERENCE_TYPES[0])
     for od_class in od_classes:
       category = self.class_to_category(self.INFERENCE_TYPES[0], od_class)
-      if category not in result_categories:
-        result_categories.append(category)
+      if category not in content_categories:
+        content_categories.append(category)
 
     # make inference call for image classification
     ic_classes = self.get_inference_results(self.INFERENCE_TYPES[1])
     for ic_class in ic_classes:
       category = self.class_to_category(self.INFERENCE_TYPES[1], ic_class)
-      if category not in result_categories:
-        result_categories.append(category)
+      if category not in content_categories:
+        content_categories.append(category)
 
-    entity_oids = self.upsert_entity(result_categories)
-    self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
+    entity_oids = self.upsert_entity(od_classes + ic_classes)
+    self.update({ '$set': { 'contentCategories': content_categories }, '$addToSet': { 'entities': { '$each': entity_oids } } })
