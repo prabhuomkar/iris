@@ -11,6 +11,7 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
+import { Loading } from '../components';
 import { gql, useQuery } from '@apollo/client';
 import '@rmwc/list/styles';
 
@@ -109,8 +110,15 @@ const Photo = () => {
                           {data.mediaItem.mediaMetadata?.photo?.cameraModel}
                         </ListItemPrimaryText>
                         <ListItemSecondaryText>
-                          f/{data.mediaItem.mediaMetadata?.photo?.apertureFNumber}{' '}
-                          {new Fraction(data.mediaItem.mediaMetadata?.photo?.exposureTime?.toFixed(2)).toString()}{' '}
+                          f/
+                          {
+                            data.mediaItem.mediaMetadata?.photo?.apertureFNumber
+                          }{' '}
+                          {new Fraction(
+                            data.mediaItem.mediaMetadata?.photo?.exposureTime?.toFixed(
+                              2
+                            )
+                          ).toString()}{' '}
                           {data.mediaItem.mediaMetadata?.photo?.focalLength}
                           mm ISO{''}
                           {data.mediaItem.mediaMetadata?.photo?.isoEquivalent}
@@ -130,7 +138,9 @@ const Photo = () => {
           </GridCell>
         </Grid>
       ) : (
-        <>Loading</>
+        <>
+          <Loading />
+        </>
       )}
     </>
   );

@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
+import { Loading } from '../components';
 import { reducePhotos } from '../utils';
 import '@rmwc/grid/styles';
 
@@ -24,7 +25,7 @@ const GET_MEDIA = gql`
 const Photos = () => {
   const { loading, error, data } = useQuery(GET_MEDIA);
 
-  if (loading) return 'Loading...';
+  if (loading) return <Loading />;
   if (error) return `Error! ${error.message}`;
 
   return (

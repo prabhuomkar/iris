@@ -19,6 +19,7 @@ const SideNav = (props) => {
         { id: 'Sharing', link_to: 'sharing', icon: 'people' },
       ],
     },
+    /*
     {
       subtitle: 'LIBRARY',
       items: [
@@ -29,6 +30,7 @@ const SideNav = (props) => {
         { id: 'Trash', link_to: 'trash', icon: 'delete' },
       ],
     },
+    */
   ];
 
   return (
@@ -37,13 +39,13 @@ const SideNav = (props) => {
         <List>
           {sideNavItems.map((section) => (
             <div key={section.subtitle}>
-              {
-                section.subtitle ? (
-                  <DrawerSubtitle className="drawer-subtitle">
-                    {section.subtitle}
-                  </DrawerSubtitle>
-                ) : <></>
-              }
+              {section.subtitle ? (
+                <DrawerSubtitle className="drawer-subtitle">
+                  {section.subtitle}
+                </DrawerSubtitle>
+              ) : (
+                <></>
+              )}
               {section.items.map((item) => (
                 <NavLink
                   key={item.link_to}
