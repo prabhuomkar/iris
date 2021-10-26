@@ -2,6 +2,8 @@
 import requests
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
+
+from .utils import get_image_classification_classes, get_object_detection_classes
 from .component import Component
 
 
@@ -538,28 +540,9 @@ class Things(Component):
       data = res.json()
       print(data)
       if inference_type == self.INFERENCE_TYPES[0]:
-        max_score = 0
-        max_score_category = ''
-        for item in data:
-          keys = list(item.keys())
-          if 'score' in keys and item['score'] > max_score:
-            max_score_category = keys[0]
-          elif 'score' in keys and item['score'] > 0.8:
-            result_classes.append(keys[0])
-        if max_score_category not in result_classes:
-          result_classes.append(max_score_category)
-        return result_classes
+        return get_object_detection_classes(data)
       if inference_type == self.INFERENCE_TYPES[1]:
-        max_score = 0
-        max_score_category = ''
-        for item in data:
-          if data[item] > max_score:
-            max_score_category = item
-          if data[item] > 0.8:
-            result_classes.append(item)
-        if max_score_category not in result_classes:
-          result_classes.append(max_score_category)
-        return result_classes
+        return get_image_classification_classes(data)
     return result_classes
 
   def upsert_entity(self, data):
