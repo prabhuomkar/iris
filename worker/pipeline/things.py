@@ -543,6 +543,8 @@ class Things(Component):
         return get_object_detection_classes(data)
       if inference_type == self.INFERENCE_TYPES[1]:
         return get_image_classification_classes(data)
+    else:
+      print(f'error while making inference request, status code: {res.status_code}')
     return result_classes
 
   def upsert_entity(self, data):
