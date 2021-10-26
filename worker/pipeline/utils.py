@@ -8,28 +8,22 @@ def get_creation_time(exif_datetime):
 def get_image_classification_classes(data, topK = 3):
   """Gets topK classes from results of image classification"""
   result_classes = []
-  max_score = 0
-  max_score_category = ''
-  for item in data:
-    keys = list(item.keys())
-    if 'score' in keys and item['score'] > max_score:
-      max_score_category = keys[0]
-    elif 'score' in keys and item['score'] > 0.8:
+  data = sorted(data.items(), key = lambda x: x['score'], reverse=True)
+  for i in enumerate(data):
+    keys = list(data[i].keys())
+    if 'score' in keys and data[i]['score'] > 0.75:
       result_classes.append(keys[0])
-  if max_score_category not in result_classes:
-    result_classes.append(max_score_category)
+    if i == topK - 1:
+      break
   return result_classes
 
 def get_object_detection_classes(data, topK = 3):
   """Gets topK classes from results of object detection"""
   result_classes = []
-  max_score = 0
-  max_score_category = ''
-  for item in data:
-    if data[item] > max_score:
-      max_score_category = item
-    if data[item] > 0.8:
-      result_classes.append(item)
-  if max_score_category not in result_classes:
-    result_classes.append(max_score_category)
+  data = sorted(data.items(), key = lambda x: x[1], reverse=True)
+  for i, key in enumerate(data):
+    if data[key] > 0.75:
+      result_classes.append(key)
+    if i == topK - 1:
+      break
   return result_classes
