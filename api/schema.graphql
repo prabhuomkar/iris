@@ -9,6 +9,7 @@ type MediaItem {
   fileName: String!
   fileSize: Int!
   mediaMetadata: MediaMetaData
+  contentCategories: [String]
   entities: [Entity!]
   createdAt: Time!
   updatedAt: Time!

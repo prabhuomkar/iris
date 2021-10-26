@@ -6,16 +6,17 @@ const ColMediaItems = "mediaitems"
 
 type (
 	MediaItem struct {
-		ID            string         `json:"id" bson:"_id"`
-		Description   string         `json:"description"`
-		ImageURL      string         `json:"imageUrl"`
-		MimeType      string         `json:"mimeType"`
-		FileName      string         `json:"fileName"`
-		FileSize      int64          `json:"fileSize"`
-		MediaMetadata *MediaMetaData `json:"mediaMetadata"`
-		Entities      []string       `json:"entities"`
-		CreatedAt     time.Time      `json:"createdAt"`
-		UpdatedAt     time.Time      `json:"updatedAt"`
+		ID                string         `json:"id" bson:"_id"`
+		Description       string         `json:"description"`
+		ImageURL          string         `json:"imageUrl"`
+		MimeType          string         `json:"mimeType"`
+		FileName          string         `json:"fileName"`
+		FileSize          int64          `json:"fileSize"`
+		MediaMetadata     *MediaMetaData `json:"mediaMetadata"`
+		ContentCategories []string       `json:"contentCategories"`
+		Entities          []string       `json:"entities"`
+		CreatedAt         time.Time      `json:"createdAt"`
+		UpdatedAt         time.Time      `json:"updatedAt"`
 	}
 
 	MediaMetaData struct {

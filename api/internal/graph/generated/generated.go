@@ -71,16 +71,17 @@ type ComplexityRoot struct {
 	}
 
 	MediaItem struct {
-		CreatedAt     func(childComplexity int) int
-		Description   func(childComplexity int) int
-		Entities      func(childComplexity int) int
-		FileName      func(childComplexity int) int
-		FileSize      func(childComplexity int) int
-		ID            func(childComplexity int) int
-		ImageURL      func(childComplexity int) int
-		MediaMetadata func(childComplexity int) int
-		MimeType      func(childComplexity int) int
-		UpdatedAt     func(childComplexity int) int
+		ContentCategories func(childComplexity int) int
+		CreatedAt         func(childComplexity int) int
+		Description       func(childComplexity int) int
+		Entities          func(childComplexity int) int
+		FileName          func(childComplexity int) int
+		FileSize          func(childComplexity int) int
+		ID                func(childComplexity int) int
+		ImageURL          func(childComplexity int) int
+		MediaMetadata     func(childComplexity int) int
+		MimeType          func(childComplexity int) int
+		UpdatedAt         func(childComplexity int) int
 	}
 
 	MediaItemConnection struct {
@@ -242,6 +243,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Location.Longitude(childComplexity), true
+
+	case "MediaItem.contentCategories":
+		if e.complexity.MediaItem.ContentCategories == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.ContentCategories(childComplexity), true
 
 	case "MediaItem.createdAt":
 		if e.complexity.MediaItem.CreatedAt == nil {
@@ -570,6 +578,7 @@ type MediaItem {
   fileName: String!
   fileSize: Int!
   mediaMetadata: MediaMetaData
+  contentCategories: [String]
   entities: [Entity!]
   createdAt: Time!
   updatedAt: Time!
@@ -1527,6 +1536,38 @@ func (ec *executionContext) _MediaItem_mediaMetadata(ctx context.Context, field 
 	res := resTmp.(*models.MediaMetaData)
 	fc.Result = res
 	return ec.marshalOMediaMetaData2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaMetaData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItem_contentCategories(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContentCategories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_entities(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -3727,6 +3768,8 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			}
 		case "mediaMetadata":
 			out.Values[i] = ec._MediaItem_mediaMetadata(ctx, field, obj)
+		case "contentCategories":
+			out.Values[i] = ec._MediaItem_contentCategories(ctx, field, obj)
 		case "entities":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -4800,6 +4843,42 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstring(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstring(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
