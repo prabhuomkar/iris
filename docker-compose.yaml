@@ -48,6 +48,8 @@ services:
     command: 'mongod --port 5010'
     ports:
       - '5010:5010'
+    volumes:
+      - ./infra/mongodb/create_indexes.js:/docker-entrypoint-initdb.d/create_indexes.js:ro
   cdn-master:
     container_name: cdn-master
     image: chrislusf/seaweedfs

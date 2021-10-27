@@ -221,8 +221,121 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	}, nil
 }
 
-func (r *queryResolver) Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error) {
-	return nil, nil
+func (r *queryResolver) Search(ctx context.Context, q *string, id *string, page *int, limit *int) (*models.MediaItemConnection, error) {
+	defaultSearchLimit := 20
+	defaultSearchPage := 1
+
+	if limit == nil {
+		limit = &defaultSearchLimit
+	}
+
+	if page == nil {
+		page = &defaultSearchPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	var entityIDs []primitive.ObjectID
+
+	if q != nil {
+		cur, err := r.DB.Collection(models.ColEntity).Find(ctx, bson.D{
+			{Key: "$text", Value: bson.D{
+				{Key: "$search", Value: *q},
+				{Key: "$caseSensitive", Value: false},
+			}}})
+		if err != nil {
+			return nil, err
+		}
+
+		var entities []*models.Entity
+		if err = cur.All(ctx, &entities); err != nil {
+			return nil, err
+		}
+
+		entityIDs = make([]primitive.ObjectID, len(entities))
+
+		for idx, entity := range entities {
+			oid, _ := primitive.ObjectIDFromHex(entity.ID)
+			entityIDs[idx] = oid
+		}
+	} else if id != nil {
+		entityIDs = make([]primitive.ObjectID, 1)
+		oid, _ := primitive.ObjectIDFromHex(*id)
+		entityIDs[0] = oid
+	}
+
+	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{
+				Key: "$in", Value: entityIDs,
+			}}}}},
+		},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "entities", Value: bson.D{{
+				Key: "$in", Value: entityIDs,
+			}}}}},
+		},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		MediaItems []*models.MediaItem `bson:"mediaItems"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.MediaItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].MediaItems,
+	}, nil
+}
+
+func (r *queryResolver) Autocomplete(ctx context.Context, q string) ([]*models.AutocompleteResponse, error) {
+	cur, err := r.DB.Collection(models.ColEntity).Find(ctx, bson.D{
+		{Key: "$text", Value: bson.D{
+			{Key: "$search", Value: q},
+			{Key: "$caseSensitive", Value: false},
+		}}})
+	if err != nil {
+		return nil, err
+	}
+
+	var entities []*models.Entity
+	if err = cur.All(ctx, &entities); err != nil {
+		return nil, err
+	}
+
+	matches := make([]*models.AutocompleteResponse, len(entities))
+	for idx, entity := range entities {
+		matches[idx] = &models.AutocompleteResponse{ID: entity.ID, Name: entity.Name}
+	}
+
+	return matches, nil
 }
 
 func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, error) {

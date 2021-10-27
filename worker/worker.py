@@ -1,4 +1,5 @@
 """Worker"""
+import os
 import json
 import urllib.request
 import pika
@@ -29,6 +30,7 @@ def message_callback(ch, method, ___, body):
     component.process()
 
   # manually acknowledge the message
+  os.remove(f'image-{oid}')
   ch.basic_ack(delivery_tag=method.delivery_tag)
 
 def start_consumers():

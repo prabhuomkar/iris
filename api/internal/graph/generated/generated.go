@@ -46,6 +46,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AutocompleteResponse struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+	}
+
 	Entity struct {
 		EntityType func(childComplexity int) int
 		ID         func(childComplexity int) int
@@ -112,12 +117,13 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Entities   func(childComplexity int, entityType string, page *int, limit *int) int
-		Entity     func(childComplexity int, id string) int
-		Explore    func(childComplexity int) int
-		MediaItem  func(childComplexity int, id string) int
-		MediaItems func(childComplexity int, page *int, limit *int) int
-		Search     func(childComplexity int, q string, page *int, limit *int) int
+		Autocomplete func(childComplexity int, q string) int
+		Entities     func(childComplexity int, entityType string, page *int, limit *int) int
+		Entity       func(childComplexity int, id string) int
+		Explore      func(childComplexity int) int
+		MediaItem    func(childComplexity int, id string) int
+		MediaItems   func(childComplexity int, page *int, limit *int) int
+		Search       func(childComplexity int, q *string, id *string, page *int, limit *int) int
 	}
 }
 
@@ -134,7 +140,8 @@ type MutationResolver interface {
 type QueryResolver interface {
 	MediaItem(ctx context.Context, id string) (*models.MediaItem, error)
 	MediaItems(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
-	Search(ctx context.Context, q string, page *int, limit *int) (*models.MediaItemConnection, error)
+	Search(ctx context.Context, q *string, id *string, page *int, limit *int) (*models.MediaItemConnection, error)
+	Autocomplete(ctx context.Context, q string) ([]*models.AutocompleteResponse, error)
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
 	Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error)
 	Entity(ctx context.Context, id string) (*models.Entity, error)
@@ -154,6 +161,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AutocompleteResponse.id":
+		if e.complexity.AutocompleteResponse.ID == nil {
+			break
+		}
+
+		return e.complexity.AutocompleteResponse.ID(childComplexity), true
+
+	case "AutocompleteResponse.name":
+		if e.complexity.AutocompleteResponse.Name == nil {
+			break
+		}
+
+		return e.complexity.AutocompleteResponse.Name(childComplexity), true
 
 	case "Entity.entityType":
 		if e.complexity.Entity.EntityType == nil {
@@ -436,6 +457,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Photo.IsoEquivalent(childComplexity), true
 
+	case "Query.autocomplete":
+		if e.complexity.Query.Autocomplete == nil {
+			break
+		}
+
+		args, err := ec.field_Query_autocomplete_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Autocomplete(childComplexity, args["q"].(string)), true
+
 	case "Query.entities":
 		if e.complexity.Query.Entities == nil {
 			break
@@ -501,7 +534,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Search(childComplexity, args["q"].(string), args["page"].(*int), args["limit"].(*int)), true
+		return e.complexity.Query.Search(childComplexity, args["q"].(*string), args["id"].(*string), args["page"].(*int), args["limit"].(*int)), true
 
 	}
 	return 0, false
@@ -630,10 +663,16 @@ type EntityItemConnection {
   totalCount: Int!
 }
 
+type AutocompleteResponse {
+  id: String!
+  name: String!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
-  search(q: String!, page: Int, limit: Int): MediaItemConnection!
+  search(q: String, id: String, page: Int, limit: Int): MediaItemConnection!
+  autocomplete(q: String!): [AutocompleteResponse]
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!): Entity!
@@ -729,6 +768,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_autocomplete_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["q"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("q"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["q"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_entities_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -819,33 +873,42 @@ func (ec *executionContext) field_Query_mediaItems_args(ctx context.Context, raw
 func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 *string
 	if tmp, ok := rawArgs["q"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("q"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["q"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["page"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+	var arg1 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg1
+	args["id"] = arg1
 	var arg2 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
 		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["limit"] = arg2
+	args["page"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg3
 	return args, nil
 }
 
@@ -886,6 +949,76 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AutocompleteResponse_id(ctx context.Context, field graphql.CollectedField, obj *models.AutocompleteResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AutocompleteResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AutocompleteResponse_name(ctx context.Context, field graphql.CollectedField, obj *models.AutocompleteResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AutocompleteResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Entity_id(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
 	defer func() {
@@ -2284,7 +2417,7 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Search(rctx, args["q"].(string), args["page"].(*int), args["limit"].(*int))
+		return ec.resolvers.Query().Search(rctx, args["q"].(*string), args["id"].(*string), args["page"].(*int), args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2299,6 +2432,45 @@ func (ec *executionContext) _Query_search(ctx context.Context, field graphql.Col
 	res := resTmp.(*models.MediaItemConnection)
 	fc.Result = res
 	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_autocomplete(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_autocomplete_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Autocomplete(rctx, args["q"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.AutocompleteResponse)
+	fc.Result = res
+	return ec.marshalOAutocompleteResponse2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐAutocompleteResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_explore(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3586,6 +3758,38 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** object.gotpl ****************************
 
+var autocompleteResponseImplementors = []string{"AutocompleteResponse"}
+
+func (ec *executionContext) _AutocompleteResponse(ctx context.Context, sel ast.SelectionSet, obj *models.AutocompleteResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, autocompleteResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AutocompleteResponse")
+		case "id":
+			out.Values[i] = ec._AutocompleteResponse_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._AutocompleteResponse_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var entityImplementors = []string{"Entity"}
 
 func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, obj *models.Entity) graphql.Marshaler {
@@ -3988,6 +4192,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "autocomplete":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_autocomplete(ctx, field)
 				return res
 			})
 		case "explore":
@@ -4679,6 +4894,53 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalOAutocompleteResponse2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐAutocompleteResponse(ctx context.Context, sel ast.SelectionSet, v []*models.AutocompleteResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOAutocompleteResponse2ᚖirisᚋapiᚋinternalᚋmodelsᚐAutocompleteResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOAutocompleteResponse2ᚖirisᚋapiᚋinternalᚋmodelsᚐAutocompleteResponse(ctx context.Context, sel ast.SelectionSet, v *models.AutocompleteResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AutocompleteResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

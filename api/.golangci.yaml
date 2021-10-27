@@ -8,6 +8,8 @@ linters:
    - gci
    - exhaustivestruct
    - dupl
+   - funlen
+   - cyclop
 linters-settings:
   lll:
     line-length: 140

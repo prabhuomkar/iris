@@ -61,10 +61,16 @@ type EntityItemConnection {
   totalCount: Int!
 }
 
+type AutocompleteResponse {
+  id: String!
+  name: String!
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
-  search(q: String!, page: Int, limit: Int): MediaItemConnection!
+  search(q: String, id: String, page: Int, limit: Int): MediaItemConnection!
+  autocomplete(q: String!): [AutocompleteResponse]
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!): Entity!
