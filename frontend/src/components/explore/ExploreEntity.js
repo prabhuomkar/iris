@@ -19,10 +19,10 @@ const ExploreEntity = ({ data }) => {
         }}
       >
         {data.map((src) => (
-          <ImageListItem key={src.image} style={{ marginBottom: '12px' }}>
-            <ImageListImage src={src.image} style={{ width: '180px' }} />
+          <ImageListItem key={src.imageUrl} style={{ marginBottom: '12px' }}>
+            <ImageListImage src={src.imageUrl} style={{ width: '180px' }} />
             <ImageListSupporting>
-              <ImageListLabel>{src.label}</ImageListLabel>
+              <ImageListLabel>{src.name}</ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>
         ))}

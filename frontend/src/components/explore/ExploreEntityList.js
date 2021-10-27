@@ -4,6 +4,8 @@ import {
   ImageList,
   ImageListImage,
   ImageListItem,
+  ImageListSupporting,
+  ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
@@ -23,7 +25,7 @@ const ExploreEntityList = ({ data, type }) => {
 
   return (
     <>
-      <ImageList>
+      <ImageList withTextProtection>
         {data.map((src) => (
           <ImageListItem
             key={src}
@@ -33,7 +35,7 @@ const ExploreEntityList = ({ data, type }) => {
           >
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={src}
+                src={src.imageUrl}
                 style={{
                   borderRadius:
                     type === 'PeopleList'
@@ -43,6 +45,9 @@ const ExploreEntityList = ({ data, type }) => {
                 }}
               />
             </ImageListImageAspectContainer>
+            <ImageListSupporting>
+              <ImageListLabel>{src.name}</ImageListLabel>
+            </ImageListSupporting>
           </ImageListItem>
         ))}
       </ImageList>

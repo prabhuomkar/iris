@@ -56,7 +56,7 @@ const Photos = () => {
                             src={img}
                             width="100%"
                             onClick={() => console.log(imageId)}
-                            style={{ cursor: 'pointer' }}
+                            style={{ cursor: 'pointer', borderRadius: '6px' }}
                           />
                         </Link>
                       </GridCell>
