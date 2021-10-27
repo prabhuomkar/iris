@@ -2,6 +2,11 @@
 
 package models
 
+type AutocompleteResponse struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 type EntityItemConnection struct {
 	Nodes      []*Entity `json:"nodes"`
 	TotalCount int       `json:"totalCount"`

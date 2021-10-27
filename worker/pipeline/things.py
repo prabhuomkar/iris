@@ -547,10 +547,16 @@ class Things(Component):
       print(f'error while making inference request, status code: {res.status_code}')
     return result_classes
 
+  def upsert_things(self, things):
+    """Upserts things for future usage"""
+    for thing in things:
+      self.db['things'].find_one_and_update({ 'name': thing }, {'$set': { 'name': thing }}, upsert=True, return_document=ReturnDocument.AFTER)
+
   def upsert_entity(self, data):
     """Upserts things entity"""
     entity_oids = []
     for cat_class in data:
+      cat_class = cat_class.replace('_', ' ')
       result = self.db['entities'].find_one_and_update(
         {'name': cat_class, 'entityType': 'things'},
         {'$set': { 'name': cat_class, 'imageUrl': self.image_url }},
@@ -580,5 +586,6 @@ class Things(Component):
       if category not in content_categories:
         content_categories.append(category)
 
+    self.upsert_things(od_classes + ic_classes)
     entity_oids = self.upsert_entity(od_classes + ic_classes)
     self.update({ '$set': { 'contentCategories': content_categories }, '$addToSet': { 'entities': { '$each': entity_oids } } })
