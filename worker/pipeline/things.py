@@ -44,7 +44,32 @@ class Things(Component):
       'bicycle': self.CONTENT_CATEGORIES[5], 'car': self.CONTENT_CATEGORIES[5],
       'motorcycle': self.CONTENT_CATEGORIES[5], 'airplane': self.CONTENT_CATEGORIES[5],
       'bus': self.CONTENT_CATEGORIES[5], 'train': self.CONTENT_CATEGORIES[5],
-      'truck': self.CONTENT_CATEGORIES[5], 'boat': self.CONTENT_CATEGORIES[5]
+      'truck': self.CONTENT_CATEGORIES[5], 'boat': self.CONTENT_CATEGORIES[5],
+      'traffic light': self.CONTENT_CATEGORIES[14], 'fire hydrant': self.CONTENT_CATEGORIES[14],
+      'street sign': self.CONTENT_CATEGORIES[14], 'stop sign': self.CONTENT_CATEGORIES[14],
+      'parking meter': self.CONTENT_CATEGORIES[14], 'bench': self.CONTENT_CATEGORIES[14],
+      'hat': self.CONTENT_CATEGORIES[25], 'backpack': self.CONTENT_CATEGORIES[25],
+      'umbrella': self.CONTENT_CATEGORIES[25], 'shoe': self.CONTENT_CATEGORIES[25],
+      'eye glasses': self.CONTENT_CATEGORIES[25], 'handbag': self.CONTENT_CATEGORIES[25],
+      'tie': self.CONTENT_CATEGORIES[25], 'suitcase': self.CONTENT_CATEGORIES[25],
+      'bottle': self.CONTENT_CATEGORIES[1], 'plate': self.CONTENT_CATEGORIES[1],
+      'wine glass': self.CONTENT_CATEGORIES[1], 'cup': self.CONTENT_CATEGORIES[1],
+      'fork': self.CONTENT_CATEGORIES[1], 'knife': self.CONTENT_CATEGORIES[1],
+      'spoon': self.CONTENT_CATEGORIES[1], 'bowl': self.CONTENT_CATEGORIES[1],
+      'chair': self.CONTENT_CATEGORIES[25], 'couch': self.CONTENT_CATEGORIES[23],
+      'mirror': self.CONTENT_CATEGORIES[23], 'dining table': self.CONTENT_CATEGORIES[23],
+      'window': self.CONTENT_CATEGORIES[23], 'desk': self.CONTENT_CATEGORIES[23],
+      'toilet': self.CONTENT_CATEGORIES[23], 'door': self.CONTENT_CATEGORIES[23],
+      'tv': self.CONTENT_CATEGORIES[25], 'laptop': self.CONTENT_CATEGORIES[25],
+      'mouse': self.CONTENT_CATEGORIES[25], 'remote': self.CONTENT_CATEGORIES[25],
+      'keyboard': self.CONTENT_CATEGORIES[25], 'phone': self.CONTENT_CATEGORIES[25],
+      'microwave': self.CONTENT_CATEGORIES[25], 'oven': self.CONTENT_CATEGORIES[25],
+      'toaster': self.CONTENT_CATEGORIES[25], 'sink': self.CONTENT_CATEGORIES[25],
+      'refrigerator': self.CONTENT_CATEGORIES[25], 'blender': self.CONTENT_CATEGORIES[25],
+      'book': self.CONTENT_CATEGORIES[25], 'clock': self.CONTENT_CATEGORIES[25],
+      'vase': self.CONTENT_CATEGORIES[25], 'scissors': self.CONTENT_CATEGORIES[25],
+      'drier': self.CONTENT_CATEGORIES[25], 'bed': self.CONTENT_CATEGORIES[23],
+      'toothbrush': self.CONTENT_CATEGORIES[25], 'hair brush': self.CONTENT_CATEGORIES[25]
     }
     self.IMAGE_CLASSIFICATION_CLASSES_TO_CATEGORY = {
       'barn_spider': self.CONTENT_CATEGORIES[0], 'black_and_gold_garden_spider':
