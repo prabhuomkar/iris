@@ -1,0 +1,4 @@
+torch==1.9.0
+torch-model-archiver==0.4.2
+torchserve==0.4.2
+torchvision==0.10.0
