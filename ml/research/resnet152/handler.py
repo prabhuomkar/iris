@@ -215,15 +215,15 @@ class ImageClassifier(PImageClassifier):
     'kit_fox': 'ANIMALS', 'red_fox': 'ANIMALS', 'red_wolf':
     'ANIMALS', 'timber_wolf': 'ANIMALS', 'white_wolf':
     'ANIMALS', 'dhole': 'ANIMALS', 'Windsor_tie':
-    'PETS', 'backpack': 'PETS', 'bolo_tie':
-    'PETS', 'bow_tie': 'PETS', 'buckle': 'PETS',
-    'feather_boa': 'PETS', 'gasmask': 'PETS',
-    'hair_slide': 'PETS', 'handkerchief': 'PETS',
-    'lipstick': 'PETS', 'mailbag': 'PETS',
-    'neck_brace': 'PETS', 'necklace': 'PETS', 'purse':
-    'PETS', 'sleeping_bag': 'PETS', 'stole':
-    'PETS', 'umbrella': 'PETS', 'wallet':
-    'PETS', 'airliner': 'TRAVEL', 'airship': 'TRAVEL',
+    'UTILITY', 'backpack': 'UTILITY', 'bolo_tie':
+    'UTILITY', 'bow_tie': 'UTILITY', 'buckle': 'UTILITY',
+    'feather_boa': 'UTILITY', 'gasmask': 'UTILITY',
+    'hair_slide': 'UTILITY', 'handkerchief': 'UTILITY',
+    'lipstick': 'UTILITY', 'mailbag': 'UTILITY',
+    'neck_brace': 'UTILITY', 'necklace': 'UTILITY', 'purse':
+    'UTILITY', 'sleeping_bag': 'UTILITY', 'stole':
+    'UTILITY', 'umbrella': 'UTILITY', 'wallet':
+    'UTILITY', 'airliner': 'TRAVEL', 'airship': 'TRAVEL',
     'parachute': 'TRAVEL', 'space_shuttle': 'TRAVEL',
     'warplane': 'TRAVEL', 'baseball': 'SPORT',
     'basketball': 'SPORT', 'croquet_ball': 'SPORT',
@@ -275,63 +275,63 @@ class ImageClassifier(PImageClassifier):
     'FASHION', 'sunglasses': 'FASHION', 'sweatshirt':
     'FASHION', 'swimming_trunks': 'FASHION', 'trench_coat':
     'FASHION', 'vestment': 'FASHION', 'wig': 'FASHION',
-    'barrel': 'PETS', 'carton': 'PETS', 'chest':
-    'PETS', 'crate': 'PETS', 'medicine_chest':
-    'PETS', 'milk_can': 'PETS', 'packet':
-    'PETS', 'pill_bottle': 'PETS', 'plastic_bag':
-    'PETS', 'rain_barrel': 'PETS', 'safe':
-    'PETS', 'shopping_basket': 'PETS', 'shopping_cart':
-    'PETS', 'vault': 'PETS', 'washbasin':
-    'PETS', 'water_bottle': 'PETS', 'water_jug':
-    'PETS', 'whiskey_jug': 'PETS', 'Crock_Pot':
-    'PETS', 'Dutch_oven': 'PETS', 'caldron':
-    'PETS', 'cleaver': 'PETS', 'cocktail_shaker':
-    'PETS', 'coffee_mug': 'PETS', 'coffeepot':
-    'PETS', 'corkscrew': 'PETS', 'cup': 'PETS',
-    'espresso_maker': 'PETS', 'frying_pan': 'PETS',
-    'goblet': 'PETS', 'hot_pot': 'PETS', 'ladle':
-    'PETS', 'measuring_cup': 'PETS', 'mixing_bowl':
-    'PETS', 'mortar': 'PETS', 'pitcher': 'PETS',
-    'plate': 'PETS', 'pot': 'PETS', 'rotisserie':
-    'PETS', 'soup_bowl': 'PETS', 'spatula':
-    'PETS', 'strainer': 'PETS', 'teapot':
-    'PETS', 'wok': 'PETS', 'wooden_spoon':
-    'PETS', 'Christmas_stocking': 'PETS', 'analog_clock':
-    'PETS', 'bath_towel': 'PETS', 'brass':
-    'PETS', 'dishrag': 'PETS', 'doormat':
-    'PETS', 'hamper': 'PETS', 'lampshade':
-    'PETS', 'piggy_bank': 'PETS', 'pillow':
-    'PETS', 'plate_rack': 'PETS', 'prayer_rug':
-    'PETS', 'quilt': 'PETS', 'screen': 'PETS',
-    'shower_curtain': 'PETS', 'soap_dispenser': 'PETS',
-    'table_lamp': 'PETS', 'theater_curtain': 'PETS',
-    'tray': 'PETS', 'vase': 'PETS',
-    'window_screen': 'PETS', 'window_shade': 'PETS',
-    'CD_player': 'PETS', 'Polaroid_camera': 'PETS',
-    'cassette_player': 'PETS', 'cellular_telephone':
-    'PETS', 'computer_keyboard': 'PETS', 'desktop_computer':
-    'PETS', 'dial_telephone': 'PETS', 'digital_clock':
-    'PETS', 'digital_watch': 'PETS', 'dishwasher':
-    'PETS', 'electric_fan': 'PETS', 'hand-held_computer':
-    'PETS', 'hand_blower': 'PETS', 'hard_disc':
-    'PETS', 'iPod': 'PETS', 'joystick': 'PETS',
-    'laptop': 'PETS', 'loudspeaker': 'PETS',
-    'microphone': 'PETS', 'microwave': 'PETS',
-    'modem': 'PETS', 'monitor': 'PETS',
-    'odometer': 'PETS', 'oscilloscope': 'PETS',
-    'parking_meter': 'PETS', 'pay-phone': 'PETS',
-    'photocopier': 'PETS', 'power_drill': 'PETS',
-    'printer': 'PETS', 'projector': 'PETS',
-    'radiator': 'PETS', 'radio': 'PETS',
-    'reflex_camera': 'PETS', 'remote_control': 'PETS',
-    'scale': 'PETS', 'slot': 'PETS', 'space_bar':
-    'PETS', 'space_heater': 'PETS', 'spotlight':
-    'PETS', 'stopwatch': 'PETS', 'switch':
-    'PETS', 'tape_player': 'PETS', 'television':
-    'PETS', 'toaster': 'PETS', 'traffic_light':
-    'PETS', 'typewriter_keyboard': 'PETS', 'vacuum':
-    'PETS', 'waffle_iron': 'PETS', 'washer':
-    'PETS', 'chainlink_fence': 'HOUSES', 'picket_fence':
+    'barrel': 'UTILITY', 'carton': 'UTILITY', 'chest':
+    'UTILITY', 'crate': 'UTILITY', 'medicine_chest':
+    'UTILITY', 'milk_can': 'UTILITY', 'packet':
+    'UTILITY', 'pill_bottle': 'UTILITY', 'plastic_bag':
+    'UTILITY', 'rain_barrel': 'UTILITY', 'safe':
+    'UTILITY', 'shopping_basket': 'UTILITY', 'shopping_cart':
+    'UTILITY', 'vault': 'UTILITY', 'washbasin':
+    'UTILITY', 'water_bottle': 'UTILITY', 'water_jug':
+    'UTILITY', 'whiskey_jug': 'UTILITY', 'Crock_Pot':
+    'UTILITY', 'Dutch_oven': 'UTILITY', 'caldron':
+    'UTILITY', 'cleaver': 'UTILITY', 'cocktail_shaker':
+    'UTILITY', 'coffee_mug': 'UTILITY', 'coffeepot':
+    'UTILITY', 'corkscrew': 'UTILITY', 'cup': 'UTILITY',
+    'espresso_maker': 'UTILITY', 'frying_pan': 'UTILITY',
+    'goblet': 'UTILITY', 'hot_pot': 'UTILITY', 'ladle':
+    'UTILITY', 'measuring_cup': 'UTILITY', 'mixing_bowl':
+    'UTILITY', 'mortar': 'UTILITY', 'pitcher': 'UTILITY',
+    'plate': 'UTILITY', 'pot': 'UTILITY', 'rotisserie':
+    'UTILITY', 'soup_bowl': 'UTILITY', 'spatula':
+    'UTILITY', 'strainer': 'UTILITY', 'teapot':
+    'UTILITY', 'wok': 'UTILITY', 'wooden_spoon':
+    'UTILITY', 'Christmas_stocking': 'UTILITY', 'analog_clock':
+    'UTILITY', 'bath_towel': 'UTILITY', 'brass':
+    'UTILITY', 'dishrag': 'UTILITY', 'doormat':
+    'UTILITY', 'hamper': 'UTILITY', 'lampshade':
+    'UTILITY', 'piggy_bank': 'UTILITY', 'pillow':
+    'UTILITY', 'plate_rack': 'UTILITY', 'prayer_rug':
+    'UTILITY', 'quilt': 'UTILITY', 'screen': 'UTILITY',
+    'shower_curtain': 'UTILITY', 'soap_dispenser': 'UTILITY',
+    'table_lamp': 'UTILITY', 'theater_curtain': 'UTILITY',
+    'tray': 'UTILITY', 'vase': 'UTILITY',
+    'window_screen': 'UTILITY', 'window_shade': 'UTILITY',
+    'CD_player': 'UTILITY', 'Polaroid_camera': 'UTILITY',
+    'cassette_player': 'UTILITY', 'cellular_telephone':
+    'UTILITY', 'computer_keyboard': 'UTILITY', 'desktop_computer':
+    'UTILITY', 'dial_telephone': 'UTILITY', 'digital_clock':
+    'UTILITY', 'digital_watch': 'UTILITY', 'dishwasher':
+    'UTILITY', 'electric_fan': 'UTILITY', 'hand-held_computer':
+    'UTILITY', 'hand_blower': 'UTILITY', 'hard_disc':
+    'UTILITY', 'iPod': 'UTILITY', 'joystick': 'UTILITY',
+    'laptop': 'UTILITY', 'loudspeaker': 'UTILITY',
+    'microphone': 'UTILITY', 'microwave': 'UTILITY',
+    'modem': 'UTILITY', 'monitor': 'UTILITY',
+    'odometer': 'UTILITY', 'oscilloscope': 'UTILITY',
+    'parking_meter': 'UTILITY', 'pay-phone': 'UTILITY',
+    'photocopier': 'UTILITY', 'power_drill': 'UTILITY',
+    'printer': 'UTILITY', 'projector': 'UTILITY',
+    'radiator': 'UTILITY', 'radio': 'UTILITY',
+    'reflex_camera': 'UTILITY', 'remote_control': 'UTILITY',
+    'scale': 'UTILITY', 'slot': 'UTILITY', 'space_bar':
+    'UTILITY', 'space_heater': 'UTILITY', 'spotlight':
+    'UTILITY', 'stopwatch': 'UTILITY', 'switch':
+    'UTILITY', 'tape_player': 'UTILITY', 'television':
+    'UTILITY', 'toaster': 'UTILITY', 'traffic_light':
+    'UTILITY', 'typewriter_keyboard': 'UTILITY', 'vacuum':
+    'UTILITY', 'waffle_iron': 'UTILITY', 'washer':
+    'UTILITY', 'chainlink_fence': 'HOUSES', 'picket_fence':
     'HOUSES', 'worm_fence': 'HOUSES', 'French_loaf':
     'FOOD', 'bagel': 'FOOD', 'beer_bottle':
     'FOOD', 'beer_glass': 'FOOD', 'burrito':
@@ -345,49 +345,49 @@ class ImageClassifier(PImageClassifier):
     'FOOD', 'pop_bottle': 'FOOD', 'potpie':
     'FOOD', 'pretzel': 'FOOD', 'red_wine': 'FOOD',
     'saltshaker': 'FOOD', 'trifle': 'FOOD',
-    'wine_bottle': 'FOOD', 'altar': 'PETS', 'ashcan':
-    'PETS', 'bannister': 'PETS', 'barber_chair':
-    'PETS', 'bassinet': 'PETS', 'bathtub':
-    'PETS', 'bookcase': 'PETS', 'chiffonier':
-    'PETS', 'china_cabinet': 'PETS', 'cradle':
-    'PETS', 'crib': 'PETS', 'desk': 'PETS',
-    'dining_table': 'PETS', 'entertainment_center':
-    'PETS', 'file': 'PETS', 'fire_screen':
-    'PETS', 'folding_chair': 'PETS', 'four-poster':
-    'PETS', 'mailbox': 'PETS', 'park_bench':
-    'PETS', 'pedestal': 'PETS', 'pool_table':
-    'PETS', 'refrigerator': 'PETS', 'rocking_chair':
-    'PETS', 'shoji': 'PETS', 'sliding_door':
-    'PETS', 'stage': 'PETS', 'stove': 'PETS',
-    'stretcher': 'PETS', 'studio_couch': 'PETS',
-    'throne': 'PETS', 'toilet_seat': 'PETS',
-    'tub': 'PETS', 'wardrobe': 'PETS',
-    'bathing_cap': 'PETS', 'bearskin': 'PETS',
-    'bonnet': 'PETS', 'crash_helmet': 'PETS',
-    'mortarboard': 'PETS', 'shower_cap': 'PETS',
-    'sombrero': 'PETS', 'pickelhaube': 'PETS',
-    'French_horn': 'PETS', 'accordion': 'PETS',
-    'acoustic_guitar': 'PETS', 'banjo': 'PETS', 'bassoon':
-    'PETS', 'cello': 'PETS', 'chime': 'PETS',
-    'cornet': 'PETS', 'drum': 'PETS', 'drumstick':
-    'PETS', 'electric_guitar': 'PETS', 'flute':
-    'PETS', 'gong': 'PETS', 'grand_piano':
-    'PETS', 'harmonica': 'PETS', 'harp': 'PETS',
-    'maraca': 'PETS', 'marimba': 'PETS', 'oboe':
-    'PETS', 'ocarina': 'PETS', 'organ': 'PETS',
-    'panpipe': 'PETS', 'pick': 'PETS', 'sax':
-    'PETS', 'steel_drum': 'PETS', 'trombone':
-    'PETS', 'upright': 'PETS', 'violin': 'PETS',
-    'Petri_dish': 'PETS', 'beaker': 'PETS',
-    'Band_Aid': 'PETS', 'bottlecap': 'PETS',
-    'bubble': 'PETS', 'face_powder': 'PETS',
-    'hair_spray': 'PETS', 'hay': 'PETS', 'honeycomb':
-    'PETS', 'knot': 'PETS', 'lotion': 'PETS',
-    'mosquito_net': 'PETS', 'muzzle': 'PETS', 'nipple':
-    'PETS', 'pencil_box': 'PETS', 'perfume':
-    'PETS', 'sunscreen': 'PETS', 'toilet_tissue':
-    'PETS', 'velvet': 'PETS', 'wing': 'PETS',
-    'wool': 'PETS', 'alp': 'LANDSCAPES', 'apiary':
+    'wine_bottle': 'FOOD', 'altar': 'UTILITY', 'ashcan':
+    'UTILITY', 'bannister': 'UTILITY', 'barber_chair':
+    'UTILITY', 'bassinet': 'UTILITY', 'bathtub':
+    'UTILITY', 'bookcase': 'UTILITY', 'chiffonier':
+    'UTILITY', 'china_cabinet': 'UTILITY', 'cradle':
+    'UTILITY', 'crib': 'UTILITY', 'desk': 'UTILITY',
+    'dining_table': 'UTILITY', 'entertainment_center':
+    'UTILITY', 'file': 'UTILITY', 'fire_screen':
+    'UTILITY', 'folding_chair': 'UTILITY', 'four-poster':
+    'UTILITY', 'mailbox': 'UTILITY', 'park_bench':
+    'UTILITY', 'pedestal': 'UTILITY', 'pool_table':
+    'UTILITY', 'refrigerator': 'UTILITY', 'rocking_chair':
+    'UTILITY', 'shoji': 'UTILITY', 'sliding_door':
+    'UTILITY', 'stage': 'UTILITY', 'stove': 'UTILITY',
+    'stretcher': 'UTILITY', 'studio_couch': 'UTILITY',
+    'throne': 'UTILITY', 'toilet_seat': 'UTILITY',
+    'tub': 'UTILITY', 'wardrobe': 'UTILITY',
+    'bathing_cap': 'UTILITY', 'bearskin': 'UTILITY',
+    'bonnet': 'UTILITY', 'crash_helmet': 'UTILITY',
+    'mortarboard': 'UTILITY', 'shower_cap': 'UTILITY',
+    'sombrero': 'UTILITY', 'pickelhaube': 'UTILITY',
+    'French_horn': 'UTILITY', 'accordion': 'UTILITY',
+    'acoustic_guitar': 'UTILITY', 'banjo': 'UTILITY', 'bassoon':
+    'UTILITY', 'cello': 'UTILITY', 'chime': 'UTILITY',
+    'cornet': 'UTILITY', 'drum': 'UTILITY', 'drumstick':
+    'UTILITY', 'electric_guitar': 'UTILITY', 'flute':
+    'UTILITY', 'gong': 'UTILITY', 'grand_piano':
+    'UTILITY', 'harmonica': 'UTILITY', 'harp': 'UTILITY',
+    'maraca': 'UTILITY', 'marimba': 'UTILITY', 'oboe':
+    'UTILITY', 'ocarina': 'UTILITY', 'organ': 'UTILITY',
+    'panpipe': 'UTILITY', 'pick': 'UTILITY', 'sax':
+    'UTILITY', 'steel_drum': 'UTILITY', 'trombone':
+    'UTILITY', 'upright': 'UTILITY', 'violin': 'UTILITY',
+    'Petri_dish': 'UTILITY', 'beaker': 'UTILITY',
+    'Band_Aid': 'UTILITY', 'bottlecap': 'UTILITY',
+    'bubble': 'UTILITY', 'face_powder': 'UTILITY',
+    'hair_spray': 'UTILITY', 'hay': 'UTILITY', 'honeycomb':
+    'UTILITY', 'knot': 'UTILITY', 'lotion': 'UTILITY',
+    'mosquito_net': 'UTILITY', 'muzzle': 'UTILITY', 'nipple':
+    'UTILITY', 'pencil_box': 'UTILITY', 'perfume':
+    'UTILITY', 'sunscreen': 'UTILITY', 'toilet_tissue':
+    'UTILITY', 'velvet': 'UTILITY', 'wing': 'UTILITY',
+    'wool': 'UTILITY', 'alp': 'LANDSCAPES', 'apiary':
     'LANDSCAPES', 'birdhouse': 'LANDSCAPES', 'breakwater':
     'LANDSCAPES', 'cliff': 'LANDSCAPES', 'dam': 'LANDSCAPES',
     'dock': 'LANDSCAPES', 'drilling_platform': 'LANDSCAPES',
@@ -402,11 +402,11 @@ class ImageClassifier(PImageClassifier):
     'totem_pole': 'LANDSCAPES', 'triumphal_arch': 'LANDSCAPES',
     'valley': 'LANDSCAPES', 'viaduct': 'LANDSCAPES', 'volcano':
     'LANDSCAPES', 'water_tower': 'LANDSCAPES', 'binder':
-    'PETS', 'book_jacket': 'PETS', 'comic_book':
-    'PETS', 'crossword_puzzle': 'PETS', 'envelope':
-    'PETS', 'jigsaw_puzzle': 'PETS', 'menu':
-    'PETS', 'notebook': 'PETS', 'paper_towel':
-    'PETS', 'balance_beam': 'SPORT', 'barbell':
+    'UTILITY', 'book_jacket': 'UTILITY', 'comic_book':
+    'UTILITY', 'crossword_puzzle': 'UTILITY', 'envelope':
+    'UTILITY', 'jigsaw_puzzle': 'UTILITY', 'menu':
+    'UTILITY', 'notebook': 'UTILITY', 'paper_towel':
+    'UTILITY', 'balance_beam': 'SPORT', 'barbell':
     'SPORT', 'football_helmet': 'SPORT', 'horizontal_bar':
     'SPORT', 'paddle': 'SPORT', 'parallel_bars':
     'SPORT', 'pole': 'SPORT', 'puck': 'SPORT',
@@ -425,58 +425,58 @@ class ImageClassifier(PImageClassifier):
     'ANIMALS', 'spindle': 'ANIMALS', 'tripod': 'ANIMALS',
     'turnstile': 'ANIMALS', 'vending_machine': 'ANIMALS',
     'wall_clock': 'ANIMALS', 'web_site': 'ANIMALS',
-    'ballpoint': 'PETS', 'barrow': 'PETS',
-    'binoculars': 'PETS', 'broom': 'PETS', 'bucket':
-    'PETS', 'can_opener': 'PETS', 'candle':
-    'PETS', "carpenter's_kit": 'PETS', 'chain':
-    'PETS', 'chain_saw': 'PETS', 'crutch':
-    'PETS', 'dumbbell': 'PETS', 'fountain_pen':
-    'PETS', 'hammer': 'PETS', 'hatchet': 'PETS',
-    'hook': 'PETS', 'iron': 'PETS',
-    'letter_opener': 'PETS', 'lighter': 'PETS', 'loupe':
-    'PETS', 'magnetic_compass': 'PETS', 'matchstick':
-    'PETS', 'nail': 'PETS', 'paintbrush':
-    'PETS', 'pencil_sharpener': 'PETS', 'plane':
-    'PETS', 'plunger': 'PETS', "potter's_wheel":
-    'PETS', 'quill': 'PETS', 'rubber_eraser':
-    'PETS', 'rule': 'PETS', 'safety_pin':
-    'PETS', 'screw': 'PETS', 'screwdriver':
-    'PETS', 'shield': 'PETS', 'shovel': 'PETS',
-    'stethoscope': 'PETS', 'sunglass': 'PETS', 'swab':
-    'PETS', 'syringe': 'PETS', 'thimble':
-    'PETS', 'torch': 'PETS', 'whistle': 'PETS',
+    'ballpoint': 'UTILITY', 'barrow': 'UTILITY',
+    'binoculars': 'UTILITY', 'broom': 'UTILITY', 'bucket':
+    'UTILITY', 'can_opener': 'UTILITY', 'candle':
+    'UTILITY', "carpenter's_kit": 'UTILITY', 'chain':
+    'UTILITY', 'chain_saw': 'UTILITY', 'crutch':
+    'UTILITY', 'dumbbell': 'UTILITY', 'fountain_pen':
+    'UTILITY', 'hammer': 'UTILITY', 'hatchet': 'UTILITY',
+    'hook': 'UTILITY', 'iron': 'UTILITY',
+    'letter_opener': 'UTILITY', 'lighter': 'UTILITY', 'loupe':
+    'UTILITY', 'magnetic_compass': 'UTILITY', 'matchstick':
+    'UTILITY', 'nail': 'UTILITY', 'paintbrush':
+    'UTILITY', 'pencil_sharpener': 'UTILITY', 'plane':
+    'UTILITY', 'plunger': 'UTILITY', "potter's_wheel":
+    'UTILITY', 'quill': 'UTILITY', 'rubber_eraser':
+    'UTILITY', 'rule': 'UTILITY', 'safety_pin':
+    'UTILITY', 'screw': 'UTILITY', 'screwdriver':
+    'UTILITY', 'shield': 'UTILITY', 'shovel': 'UTILITY',
+    'stethoscope': 'UTILITY', 'sunglass': 'UTILITY', 'swab':
+    'UTILITY', 'syringe': 'UTILITY', 'thimble':
+    'UTILITY', 'torch': 'UTILITY', 'whistle': 'UTILITY',
     'balloon': 'BIRTHDAYS', 'pinwheel': 'BIRTHDAYS', 'swing':
     'BIRTHDAYS', 'teddy': 'BIRTHDAYS', 'bullet_train':
     'TRAVEL', 'electric_locomotive': 'TRAVEL', 'freight_car':
     'TRAVEL', 'steam_locomotive': 'TRAVEL', 'Model_T':
-    'PETS', 'ambulance': 'PETS', 'amphibian':
-    'PETS', 'beach_wagon': 'PETS', 'bicycle-built-for-two':
-    'PETS', 'bobsled': 'PETS', 'cab': 'PETS',
-    'convertible': 'PETS', 'crane': 'PETS', 'dogsled':
-    'PETS', 'fire_engine': 'PETS', 'forklift':
-    'PETS', 'garbage_truck': 'PETS', 'go-kart':
-    'PETS', 'golfcart': 'PETS', 'grille':
-    'PETS', 'half_track': 'PETS', 'harvester':
-    'PETS', 'horse_cart': 'PETS', 'jeep':
-    'PETS', 'jinrikisha': 'PETS', 'lawn_mower':
-    'PETS', 'limousine': 'PETS', 'minibus':
-    'PETS', 'minivan': 'PETS', 'moped': 'PETS',
-    'motor_scooter': 'PETS', 'mountain_bike': 'PETS',
-    'moving_van': 'PETS', 'oxcart': 'PETS',
-    'passenger_car': 'PETS', 'pickup': 'PETS', 'plow':
-    'PETS', 'police_van': 'PETS', 'racer':
-    'PETS', 'recreational_vehicle': 'PETS', 'school_bus':
-    'PETS', 'snowmobile': 'PETS', 'snowplow':
-    'PETS', 'sports_car': 'PETS', 'streetcar':
-    'PETS', 'tank': 'PETS', 'thresher': 'PETS',
-    'tow_truck': 'PETS', 'tractor': 'PETS',
-    'trailer_truck': 'PETS', 'tricycle': 'PETS',
-    'trolleybus': 'PETS', 'unicycle': 'PETS',
-    'assault_rifle': 'PETS', 'bow': 'PETS', 'cannon':
-    'PETS', 'guillotine': 'PETS', 'holster':
-    'PETS', 'missile': 'PETS', 'projectile':
-    'PETS', 'revolver': 'PETS', 'rifle': 'PETS',
-    'scabbard': 'PETS',
+    'UTILITY', 'ambulance': 'UTILITY', 'amphibian':
+    'UTILITY', 'beach_wagon': 'UTILITY', 'bicycle-built-for-two':
+    'UTILITY', 'bobsled': 'UTILITY', 'cab': 'UTILITY',
+    'convertible': 'UTILITY', 'crane': 'UTILITY', 'dogsled':
+    'UTILITY', 'fire_engine': 'UTILITY', 'forklift':
+    'UTILITY', 'garbage_truck': 'UTILITY', 'go-kart':
+    'UTILITY', 'golfcart': 'UTILITY', 'grille':
+    'UTILITY', 'half_track': 'UTILITY', 'harvester':
+    'UTILITY', 'horse_cart': 'UTILITY', 'jeep':
+    'UTILITY', 'jinrikisha': 'UTILITY', 'lawn_mower':
+    'UTILITY', 'limousine': 'UTILITY', 'minibus':
+    'UTILITY', 'minivan': 'UTILITY', 'moped': 'UTILITY',
+    'motor_scooter': 'UTILITY', 'mountain_bike': 'UTILITY',
+    'moving_van': 'UTILITY', 'oxcart': 'UTILITY',
+    'passenger_car': 'UTILITY', 'pickup': 'UTILITY', 'plow':
+    'UTILITY', 'police_van': 'UTILITY', 'racer':
+    'UTILITY', 'recreational_vehicle': 'UTILITY', 'school_bus':
+    'UTILITY', 'snowmobile': 'UTILITY', 'snowplow':
+    'UTILITY', 'sports_car': 'UTILITY', 'streetcar':
+    'UTILITY', 'tank': 'UTILITY', 'thresher': 'UTILITY',
+    'tow_truck': 'UTILITY', 'tractor': 'UTILITY',
+    'trailer_truck': 'UTILITY', 'tricycle': 'UTILITY',
+    'trolleybus': 'UTILITY', 'unicycle': 'UTILITY',
+    'assault_rifle': 'UTILITY', 'bow': 'UTILITY', 'cannon':
+    'UTILITY', 'guillotine': 'UTILITY', 'holster':
+    'UTILITY', 'missile': 'UTILITY', 'projectile':
+    'UTILITY', 'revolver': 'UTILITY', 'rifle': 'UTILITY',
+    'scabbard': 'UTILITY',
   }
 
   def postprocess(self, data):
