@@ -5,6 +5,7 @@ from ts.utils.util import map_class_to_label
 
 
 class ImageClassifier(PImageClassifier):
+  """Image Classifier"""
   IMAGE_CLASSIFICATION_CLASSES_TO_CATEGORY = {
     'barn_spider': 'ANIMALS', 'black_and_gold_garden_spider':
     'ANIMALS', 'black_widow': 'ANIMALS', 'garden_spider':
@@ -477,15 +478,15 @@ class ImageClassifier(PImageClassifier):
     'PETS', 'revolver': 'PETS', 'rifle': 'PETS',
     'scabbard': 'PETS',
   }
-  """Image Classifier"""
+
   def postprocess(self, data):
     # get results from pytorch inferencing
     ps = F.softmax(data, dim=1)
-    probs, classes = torch.topk(ps, self.topk, dim=1)
+    probs, classes = torch.topk(ps, self.topk, dim=1) # pylint: disable=no-member
     probs = probs.tolist()
     classes = classes.tolist()
     results = map_class_to_label(probs, self.mapping, classes)
-    # customizing based on skim requirements
+    # customizing based on iris requirements
     results = results[0]
     result_classes = []
     content_categories = []
