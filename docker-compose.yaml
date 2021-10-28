@@ -29,7 +29,7 @@ services:
     image: pytorch/torchserve
     restart: always
     container_name: ml
-    command: './scripts/download_model_archives.sh && ./scripts/start.sh'
+    command: './scripts/download_model_weights.sh && ./scripts/generate_model_archives.sh && ./scripts/start.sh'
     ports:
       - '5002:5002'
     volumes:
