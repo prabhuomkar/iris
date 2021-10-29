@@ -1,10 +1,10 @@
 import React from 'react';
 import { Grid, GridCell } from '@rmwc/grid';
 import { gql, useQuery } from '@apollo/client';
-import { ExploreEntity } from '../../components';
+import { Loading, Error, ExploreEntity } from '../../components';
 
 const GET_PLACES = gql`
-  query GetPlaces($entityType: String!) {
+  query getPlaces($entityType: String!) {
     entities(entityType: $entityType, limit: 7) {
       totalCount
       nodes {
@@ -17,37 +17,14 @@ const GET_PLACES = gql`
 `;
 
 const Places = () => {
+  const url = window.location.pathname;
+  const type = url.split('/').pop();
+
   const { error: placesError, data: placesData } = useQuery(GET_PLACES, {
     variables: { entityType: 'places' },
   });
 
-  if (placesError) return `Error! ${error.message}`;
-  console.log(placesData);
-
-  /*
-  const placesData = [
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-    { image: '/places.jpg', label: 'Places' },
-  ];
-  */
+  if (placesError) return <Error />;
 
   return (
     <>
@@ -60,12 +37,12 @@ const Places = () => {
           </Grid>
           <Grid>
             <GridCell desktop={12} tablet={12} phone={12}>
-              <ExploreEntity data={placesData.entities.nodes} />
+              <ExploreEntity type={type} data={placesData.entities.nodes} />
             </GridCell>
           </Grid>
         </>
       ) : (
-        <>Loading...</>
+        <Loading />
       )}
     </>
   );

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.4.11",
+    "@rmwc/circular-progress": "^6.1.4",
     "@rmwc/dialog": "^6.1.4",
     "@rmwc/drawer": "^6.1.4",
     "@rmwc/grid": "^6.1.4",

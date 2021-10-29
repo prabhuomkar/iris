@@ -11,7 +11,7 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
-import { Loading } from '../components';
+import { Loading, Error } from '../components';
 import { gql, useQuery } from '@apollo/client';
 import '@rmwc/list/styles';
 
@@ -24,6 +24,9 @@ const GET_MEDIA_ITEM = gql`
       mimeType
       fileName
       fileSize
+      entities {
+        name
+      }
       mediaMetadata {
         creationTime
         width
@@ -53,8 +56,7 @@ const Photo = () => {
     variables: { id },
   });
 
-  if (error) return `Error! ${error.message}`;
-  console.log(data);
+  if (error) return <Error />;
 
   return (
     <>
@@ -127,14 +129,30 @@ const Photo = () => {
                     </ListItem>
                   </>
                 )}
-              <ListItem>
-                <ListItemGraphic icon="location_on" />
-                <ListItemText>
-                  <ListItemPrimaryText>NA</ListItemPrimaryText>
-                  <ListItemSecondaryText>NA</ListItemSecondaryText>
-                </ListItemText>
-              </ListItem>
             </List>
+            {data.mediaItem?.entities && (
+              <>
+                <List>
+                  {data.mediaItem?.mediaMetadata?.location &&
+                  data.mediaItem.mediaMetadata?.location?.latitude &&
+                  data.mediaItem.mediaMetadata?.location?.longitude ? (
+                    <ListItem>
+                      <ListItemGraphic icon="location_on" />
+                      <ListItemText>
+                        {data.mediaItem?.entities[0]?.name}
+                      </ListItemText>
+                    </ListItem>
+                  ) : (
+                    <ListItem>
+                      <ListItemGraphic icon="visibility" />
+                      <ListItemText>
+                        {data.mediaItem?.entities.map((e) => e.name).join(', ')}
+                      </ListItemText>
+                    </ListItem>
+                  )}
+                </List>
+              </>
+            )}
           </GridCell>
         </Grid>
       ) : (

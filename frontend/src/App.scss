@@ -151,3 +151,7 @@ p {
   display: flex;
   justify-content: space-between;
 }
+
+.mdc-image-list__image-aspect-container .mdc-image-list__image {
+  object-fit: cover !important;
+}

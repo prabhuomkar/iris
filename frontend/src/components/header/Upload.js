@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { TopAppBarActionItem } from '@rmwc/top-app-bar';
+import { TopAppBarSection } from '@rmwc/top-app-bar';
+import { Button } from '@rmwc/button';
+import '@rmwc/button/styles';
 import UploadDialog from '../UploadDialog';
 
 const Upload = () => {
@@ -8,7 +10,14 @@ const Upload = () => {
   return (
     <>
       <UploadDialog open={open} setOpen={setOpen} />
-      <TopAppBarActionItem icon="file_upload" onClick={() => setOpen(true)} />
+      {/*<TopAppBarActionItem icon="file_upload" onClick={() => setOpen(true)} />*/}
+      <TopAppBarSection alignEnd>
+        <Button
+          label="Upload"
+          icon="file_upload"
+          onClick={() => setOpen(true)}
+        />
+      </TopAppBarSection>
     </>
   );
 };

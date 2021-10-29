@@ -13,14 +13,14 @@ import '@rmwc/dialog/styles';
 import { LinearProgress } from '@rmwc/linear-progress';
 import '@rmwc/linear-progress/styles';
 
-const MUTATION = gql`
+const UPLOAD_IMAGE = gql`
   mutation ($file: Upload!) {
     upload(file: $file)
   }
 `;
 
 const UploadDialog = ({ open, setOpen }) => {
-  const [mutate, { data, loading, error }] = useMutation(MUTATION);
+  const [mutate, { data, loading, error }] = useMutation(UPLOAD_IMAGE);
   let history = useHistory();
 
   const onChange = ({
@@ -33,18 +33,11 @@ const UploadDialog = ({ open, setOpen }) => {
   };
 
   if (data && data.upload) {
-    // console.log(data.upload);
     setTimeout(() => {
       history.push('/');
       history.go(0);
       setOpen(false);
     }, 2000);
-  }
-  if (loading) {
-    console.log(loading);
-  }
-  if (error) {
-    console.log(error);
   }
 
   return (
@@ -66,8 +59,16 @@ const UploadDialog = ({ open, setOpen }) => {
             <LinearProgress />
           </>
         )}
+        {error && (
+          <>
+            <br /> <span>Sorry, some error occured.</span>
+          </>
+        )}
         {data && data.upload && (
-          <span style={{ color: 'green' }}>Photo uploaded successfully!</span>
+          <>
+            <br />
+            <span style={{ color: '#33691E' }}>Done!</span>
+          </>
         )}
       </DialogContent>
       <DialogActions>

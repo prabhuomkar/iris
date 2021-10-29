@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useHistory } from 'react-router-dom';
 import {
   ImageList,
   ImageListImage,
@@ -11,6 +12,7 @@ import {
 import '@rmwc/image-list/styles';
 
 const ExploreEntityList = ({ data, type }) => {
+  let history = useHistory();
   const stylePeopleList = {
     radius: '50%',
     width: '10%',
@@ -18,8 +20,8 @@ const ExploreEntityList = ({ data, type }) => {
   };
 
   const stylePlacesThigsList = {
-    radius: '6px',
-    width: '13%',
+    radius: '4px',
+    width: '180px',
     margin: '0px 6px 12px 6px',
   };
 
@@ -28,17 +30,16 @@ const ExploreEntityList = ({ data, type }) => {
       <ImageList withTextProtection>
         {data.map((src) => (
           <ImageListItem
-            key={src}
-            style={
-              type === 'PeopleList' ? stylePeopleList : stylePlacesThigsList
-            }
+            key={src.id}
+            style={type === 'people' ? stylePeopleList : stylePlacesThigsList}
           >
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={src.imageUrl}
+                src={`${src.imageUrl}?width=200&height=200`}
+                onClick={() => history.push(`/explore/${type}/${src.id}`)}
                 style={{
                   borderRadius:
-                    type === 'PeopleList'
+                    type === 'people'
                       ? stylePeopleList.radius
                       : stylePlacesThigsList.radius,
                   cursor: 'pointer',

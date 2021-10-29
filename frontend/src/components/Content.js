@@ -7,6 +7,8 @@ import { Explore, People, Places, Things } from '../pages/explore';
 import Sharing from '../pages/Sharing';
 import SideNav from './SideNav';
 import Photo from '../pages/Photo';
+import Entity from '../pages/explore/Entity';
+import Search from '../pages/Search';
 
 const Content = (props) => {
   const { open } = props;
@@ -20,8 +22,11 @@ const Content = (props) => {
           <Route exact path="/explore/people" component={People} />
           <Route exact path="/explore/places" component={Places} />
           <Route exact path="/explore/things" component={Things} />
+          <Route exact path="/explore/places/:id" component={Entity} />
+          <Route exact path="/explore/things/:id" component={Entity} />
           <Route exact path="/sharing" component={Sharing} />
           <Route exact path="/photo/:id" component={Photo} />
+          <Route path="/search" component={Search} />
         </Switch>
       </DrawerAppContent>
     </div>

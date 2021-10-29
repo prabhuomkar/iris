@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, GridCell } from '@rmwc/grid';
-import { LinearProgress } from '@rmwc/linear-progress';
-import '@rmwc/linear-progress/styles';
+import { CircularProgress } from '@rmwc/circular-progress';
+import '@rmwc/circular-progress/styles';
 import '@rmwc/grid/styles';
 
 const Loading = () => {
@@ -10,14 +10,11 @@ const Loading = () => {
       <Grid>
         <GridCell desktop={4} tablet={4} phone={4}></GridCell>
         <GridCell desktop={4} tablet={4} phone={4}>
-          <img src="/images.svg" width="100%" />
-        </GridCell>
-        <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-      </Grid>
-      <Grid>
-        <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-        <GridCell desktop={4} tablet={4} phone={4}>
-          <LinearProgress />
+          <center>
+            <CircularProgress size="xlarge" />
+            <br />
+            <span>Loading...</span>
+          </center>
         </GridCell>
         <GridCell desktop={4} tablet={4} phone={4}></GridCell>
       </Grid>

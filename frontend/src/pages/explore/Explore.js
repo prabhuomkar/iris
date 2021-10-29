@@ -2,12 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
 import { gql, useQuery } from '@apollo/client';
-import { ExploreEntityList } from '../../components';
+import { Loading, Error, ExploreEntityList } from '../../components';
 import '@rmwc/grid/styles';
 
 const GET_PLACES = gql`
-  query GetPlaces($entityType: String!) {
-    entities(entityType: $entityType, limit: 7) {
+  query getPlaces($entityType: String!) {
+    entities(entityType: $entityType, limit: 6) {
       totalCount
       nodes {
         id
@@ -19,8 +19,8 @@ const GET_PLACES = gql`
 `;
 
 const GET_THINGS = gql`
-  query GetThings($entityType: String!) {
-    entities(entityType: $entityType, limit: 7) {
+  query getThings($entityType: String!) {
+    entities(entityType: $entityType, limit: 6) {
       totalCount
       nodes {
         id
@@ -31,40 +31,6 @@ const GET_THINGS = gql`
   }
 `;
 
-/*
-const peopleList = [
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-  '/avatar.jpg',
-];
-
-const placesList = [
-  '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
-  '/places.jpg',
-];
-
-const thingsList = [
-  '/things.jpeg',
-  '/things.jpeg',
-  '/things.jpeg',
-  '/things.jpeg',
-  '/things.jpeg',
-  '/things.jpeg',
-  '/things.jpeg',
-];
-*/
-
 const Explore = () => {
   const { error: placesError, data: placesData } = useQuery(GET_PLACES, {
     variables: { entityType: 'places' },
@@ -74,10 +40,7 @@ const Explore = () => {
     variables: { entityType: 'things' },
   });
 
-  if (placesError) return `Error! ${error.message}`;
-  if (thingsError) return `Error! ${error.message}`;
-  console.log(placesData);
-  console.log(thingsData);
+  if (placesError || thingsError) return <Error />;
 
   return (
     <>
@@ -86,62 +49,69 @@ const Explore = () => {
       thingsData &&
       thingsData.entities ? (
         <>
-          {/*
-          <Grid className="grid-cols">
-            <GridCell desktop={10} tablet={6} phone={3}>
-              People
-            </GridCell>
-            <GridCell desktop={2} tablet={2} phone={1}>
-              <Link to="/explore/people" className="link">
-                SEE ALL
-              </Link>
-            </GridCell>
-          </Grid>
-          <Grid>
-            <GridCell desktop={12} tablet={12} phone={12}>
-              <ExploreEntityList type="PeopleList" data={peopleList} />
-            </GridCell>
-          </Grid>
-          */}
-          <Grid className="grid-cols">
-            <GridCell desktop={10} tablet={6} phone={3}>
-              Places
-            </GridCell>
-            <GridCell desktop={2} tablet={2} phone={1}>
-              <Link to="/explore/places" className="link">
-                SEE ALL
-              </Link>
-            </GridCell>
-          </Grid>
-          <Grid>
-            <GridCell desktop={12} tablet={12} phone={12}>
-              <ExploreEntityList
-                type="PlacesList"
-                data={placesData.entities.nodes}
-              />
-            </GridCell>
-          </Grid>
-          <Grid className="grid-cols">
-            <GridCell desktop={10} tablet={6} phone={3}>
-              Things
-            </GridCell>
-            <GridCell desktop={2} tablet={2} phone={1}>
-              <Link to="/explore/things" className="link">
-                SEE ALL
-              </Link>
-            </GridCell>
-          </Grid>
-          <Grid>
-            <GridCell desktop={12} tablet={12} phone={12}>
-              <ExploreEntityList
-                type="ThingsList"
-                data={thingsData.entities.nodes}
-              />
-            </GridCell>
-          </Grid>
+          {placesData.entities.totalCount === 0 &&
+          thingsData.entities.totalCount === 0 ? (
+            <>
+              <Grid>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}>
+                  <img src="/explore.svg" width="100%" />
+                </GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}>
+                  <center>
+                    Upload your photos to iris! so you can find them faster
+                  </center>
+                </GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <Grid className="grid-cols">
+                <GridCell desktop={10} tablet={6} phone={3}>
+                  Places
+                </GridCell>
+                <GridCell desktop={2} tablet={2} phone={1}>
+                  <Link to="/explore/places" className="link">
+                    SEE ALL
+                  </Link>
+                </GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={12} tablet={12} phone={12}>
+                  <ExploreEntityList
+                    type="places"
+                    data={placesData.entities.nodes}
+                  />
+                </GridCell>
+              </Grid>
+              <Grid className="grid-cols">
+                <GridCell desktop={10} tablet={6} phone={3}>
+                  Things
+                </GridCell>
+                <GridCell desktop={2} tablet={2} phone={1}>
+                  <Link to="/explore/things" className="link">
+                    SEE ALL
+                  </Link>
+                </GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={12} tablet={12} phone={12}>
+                  <ExploreEntityList
+                    type="things"
+                    data={thingsData.entities.nodes}
+                  />
+                </GridCell>
+              </Grid>
+            </>
+          )}
         </>
       ) : (
-        <>Loading...</>
+        <Loading />
       )}
     </>
   );
