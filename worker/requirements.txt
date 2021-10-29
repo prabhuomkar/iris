@@ -2,3 +2,4 @@ pika==1.2.0
 PyExifTool==0.4.11
 pymongo==3.11.3
 requests==2.25.1
+annoy==1.17.0

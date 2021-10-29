@@ -25,17 +25,13 @@ services:
     container_name: worker
     depends_on:
       - queue
+      - ml
   ml:
-    image: pytorch/torchserve
+    build: ml
     restart: always
     container_name: ml
-    command: './scripts/download_model_weights.sh && ./scripts/generate_model_archives.sh && ./scripts/start.sh'
     ports:
       - '5002:5002'
-    volumes:
-      - ./ml/models:/home/model-server/models:ro
-      - ./ml/scripts:/home/model-server/scripts:ro
-      - ./ml/config.properties:/home/model-server/config.properties:ro
   # infra services
   database:
     image: mongo
