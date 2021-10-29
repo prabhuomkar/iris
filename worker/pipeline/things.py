@@ -18,7 +18,6 @@ class Things(Component):
 
   def get_inference_results(self, inference_type):
     """Calls torchserve inference api and returns response"""
-    result_classes = []
     model_name = self.MODELS[0] if inference_type == self.INFERENCE_TYPES[0] else self.MODELS[1]
     data = None
     with open(self.file_name, 'rb') as f:
@@ -30,7 +29,7 @@ class Things(Component):
       print(f'{inference_type} {data}')
       return data
     print(f'error while making inference request, status code: {res.status_code}')
-    return result_classes
+    return {}
 
   def upsert_entity(self, data):
     """Upserts things entity"""

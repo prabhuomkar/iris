@@ -2,6 +2,7 @@
 import requests
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
+from .utils import get_closest_people
 from .component import Component
 
 
@@ -26,29 +27,46 @@ class People(Component):
 
   def upsert_entity(self, data):
     """Upserts people entity"""
-    entity_oids = []
-    for face in data:
+    if 'name' in data:
       result = self.db['entities'].find_one_and_update(
-        {'name': face['name'] if 'name' in face else '', 'entityType': 'people'},
+        {'name': data['name'], 'entityType': 'people'},
         {'$set': data},
         upsert=True,
         return_document=ReturnDocument.AFTER
       )
       self.db['entities'].update_one(
         {'_id': result['_id']},
-        {'$addToSet': {'embeddings': face['embedding'], 'mediaItems': ObjectId(self.oid)}},
+        {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
       )
-      entity_oids.append(result['_id'])
-    print(f'[people]: {entity_oids}')
+      print(f'[people]: {result["_id"]}')
+      return result['_id']
+
+    self.db['entities'].update_one(
+      {'_id': data['_id']},
+      {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
+    )
+    print(f'[people]: {data["_id"]}')
+    return data['_id']
+
+  def cluster_people(self, result):
+    """Cluster people from detected faces and embeddings"""
+    entity_oids = []
+    for val in result:
+      people = list(self.db['entities'].find({'entityType': 'people'}))
+      insert_people = None
+      if len(people) == 0:
+        image_url = '' # get from seaweedfs
+        insert_people = {'name': 'Face #1', 'imageUrl': image_url, 'embedding': val['embedding']}
+      else:
+        _id = get_closest_people(people, val['embedding'])
+        insert_people = {'_id': _id, 'embedding': val['embedding']}
+        if _id is None:
+          image_url = '' # get from seaweedfs
+          insert_people = {'name': f'Face #{len(people)+1}', 'imageUrl': image_url, 'embedding': val['embedding']}
+      entity_oids.append(self.upsert_entity(insert_people))
     return entity_oids
 
   def process(self):
     result = self.get_inference_results()
-    print(len(result))
-    # for val in result:
-      # print(val['data'])
-      # print(val['embedding'])
-    # generate { 'name': '<get from clustering>', 'imageUrl': '<from cdn>', 'embedding': '<from val>' }
-    people = []
-    entity_oids = self.upsert_entity(people)
+    entity_oids = self.cluster_people(result)
     self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
