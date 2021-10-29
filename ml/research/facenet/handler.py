@@ -35,17 +35,19 @@ class FaceDetector(BaseHandler):
     res_bytes = []
     ten_imgs = []
     imgs = self.mtcnn_model(data, save_path=f'{filename}.jpg')
-    for i in range(1, len(imgs)+1):
-      ten_imgs.append(imgs[i-1])
-      img_path = f'{filename}.jpg' if i == 1 else f'{filename}_{i}.jpg'
-      with open(img_path, 'rb') as f:
-        res_bytes.append(f.read())
-        os.remove(img_path)
-    stacked_imgs = torch.stack(ten_imgs) # pylint: disable=no-member
-    embeddings = self.resnet_model(stacked_imgs)
-    result = [
-      { 'data': res.decode('latin1'), 'embedding': embed.tolist() } for res, embed in zip(res_bytes, embeddings)
-    ]
+    result = []
+    if imgs is not None:
+      for i in range(1, len(imgs)+1):
+        ten_imgs.append(imgs[i-1])
+        img_path = f'{filename}.jpg' if i == 1 else f'{filename}_{i}.jpg'
+        with open(img_path, 'rb') as f:
+          res_bytes.append(f.read())
+          os.remove(img_path)
+      stacked_imgs = torch.stack(ten_imgs) # pylint: disable=no-member
+      embeddings = self.resnet_model(stacked_imgs)
+      result = [
+        { 'data': res.decode('latin1'), 'embedding': embed.tolist() } for res, embed in zip(res_bytes, embeddings)
+      ]
     return result
 
   def postprocess(self, data):

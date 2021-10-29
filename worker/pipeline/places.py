@@ -12,12 +12,8 @@ class Places(Component):
   def __init__(self, db, oid, image_url, mime_type):
     super().__init__('places', db, oid, image_url, mime_type)
 
-  def upsert_place(self, address_filter, address):
-    """Upserts place for future usage"""
-    self.db['places'].find_one_and_update(address_filter, {'$set': address}, upsert=True, return_document=ReturnDocument.AFTER)
-
   def upsert_entity(self, data):
-    """Upserts place entity"""
+    """Upserts places entity"""
     result = self.db['entities'].find_one_and_update(
       {'name': data['name'], 'entityType': 'places'},
       {'$set': data},
@@ -28,7 +24,7 @@ class Places(Component):
       {'_id': result['_id']},
       {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
     )
-    print(f'[place]: {result}')
+    print(f'[places]: {result}')
     return result['_id']
 
   def process(self):
@@ -42,7 +38,6 @@ class Places(Component):
         coords.append(metadata['Composite:GPSLatitude'])
         coords.append(metadata['Composite:GPSLongitude'])
       address = {}
-      address_filter = {}
       name = ''
 
       # get address from open street map API
@@ -54,18 +49,14 @@ class Places(Component):
 
       # check if address exists in database
       if len(address) > 0:
-        address_filter = {}
         if 'city' in address:
-          address_filter = {'city': address['city']}
           name = address['city']
         if 'town' in address:
-          address_filter = {'town': address['town']}
           name = address['town']
 
       # update database with new place and new entity if necessary
-      if len(address_filter) > 0 and len(name) > 0:
-        self.upsert_place(address_filter, address)
-        entity_oid = self.upsert_entity({'name': name, 'imageUrl': self.image_url})
+      if len(name) > 0:
+        entity_oid = self.upsert_entity({'name': name, 'imageUrl': self.image_url, 'data': address})
 
         # update database with
         self.update({ '$addToSet': { 'entities': entity_oid } })
