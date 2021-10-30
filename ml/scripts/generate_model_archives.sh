@@ -4,7 +4,7 @@ if [ -f "models/maskrcnn.mar" ]; then
 else
   echo "generating maskrcnn.mar"
   torch-model-archiver --model-name maskrcnn --version 1.0 --model-file ./research/maskrcnn/model.py --serialized-file ./models/maskrcnn.pth --handler ./research/maskrcnn/handler.py --extra-files ./research/maskrcnn/index_to_name.json
-  mv maskrcnn.mar ./models
+  mv maskrcnn.mar models/
 fi
 # generate resnet152 model archive
 if [ -f "models/resnet152.mar" ]; then
@@ -12,5 +12,13 @@ if [ -f "models/resnet152.mar" ]; then
 else
   echo "generating resnet152.mar"
   torch-model-archiver --model-name resnet152 --version 1.0 --model-file ./research/resnet152/model.py --serialized-file ./models/resnet152.pth --handler ./research/resnet152/handler.py --extra-files ./research/resnet152/index_to_name.json
-  mv resnet152.mar ./models
+  mv resnet152.mar models/
+fi
+# generate facenet model archive
+if [ -f "models/facenet.mar" ]; then
+  echo "facenet.mar exists"
+else
+  echo "generating facenet.mar"
+  torch-model-archiver --model-name facenet --version 1.0 --handler ./research/facenet/handler.py
+  mv facenet.mar models/
 fi

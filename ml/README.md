@@ -33,9 +33,7 @@ pip install -r requirements.txt
 ```
 - Start the ML server
 ```
-torchserve --start --ts-config config.properties \
-  --model-store models \
-  --models maskrcnn=maskrcnn.mar resnet152=resnet152.mar 
+./scripts/start.sh
 ```
 
 ### Configuration
