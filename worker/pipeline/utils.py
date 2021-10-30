@@ -1,7 +1,12 @@
+import io
+import os
+import uuid
 from datetime import datetime
 from collections import Counter
+from PIL import Image
 from annoy import AnnoyIndex
 from bson.objectid import ObjectId
+from pyseaweed import WeedFS
 
 
 def get_creation_time(exif_datetime):
@@ -31,3 +36,15 @@ def get_closest_people(people, embedding):
     _id = max_occ_dist_id[0][0]
     return ObjectId(_id)
   return _id
+
+def upload_image(data):
+  """Upload image to CDN"""
+  img_path = f'{uuid.uuid4()}.jpg'
+  # generate image locally
+  img = Image.open(io.BytesIO(data.encode('latin1')))
+  img.save(img_path)
+  # connect to cdn, upload and get image url
+  w = WeedFS("cdn-master", 5020)
+  fid = w.upload_file(img_path)
+  os.remove(img_path)
+  return w.get_file_url(fid)

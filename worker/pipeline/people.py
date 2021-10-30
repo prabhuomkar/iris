@@ -2,7 +2,7 @@
 import requests
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
-from .utils import get_closest_people
+from .utils import get_closest_people, upload_image
 from .component import Component
 
 
@@ -55,13 +55,13 @@ class People(Component):
       people = list(self.db['entities'].find({'entityType': 'people'}))
       insert_people = None
       if len(people) == 0:
-        image_url = '' # get from seaweedfs
+        image_url = upload_image(val['data'])
         insert_people = {'name': 'Face #1', 'imageUrl': image_url, 'embedding': val['embedding']}
       else:
         _id = get_closest_people(people, val['embedding'])
         insert_people = {'_id': _id, 'embedding': val['embedding']}
         if _id is None:
-          image_url = '' # get from seaweedfs
+          image_url = upload_image(val['data'])
           insert_people = {'name': f'Face #{len(people)+1}', 'imageUrl': image_url, 'embedding': val['embedding']}
       entity_oids.append(self.upsert_entity(insert_people))
     return entity_oids
