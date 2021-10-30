@@ -5,7 +5,7 @@ import { Loading, Error, ExploreEntity } from '../../components';
 
 const GET_PEOPLE = gql`
   query getPeople($entityType: String!) {
-    entities(entityType: $entityType, limit: 6) {
+    entities(entityType: $entityType) {
       totalCount
       nodes {
         id

@@ -16,7 +16,7 @@ const ExplorePeopleList = ({ data, type }) => {
   let history = useHistory();
   const stylePeopleList = {
     radius: '50%',
-    width: '140px',
+    width: '120px',
     margin: '0px 6px 8px 6px',
   };
 

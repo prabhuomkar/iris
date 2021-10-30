@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import { DrawerAppContent } from '@rmwc/drawer';
 import Photos from '../pages/Photos';
 import { Explore, People, Places, Things } from '../pages/explore';
-import Sharing from '../pages/Sharing';
+import Upcoming from '../pages/Upcoming';
 import SideNav from './SideNav';
 import Photo from '../pages/Photo';
 import Entity from '../pages/explore/Entity';
@@ -25,9 +25,15 @@ const Content = (props) => {
           <Route exact path="/explore/people/:id" component={Entity} />
           <Route exact path="/explore/places/:id" component={Entity} />
           <Route exact path="/explore/things/:id" component={Entity} />
-          <Route exact path="/sharing" component={Sharing} />
           <Route exact path="/photo/:id" component={Photo} />
           <Route path="/search" component={Search} />
+          {/* static */}
+          <Route exact path="/sharing" component={Upcoming} />
+          <Route exact path="/favourites" component={Upcoming} />
+          <Route exact path="/albums" component={Upcoming} />
+          <Route exact path="/utilities" component={Upcoming} />
+          <Route exact path="/archive" component={Upcoming} />
+          <Route exact path="/trash" component={Upcoming} />
         </Switch>
       </DrawerAppContent>
     </div>

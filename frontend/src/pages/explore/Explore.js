@@ -12,7 +12,7 @@ import '@rmwc/grid/styles';
 
 const GET_PEOPLE = gql`
   query getPeople($entityType: String!) {
-    entities(entityType: $entityType, limit: 6) {
+    entities(entityType: $entityType, limit: 8) {
       totalCount
       nodes {
         id

@@ -80,7 +80,9 @@ const UploadDialog = ({ open, setOpen }) => {
         )}
       </DialogContent>
       <DialogActions>
-        <DialogButton action="close">Close</DialogButton>
+        <DialogButton outlined action="close">
+          Close
+        </DialogButton>
       </DialogActions>
     </Dialog>
   );

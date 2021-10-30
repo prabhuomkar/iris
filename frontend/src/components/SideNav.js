@@ -16,10 +16,10 @@ const SideNav = (props) => {
       items: [
         { id: 'Photos', link_to: '', icon: 'image' },
         { id: 'Explore', link_to: 'explore', icon: 'search' },
-        // { id: 'Sharing', link_to: 'sharing', icon: 'people' },
+        { id: 'Sharing', link_to: 'sharing', icon: 'people' },
       ],
     },
-    /*
+
     {
       subtitle: 'LIBRARY',
       items: [
@@ -30,7 +30,6 @@ const SideNav = (props) => {
         { id: 'Trash', link_to: 'trash', icon: 'delete' },
       ],
     },
-    */
   ];
 
   return (

@@ -16,7 +16,6 @@ const SearchBar = () => {
     <div className="search-bar-section">
       <form onSubmit={handleSearch}>
         <TextField
-          outlined
           className="search-bar"
           icon="search"
           value={search}
