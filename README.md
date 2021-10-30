@@ -8,7 +8,7 @@ Open Source Photos Platform Powered by PyTorch
 - [Frontend](frontend/README.md) [![Frontend](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml)
 - [API](api/README.md) [![API](https://github.com/prabhuomkar/iris/actions/workflows/api.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/api.yaml)
 - [Worker](worker/README.md) [![Worker](https://github.com/prabhuomkar/iris/actions/workflows/worker.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/worker.yaml)
-- [ML](ml/README.md)
+- [ML](ml/README.md) [![ML](https://github.com/prabhuomkar/iris/actions/workflows/ml.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/ml.yaml)
 
 **Infrastructure Services:**  
 - [Database: MongoDB](https://www.mongodb.com)
