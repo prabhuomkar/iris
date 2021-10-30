@@ -3,8 +3,12 @@ import moment from 'moment';
 const reducePhotos = (data) => {
   let output = data.reduce((ob, cur) => {
     let occurs = ob.reduce((n, item, i) => {
-      return moment(item.createdAt).format('D MMMM YYYY') ===
-        moment(cur.createdAt).format('D MMMM YYYY')
+      return moment(item.mediaMetadata?.creationTime || item.createdAt).format(
+        'D MMMM YYYY'
+      ) ===
+        moment(cur.mediaMetadata?.creationTime || cur.createdAt).format(
+          'D MMMM YYYY'
+        )
         ? i
         : n;
     }, -1);
@@ -14,7 +18,7 @@ const reducePhotos = (data) => {
       ob[occurs].id = ob[occurs].id.concat(cur.id);
     } else {
       let obj = {
-        createdAt: cur.createdAt,
+        createdAt: cur.mediaMetadata?.creationTime || cur.createdAt,
         id: [cur.id],
         imageUrl: [cur.imageUrl],
       };

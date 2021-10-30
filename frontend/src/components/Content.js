@@ -22,6 +22,7 @@ const Content = (props) => {
           <Route exact path="/explore/people" component={People} />
           <Route exact path="/explore/places" component={Places} />
           <Route exact path="/explore/things" component={Things} />
+          <Route exact path="/explore/people/:id" component={Entity} />
           <Route exact path="/explore/places/:id" component={Entity} />
           <Route exact path="/explore/things/:id" component={Entity} />
           <Route exact path="/sharing" component={Sharing} />

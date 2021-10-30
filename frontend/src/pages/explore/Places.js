@@ -22,6 +22,7 @@ const Places = () => {
 
   const { error: placesError, data: placesData } = useQuery(GET_PLACES, {
     variables: { entityType: 'places' },
+    fetchPolicy: 'no-cache',
   });
 
   if (placesError) return <Error />;

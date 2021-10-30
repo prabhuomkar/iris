@@ -12,7 +12,7 @@ import {
 import { capThings } from '../../utils';
 import '@rmwc/image-list/styles';
 
-const ExploreEntityList = ({ data, type }) => {
+const ExplorePeopleList = ({ data, type }) => {
   let history = useHistory();
   const stylePeopleList = {
     radius: '50%',
@@ -20,20 +20,11 @@ const ExploreEntityList = ({ data, type }) => {
     margin: '0px 6px 8px 6px',
   };
 
-  const stylePlacesThigsList = {
-    radius: '4px',
-    width: '180px',
-    margin: '0px 6px 8px 6px',
-  };
-
   return (
     <>
-      <ImageList withTextProtection>
+      <ImageList>
         {data.map((src) => (
-          <ImageListItem
-            key={src.id}
-            style={type === 'people' ? stylePeopleList : stylePlacesThigsList}
-          >
+          <ImageListItem key={src.id} style={stylePeopleList}>
             <ImageListImageAspectContainer>
               <ImageListImage
                 src={`${src.imageUrl}?width=200&height=200`}
@@ -48,7 +39,14 @@ const ExploreEntityList = ({ data, type }) => {
               />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
-              <ImageListLabel>{capThings(src.name)}</ImageListLabel>
+              <ImageListLabel
+                style={{
+                  justifyContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                {capThings(src.name)}
+              </ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>
         ))}
@@ -57,9 +55,9 @@ const ExploreEntityList = ({ data, type }) => {
   );
 };
 
-ExploreEntityList.propTypes = {
+ExplorePeopleList.propTypes = {
   type: PropTypes.string,
   data: PropTypes.array,
 };
 
-export default ExploreEntityList;
+export default ExplorePeopleList;

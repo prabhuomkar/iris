@@ -157,7 +157,7 @@ p {
 }
 
 .mdc-image-list--with-text-protection .mdc-image-list__supporting {
-  background: rgba(0, 0, 0, 0.05) !important;
+  background: rgba(0, 0, 0, 0) !important;
   justify-content: center !important;
 }
 
@@ -169,6 +169,19 @@ p {
   grid-gap: 12px !important;
 }
 
-.mdc-text-field__ripple {
-  background: #fafafa !important;
+.mdc-dialog .mdc-dialog__scrim {
+  background: transparent;
+}
+
+.mdc-dialog__surface {
+  box-shadow: 0px 0px 30px 5px #000000a1 !important;
+}
+
+.edit-section {
+  display: flex;
+  align-items: center;
+}
+
+.mdc-image-list__supporting {
+  justify-content: center !important;
 }

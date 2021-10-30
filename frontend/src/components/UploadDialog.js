@@ -43,19 +43,22 @@ const UploadDialog = ({ open, setOpen }) => {
   return (
     <Dialog
       open={open}
-      onClose={(evt) => {
-        console.log(evt.detail.action);
+      onClose={() => {
         setOpen(false);
       }}
-      onClosed={(evt) => console.log(evt.detail.action)}
     >
       <DialogTitle>Upload Photo</DialogTitle>
       <DialogContent>
-        <input type="file" required onChange={onChange} />
+        <input
+          type="file"
+          accept="image/jpeg, image/png, image/bmp"
+          required
+          onChange={onChange}
+        />
         <br />
         <br />
         <span style={{ fontSize: '15px', color: '#FF5722' }}>
-          currently only supports, .png, .jpg and .bmp format
+          Currently only supports, .png, .jpg and .bmp format
         </span>
         <br />
         {loading && (

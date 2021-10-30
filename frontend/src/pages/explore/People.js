@@ -1,43 +1,50 @@
 import React from 'react';
 import { Grid, GridCell } from '@rmwc/grid';
-import { ExploreEntity } from '../../components';
+import { gql, useQuery } from '@apollo/client';
+import { Loading, Error, ExploreEntity } from '../../components';
+
+const GET_PEOPLE = gql`
+  query getPeople($entityType: String!) {
+    entities(entityType: $entityType, limit: 6) {
+      totalCount
+      nodes {
+        id
+        name
+        imageUrl
+      }
+    }
+  }
+`;
 
 const People = () => {
-  const peopleData = [
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-    { image: '/avatar.jpg', label: 'People' },
-  ];
+  const url = window.location.pathname;
+  const type = url.split('/').pop();
+
+  const { error: peopleError, data: peopleData } = useQuery(GET_PEOPLE, {
+    variables: { entityType: 'people' },
+    fetchPolicy: 'no-cache',
+  });
+
+  if (peopleError) return <Error />;
 
   return (
     <>
-      <Grid className="grid-cols">
-        <GridCell desktop={10} tablet={6} phone={3}>
-          People
-        </GridCell>
-      </Grid>
-      <Grid>
-        <GridCell desktop={12} tablet={12} phone={12}>
-          <ExploreEntity data={peopleData} />
-        </GridCell>
-      </Grid>
+      {peopleData && peopleData.entities ? (
+        <>
+          <Grid className="grid-cols">
+            <GridCell desktop={10} tablet={6} phone={3}>
+              People
+            </GridCell>
+          </Grid>
+          <Grid>
+            <GridCell desktop={12} tablet={12} phone={12}>
+              <ExploreEntity type={type} data={peopleData.entities.nodes} />
+            </GridCell>
+          </Grid>
+        </>
+      ) : (
+        <Loading />
+      )}
     </>
   );
 };

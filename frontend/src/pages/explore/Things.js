@@ -21,6 +21,7 @@ const Things = () => {
   const type = url.split('/').pop();
   const { error: thingsError, data: thingsData } = useQuery(GET_THINGS, {
     variables: { entityType: 'things' },
+    fetchPolicy: 'no-cache',
   });
 
   if (thingsError) return <Error />;
