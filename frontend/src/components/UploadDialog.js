@@ -53,6 +53,11 @@ const UploadDialog = ({ open, setOpen }) => {
       <DialogContent>
         <input type="file" required onChange={onChange} />
         <br />
+        <br />
+        <span style={{ fontSize: '15px', color: '#FF5722' }}>
+          currently only supports, .png, .jpg and .bmp format
+        </span>
+        <br />
         {loading && (
           <>
             <br />

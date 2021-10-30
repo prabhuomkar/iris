@@ -9,6 +9,7 @@ import {
   ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
+import { capThings } from '../../utils';
 import '@rmwc/image-list/styles';
 
 const ExploreEntityList = ({ data, type }) => {
@@ -22,7 +23,7 @@ const ExploreEntityList = ({ data, type }) => {
   const stylePlacesThigsList = {
     radius: '4px',
     width: '180px',
-    margin: '0px 6px 12px 6px',
+    margin: '0px 6px 8px 6px',
   };
 
   return (
@@ -47,7 +48,7 @@ const ExploreEntityList = ({ data, type }) => {
               />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
-              <ImageListLabel>{src.name}</ImageListLabel>
+              <ImageListLabel>{capThings(src.name)}</ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>
         ))}

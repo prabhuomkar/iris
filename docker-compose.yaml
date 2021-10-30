@@ -1,14 +1,14 @@
-version: "3.9"
+version: '3'
 services:
   # applications
-  frontend:
-    build: frontend
-    restart: always
-    container_name: frontend
-    ports:
-      - '5000:80'
-    depends_on:
-      - api
+  # frontend:
+  #   build: frontend
+  #   restart: always
+  #   container_name: frontend
+  #   ports:
+  #     - '5000:80'
+  #   depends_on:
+  #     - api
   api:
     build: api
     restart: always
@@ -56,7 +56,7 @@ services:
     ports:
       - '5020:5020'
       - '15020:15020'
-    command: 'master -ip=cdn-master -port=5020'
+    command: 'master -ip=cdn-master -port=5020 -port.grpc=15020'
   cdn-volume:
     container_name: cdn-volume
     image: chrislusf/seaweedfs

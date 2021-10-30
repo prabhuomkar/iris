@@ -11,9 +11,11 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
+import { capThings } from '../utils';
 import { Loading, Error } from '../components';
 import { gql, useQuery } from '@apollo/client';
 import '@rmwc/list/styles';
+const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
   query getMediaItem($id: String!) {
@@ -25,6 +27,7 @@ const GET_MEDIA_ITEM = gql`
       fileName
       fileSize
       entities {
+        entityType
         name
       }
       mediaMetadata {
@@ -57,6 +60,36 @@ const Photo = () => {
   });
 
   if (error) return <Error />;
+
+  const entityTypeIcon = (type) => {
+    let typeIcon = '';
+    switch (type) {
+      case 'things':
+        typeIcon = 'visibility';
+        break;
+      case 'places':
+        typeIcon = 'location_on';
+        break;
+      case 'people':
+        typeIcon = 'people';
+        break;
+      default:
+        typeIcon = 'visibility';
+    }
+    return typeIcon;
+  };
+
+  const getEntity = (data, eType) =>
+    data
+      .filter((e) => e.entityType === eType)
+      .reduce((prev, curr) => {
+        prev.push(curr.name);
+        return prev;
+      }, []);
+
+  const things = getEntity(data?.mediaItem?.entities ?? [], 'things');
+  const places = getEntity(data?.mediaItem?.entities ?? [], 'places');
+  const people = getEntity(data?.mediaItem?.entities ?? [], 'people');
 
   return (
     <>
@@ -93,7 +126,7 @@ const Photo = () => {
                           {data.mediaItem.mediaMetadata?.height}{' '}
                         </>
                       )}
-                    {data.mediaItem.fileSize / 1000} KB
+                    {prettyBytes(data.mediaItem.fileSize)}
                   </ListItemSecondaryText>
                 </ListItemText>
               </ListItem>
@@ -133,21 +166,24 @@ const Photo = () => {
             {data.mediaItem?.entities && (
               <>
                 <List>
-                  {data.mediaItem?.mediaMetadata?.location &&
-                  data.mediaItem.mediaMetadata?.location?.latitude &&
-                  data.mediaItem.mediaMetadata?.location?.longitude ? (
+                  {things && things.length > 0 && (
                     <ListItem>
-                      <ListItemGraphic icon="location_on" />
+                      <ListItemGraphic icon={entityTypeIcon('things')} />
                       <ListItemText>
-                        {data.mediaItem?.entities[0]?.name}
+                        {capThings(things.join(', '))}
                       </ListItemText>
                     </ListItem>
-                  ) : (
+                  )}
+                  {people && people.length > 0 && (
                     <ListItem>
-                      <ListItemGraphic icon="visibility" />
-                      <ListItemText>
-                        {data.mediaItem?.entities.map((e) => e.name).join(', ')}
-                      </ListItemText>
+                      <ListItemGraphic icon={entityTypeIcon('people')} />
+                      <ListItemText>{people.join(', ')}</ListItemText>
+                    </ListItem>
+                  )}
+                  {places && places.length > 0 && (
+                    <ListItem>
+                      <ListItemGraphic icon={entityTypeIcon('places')} />
+                      <ListItemText>{places.join(', ')}</ListItemText>
                     </ListItem>
                   )}
                 </List>

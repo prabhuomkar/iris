@@ -10,15 +10,20 @@ import {
 import { Grid, GridCell } from '@rmwc/grid';
 import { Loading, Error } from '../../components';
 import { gql, useQuery } from '@apollo/client';
+import { capThings } from '../../utils';
 import '@rmwc/list/styles';
 
 const GET_MEDIA_ITEM = gql`
   query getMediaItem($id: String!) {
     entity(id: $id) {
+      name
       mediaItems {
         nodes {
           id
           imageUrl
+          entities {
+            name
+          }
         }
       }
     }
@@ -37,13 +42,18 @@ const Entity = () => {
   const stylePlacesThigsList = {
     radius: '4px',
     width: '180px',
-    margin: '0px 6px 6px 6px',
+    margin: '6px 6px 6px 6px',
   };
 
   return (
     <>
       {data && data.entity?.mediaItems?.nodes ? (
         <>
+          <Grid>
+            <GridCell desktop="10" tablet="6" phone="3">
+              {capThings(data.entity?.name)}
+            </GridCell>
+          </Grid>
           <Grid>
             <GridCell desktop={12} tablet={12} phone={12}>
               <ImageList withTextProtection>

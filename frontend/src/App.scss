@@ -155,3 +155,20 @@ p {
 .mdc-image-list__image-aspect-container .mdc-image-list__image {
   object-fit: cover !important;
 }
+
+.mdc-image-list--with-text-protection .mdc-image-list__supporting {
+  background: rgba(0, 0, 0, 0.05) !important;
+  justify-content: center !important;
+}
+
+.mdc-layout-grid {
+  padding: 18px 24px 0px 24px !important;
+}
+
+.mdc-layout-grid__inner {
+  grid-gap: 12px !important;
+}
+
+.mdc-text-field__ripple {
+  background: #fafafa !important;
+}

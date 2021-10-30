@@ -38,7 +38,7 @@ const Search = () => {
   const stylePlacesThigsList = {
     radius: '4px',
     width: '180px',
-    margin: '0px 6px 6px 6px',
+    margin: '12px 6px 6px 6px',
   };
 
   return (
