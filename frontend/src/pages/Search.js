@@ -30,8 +30,7 @@ const Search = () => {
     }
   `;
 
-  const { error, data } = useQuery(searchQuery);
-  console.log(data);
+  const { error, data } = useQuery(searchQuery, { fetchPolicy: 'no-cache' });
 
   if (error) return <Error />;
 

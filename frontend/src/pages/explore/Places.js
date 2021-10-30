@@ -5,7 +5,7 @@ import { Loading, Error, ExploreEntity } from '../../components';
 
 const GET_PLACES = gql`
   query getPlaces($entityType: String!) {
-    entities(entityType: $entityType, limit: 7) {
+    entities(entityType: $entityType) {
       totalCount
       nodes {
         id
@@ -22,6 +22,7 @@ const Places = () => {
 
   const { error: placesError, data: placesData } = useQuery(GET_PLACES, {
     variables: { entityType: 'places' },
+    fetchPolicy: 'no-cache',
   });
 
   if (placesError) return <Error />;

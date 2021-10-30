@@ -10,7 +10,6 @@ const Upload = () => {
   return (
     <>
       <UploadDialog open={open} setOpen={setOpen} />
-      {/*<TopAppBarActionItem icon="file_upload" onClick={() => setOpen(true)} />*/}
       <TopAppBarSection alignEnd>
         <Button
           label="Upload"

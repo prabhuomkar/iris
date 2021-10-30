@@ -17,13 +17,18 @@ const GET_MEDIA_ITEMS = gql`
         fileName
         createdAt
         updatedAt
+        mediaMetadata {
+          creationTime
+        }
       }
     }
   }
 `;
 
 const Photos = () => {
-  const { loading, error, data } = useQuery(GET_MEDIA_ITEMS);
+  const { loading, error, data } = useQuery(GET_MEDIA_ITEMS, {
+    fetchPolicy: 'no-cache',
+  });
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -53,7 +58,7 @@ const Photos = () => {
             <>
               {reducePhotos(data.mediaItems.nodes).map((image) => {
                 return (
-                  <>
+                  <div key={image.createdAt}>
                     <Grid>
                       <GridCell desktop={10} tablet={6} phone={3}>
                         {moment(image.createdAt).format('MMMM D, YYYY')}
@@ -85,7 +90,7 @@ const Photos = () => {
                         );
                       })}
                     </Grid>
-                  </>
+                  </div>
                 );
               })}
             </>

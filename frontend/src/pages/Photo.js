@@ -42,6 +42,7 @@ const GET_MEDIA_ITEM = gql`
           isoEquivalent
           exposureTime
         }
+        creationTime
         location {
           latitude
           longitude
@@ -57,6 +58,7 @@ const Photo = () => {
   let { id } = useParams();
   const { error, data } = useQuery(GET_MEDIA_ITEM, {
     variables: { id },
+    fetchPolicy: 'no-cache',
   });
 
   if (error) return <Error />;
@@ -104,11 +106,21 @@ const Photo = () => {
                 <ListItemGraphic icon="today" />
                 <ListItemText>
                   <ListItemPrimaryText>
-                    {moment(data.mediaItem.createdAt).format('MMMM D, YYYY')}
+                    {moment(
+                      data.mediaItem?.mediaMetadata?.creationTime ||
+                        data.mediaItem.createdAt
+                    ).format('MMMM D, YYYY')}
                   </ListItemPrimaryText>
                   <ListItemSecondaryText>
-                    {moment(data.mediaItem.createdAt).format('dddd')},{' '}
-                    {moment(data.mediaItem.createdAt).format('h:mm a')}
+                    {moment(
+                      data.mediaItem?.mediaMetadata?.creationTime ||
+                        data.mediaItem.createdAt
+                    ).format('dddd')}
+                    ,{' '}
+                    {moment(
+                      data.mediaItem?.mediaMetadata?.creationTime ||
+                        data.mediaItem.createdAt
+                    ).format('h:mm a')}
                   </ListItemSecondaryText>
                 </ListItemText>
               </ListItem>
