@@ -58,7 +58,7 @@ services:
     ports:
       - '5020:5020'
       - '15020:15020'
-    command: 'master -ip=cdn-master -port=5020'
+    command: 'master -ip=cdn-master -port=5020 -port.grpc=15020'
   cdn-volume:
     container_name: cdn-volume
     image: chrislusf/seaweedfs
