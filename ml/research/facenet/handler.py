@@ -19,7 +19,7 @@ class FaceDetector(BaseHandler):
     """Initialize FaceNetHandler"""
     self.manifest = context.manifest
 
-    self.mtcnn_model = MTCNN(margin=32, image_size=240, keep_all=True)
+    self.mtcnn_model = MTCNN(margin=48, image_size=240, keep_all=True)
     self.resnet_model = InceptionResnetV1(pretrained='vggface2').eval()
     self.initialized = True
 
