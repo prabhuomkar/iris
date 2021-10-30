@@ -32,6 +32,12 @@ services:
     container_name: ml
     ports:
       - '5002:5002'
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+        reservations:
+          cpus: '1.0'
   # infra services
   database:
     image: mongo
