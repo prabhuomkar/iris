@@ -143,7 +143,19 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (boo
 }
 
 func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name string) (bool, error) {
-	return false, nil
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	res := r.DB.Collection(models.ColEntity).FindOneAndUpdate(ctx, bson.D{
+		{Key: "_id", Value: oid}, {Key: "entityType", Value: "people"},
+	}, bson.D{{Key: "$set", Value: bson.D{{Key: "name", Value: name}}}})
+	if res.Err() != nil {
+		return false, res.Err()
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) MediaItem(ctx context.Context, id string) (*models.MediaItem, error) {
