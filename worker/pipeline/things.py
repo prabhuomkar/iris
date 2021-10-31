@@ -59,19 +59,24 @@ class Things(Component):
     return entity_oids
 
   def process(self):
-    # make inference call for object detection
-    od_result = self.get_inference_results(self.INFERENCE_TYPES[0])
-    ic_result = self.get_inference_results(self.INFERENCE_TYPES[1])
-    if 'content_categories' not in od_result:
-      od_result['content_categories'] = []
-    if 'content_categories' not in ic_result:
-      ic_result['content_categories'] = []
-    if 'classes' not in od_result:
-      od_result['classes'] = []
-    if 'classes' not in ic_result:
-      ic_result['classes'] = []
-    content_categories = list(set(od_result['content_categories'] + ic_result['content_categories']))
-    classes = list(set(od_result['classes'] + ic_result['classes']))
+    try:
+      # make inference call for object detection
+      od_result = self.get_inference_results(self.INFERENCE_TYPES[0])
+      ic_result = self.get_inference_results(self.INFERENCE_TYPES[1])
+      if 'content_categories' not in od_result:
+        od_result['content_categories'] = []
+      if 'content_categories' not in ic_result:
+        ic_result['content_categories'] = []
+      if 'classes' not in od_result:
+        od_result['classes'] = []
+      if 'classes' not in ic_result:
+        ic_result['classes'] = []
+      content_categories = list(set(od_result['content_categories'] + ic_result['content_categories']))
+      classes = list(set(od_result['classes'] + ic_result['classes']))
 
-    entity_oids = self.upsert_entity(classes)
-    self.update({ '$set': { 'contentCategories': content_categories }, '$addToSet': { 'entities': { '$each': entity_oids } } })
+      entity_oids = self.upsert_entity(classes)
+      self.update({ '$set': { 'contentCategories': content_categories }, '$addToSet': { 'entities': { '$each': entity_oids } } })
+    except Exception as e:
+      print(f'some exception while processing things: {str(e)}')
+    finally:
+      self.clear_files()

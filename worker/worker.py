@@ -19,8 +19,7 @@ def start_consumers():
   for queue, component in zip(queues, components):
     callback = Callback(queue=queue, component=component, db=db)
     message_callback = callback.process
-    channel.basic_consume(queue=queue,
-                        auto_ack=False,
+    channel.basic_consume(queue=queue, auto_ack=False,
                         on_message_callback=message_callback)
   channel.start_consuming()
 

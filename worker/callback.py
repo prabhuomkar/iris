@@ -1,6 +1,5 @@
-import os
 import json
-import urllib.request
+from threading import Thread
 
 
 class Callback:
@@ -15,15 +14,12 @@ class Callback:
     data = json.loads(body)
     print(f'[{self.queue}]: {data}')
 
-    # download the file for usage
+    # extract details from message
     oid, image_url, mime_type = data['id'], data['imageUrl'], data['mimeType']
-    urllib.request.urlretrieve(image_url, f'image-{oid}')
-    print(f'[{self.queue}]: downloaded file: image-{oid} from url: {image_url} mime: {mime_type}')
 
     # start the component
     component = self.component(self.db, oid, image_url, mime_type)
-    component.process()
+    Thread(target=component.process, args=()).start()
 
     # manually acknowledge the message
-    os.remove(f'image-{oid}')
     ch.basic_ack(delivery_tag=method.delivery_tag)

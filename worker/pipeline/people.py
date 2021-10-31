@@ -67,6 +67,11 @@ class People(Component):
     return entity_oids
 
   def process(self):
-    result = self.get_inference_results()
-    entity_oids = self.cluster_people(result)
-    self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
+    try:
+      result = self.get_inference_results()
+      entity_oids = self.cluster_people(result)
+      self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
+    except Exception as e:
+      print(f'some exception while processing people: {str(e)}')
+    finally:
+      self.clear_files()
