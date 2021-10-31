@@ -12,6 +12,7 @@ const Upload = () => {
       <UploadDialog open={open} setOpen={setOpen} />
       <TopAppBarSection alignEnd>
         <Button
+          outlined
           label="Upload"
           icon="file_upload"
           onClick={() => setOpen(true)}
