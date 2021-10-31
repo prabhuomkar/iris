@@ -121,7 +121,7 @@ const Entity = () => {
                 <>
                   {data.entity?.entityType === 'people' ? (
                     <>
-                      {editEntity ? editEntity : data.entity.name}
+                      {editEntity ? editEntity : capThings(data.entity.name)}
                       &nbsp;&nbsp;&nbsp;
                       <Button
                         icon="edit"

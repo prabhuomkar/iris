@@ -13,10 +13,10 @@ const Upcoming = () => {
       <Grid>
         <GridCell span={12}>
           <center>
-            <h2>
+            <h3>
               <p>This is out of scope for Hackathon Submission.</p>
               <p>This feature will be released in December 2021 version.</p>
-            </h2>
+            </h3>
           </center>
         </GridCell>
       </Grid>
