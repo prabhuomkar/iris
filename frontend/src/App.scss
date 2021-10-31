@@ -186,6 +186,7 @@ p {
   justify-content: center !important;
 }
 
-.mdc-image-list__label {
+.mdc-image-list__label,
+.mdc-text-field__input {
   font-family: $font;
 }
