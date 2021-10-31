@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
 import { Loading, Error } from '../components';
-import { reducePhotos } from '../utils';
+import { reducePhotos, sortPhotos } from '../utils';
 import '@rmwc/grid/styles';
 
 const GET_MEDIA_ITEMS = gql`
@@ -56,7 +56,8 @@ const Photos = () => {
             </>
           ) : (
             <>
-              {reducePhotos(data.mediaItems.nodes).map((image) => {
+              {/*sortPhotos(reducePhotos(data.mediaItems.nodes))*/}
+              {sortPhotos(reducePhotos(data.mediaItems.nodes)).map((image) => {
                 return (
                   <div key={image.createdAt}>
                     <Grid>
