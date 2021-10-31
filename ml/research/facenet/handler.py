@@ -1,11 +1,14 @@
 import os
 import io
 import uuid
+import logging
 import torch
 from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from ts.torch_handler.base_handler import BaseHandler
 
+
+logger = logging.getLogger(__name__)
 
 class FaceDetector(BaseHandler):
   """FaceNet Handler"""
@@ -35,10 +38,11 @@ class FaceDetector(BaseHandler):
     res_bytes = []
     ten_imgs = []
     imgs, probs = self.mtcnn_model(data, save_path=f'{filename}.jpg', return_prob=True)
+    logger.info(f'face_probabilities: {probs}')
     result = []
     if imgs is not None:
       for i in range(1, len(imgs)+1):
-        if probs[i-1] > 0.98:
+        if probs[i-1] >= 0.99:
           ten_imgs.append(imgs[i-1])
           img_path = f'{filename}.jpg' if i == 1 else f'{filename}_{i}.jpg'
           with open(img_path, 'rb') as f:

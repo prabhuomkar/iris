@@ -1,8 +1,11 @@
+import logging
 import torch
 import torch.nn.functional as F
 from ts.torch_handler.image_classifier import ImageClassifier as PImageClassifier
 from ts.utils.util import map_class_to_label
 
+
+logger = logging.getLogger(__name__)
 
 class ImageClassifier(PImageClassifier):
   """Image Classifier"""
@@ -491,6 +494,7 @@ class ImageClassifier(PImageClassifier):
     result_classes = []
     content_categories = []
     results = dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
+    logger.info(f'classified_categories: {results}')
     for i, key in enumerate(results):
       if results[key] > 0.80:
         result_classes.append(key)

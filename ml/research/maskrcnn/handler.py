@@ -1,6 +1,9 @@
+import logging
 from ts.torch_handler.object_detector import ObjectDetector as PObjectDetector
 from ts.utils.util import map_class_to_label
 
+
+logger = logging.getLogger(__name__)
 
 class ObjectDetector(PObjectDetector):
   """Object Detector"""
@@ -74,6 +77,7 @@ class ObjectDetector(PObjectDetector):
     content_categories = []
     max_prob_found = False
     data = list(sorted(result, key=lambda x: x['score'], reverse=True))
+    logger.info(f'objects_detected: {data}')
     for i, elem in enumerate(data):
       keys = list(elem.keys())
       if 'score' in keys and elem['score'] > 0.80:
