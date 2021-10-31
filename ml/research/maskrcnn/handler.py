@@ -77,10 +77,10 @@ class ObjectDetector(PObjectDetector):
     content_categories = []
     max_prob_found = False
     data = list(sorted(result, key=lambda x: x['score'], reverse=True))
-    logger.info(f'objects_detected: {data}')
+    logger.info('objects_detected: %s', data)
     for i, elem in enumerate(data):
       keys = list(elem.keys())
-      if 'score' in keys and elem['score'] > 0.80:
+      if 'score' in keys and elem['score'] > 0.90:
         result_classes.append(keys[0])
         if elem['score'] > 0.95:
           max_prob_found = True

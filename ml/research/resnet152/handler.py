@@ -494,9 +494,9 @@ class ImageClassifier(PImageClassifier):
     result_classes = []
     content_categories = []
     results = dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
-    logger.info(f'classified_categories: {results}')
+    logger.info('classified_categories: %s', results)
     for i, key in enumerate(results):
-      if results[key] > 0.80:
+      if results[key] > 0.90:
         result_classes.append(key)
         if results[key] > 0.95:
           break

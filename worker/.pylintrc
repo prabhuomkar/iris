@@ -2,7 +2,7 @@
 ignore=CVS, .svn, .git
 
 [MESSAGES CONTROL]
-disable=missing-module-docstring,invalid-name,duplicate-code
+disable=missing-module-docstring,invalid-name,duplicate-code,too-few-public-methods
 
 indent-string='  '
 max-line-length=160
