@@ -1,5 +1,5 @@
 const capThings = (things) => {
-  const words = things.split(' ');
+  const words = things.trim().split(' ');
 
   return words
     .map((word) => {
