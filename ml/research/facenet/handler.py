@@ -38,7 +38,7 @@ class FaceDetector(BaseHandler):
     res_bytes = []
     ten_imgs = []
     imgs, probs = self.mtcnn_model(data, save_path=f'{filename}.jpg', return_prob=True)
-    logger.info(f'face_probabilities: {probs}')
+    logger.info('face_probabilities: %s', probs)
     result = []
     if imgs is not None:
       for i in range(1, len(imgs)+1):

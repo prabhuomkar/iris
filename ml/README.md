@@ -35,6 +35,10 @@ pip install -r requirements.txt
 ```
 ./scripts/start.sh
 ```
+- Linting the code
+```
+pylint ./*.py pipeline/...
+```
 
 ### Configuration
 TBD

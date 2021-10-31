@@ -29,7 +29,7 @@ python worker.py
 ```
 - Linting the code
 ```
-pylint worker.py pipeline/...
+pylint ./*.py pipeline/...
 ```
 
 ### Configuration
