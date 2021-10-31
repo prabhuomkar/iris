@@ -99,60 +99,72 @@ const Explore = () => {
             </>
           ) : (
             <>
-              <Grid className="grid-cols">
-                <GridCell desktop={10} tablet={6} phone={3}>
-                  People
-                </GridCell>
-                <GridCell desktop={2} tablet={2} phone={1}>
-                  <Link to="/explore/people" className="link">
-                    SEE ALL
-                  </Link>
-                </GridCell>
-              </Grid>
-              <Grid>
-                <GridCell desktop={12} tablet={12} phone={12}>
-                  <ExplorePeopleList
-                    type="people"
-                    data={peopleData.entities.nodes}
-                  />
-                </GridCell>
-              </Grid>
-              <Grid className="grid-cols">
-                <GridCell desktop={10} tablet={6} phone={3}>
-                  Places
-                </GridCell>
-                <GridCell desktop={2} tablet={2} phone={1}>
-                  <Link to="/explore/places" className="link">
-                    SEE ALL
-                  </Link>
-                </GridCell>
-              </Grid>
-              <Grid>
-                <GridCell desktop={12} tablet={12} phone={12}>
-                  <ExploreEntityList
-                    type="places"
-                    data={placesData.entities.nodes}
-                  />
-                </GridCell>
-              </Grid>
-              <Grid className="grid-cols">
-                <GridCell desktop={10} tablet={6} phone={3}>
-                  Things
-                </GridCell>
-                <GridCell desktop={2} tablet={2} phone={1}>
-                  <Link to="/explore/things" className="link">
-                    SEE ALL
-                  </Link>
-                </GridCell>
-              </Grid>
-              <Grid>
-                <GridCell desktop={12} tablet={12} phone={12}>
-                  <ExploreEntityList
-                    type="things"
-                    data={thingsData.entities.nodes}
-                  />
-                </GridCell>
-              </Grid>
+              {peopleData.entities.totalCount > 0 && (
+                <>
+                  <Grid className="grid-cols">
+                    <GridCell desktop={10} tablet={6} phone={3}>
+                      People
+                    </GridCell>
+                    <GridCell desktop={2} tablet={2} phone={1}>
+                      <Link to="/explore/people" className="link">
+                        SEE ALL
+                      </Link>
+                    </GridCell>
+                  </Grid>
+                  <Grid>
+                    <GridCell desktop={12} tablet={12} phone={12}>
+                      <ExplorePeopleList
+                        type="people"
+                        data={peopleData.entities.nodes}
+                      />
+                    </GridCell>
+                  </Grid>
+                </>
+              )}
+              {placesData.entities.totalCount > 0 && (
+                <>
+                  <Grid className="grid-cols">
+                    <GridCell desktop={10} tablet={6} phone={3}>
+                      Places
+                    </GridCell>
+                    <GridCell desktop={2} tablet={2} phone={1}>
+                      <Link to="/explore/places" className="link">
+                        SEE ALL
+                      </Link>
+                    </GridCell>
+                  </Grid>
+                  <Grid>
+                    <GridCell desktop={12} tablet={12} phone={12}>
+                      <ExploreEntityList
+                        type="places"
+                        data={placesData.entities.nodes}
+                      />
+                    </GridCell>
+                  </Grid>
+                </>
+              )}
+              {thingsData.entities.totalCount > 0 && (
+                <>
+                  <Grid className="grid-cols">
+                    <GridCell desktop={10} tablet={6} phone={3}>
+                      Things
+                    </GridCell>
+                    <GridCell desktop={2} tablet={2} phone={1}>
+                      <Link to="/explore/things" className="link">
+                        SEE ALL
+                      </Link>
+                    </GridCell>
+                  </Grid>
+                  <Grid>
+                    <GridCell desktop={12} tablet={12} phone={12}>
+                      <ExploreEntityList
+                        type="things"
+                        data={thingsData.entities.nodes}
+                      />
+                    </GridCell>
+                  </Grid>
+                </>
+              )}
             </>
           )}
         </>
