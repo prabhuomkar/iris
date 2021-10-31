@@ -28,35 +28,40 @@ class Places(Component):
     return result['_id']
 
   def process(self):
-    with exiftool.ExifTool() as et:
-      metadata = et.get_metadata(self.file_name)
-      coords = []
-      if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
-        coords.append(metadata['EXIF:GPSLatitude'])
-        coords.append(metadata['EXIF:GPSLongitude'])
-      elif 'Composite:GPSLatitude' in metadata and 'Composite:GPSLongitude' in metadata:
-        coords.append(metadata['Composite:GPSLatitude'])
-        coords.append(metadata['Composite:GPSLongitude'])
-      address = {}
-      name = ''
+    try:
+      with exiftool.ExifTool() as et:
+        metadata = et.get_metadata(self.file_name)
+        coords = []
+        if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
+          coords.append(metadata['EXIF:GPSLatitude'])
+          coords.append(metadata['EXIF:GPSLongitude'])
+        elif 'Composite:GPSLatitude' in metadata and 'Composite:GPSLongitude' in metadata:
+          coords.append(metadata['Composite:GPSLatitude'])
+          coords.append(metadata['Composite:GPSLongitude'])
+        address = {}
+        name = ''
 
-      # get address from open street map API
-      if len(coords) == 2:
-        lat, lon = coords[0], coords[1]
-        with urllib.request.urlopen(f'https://nominatim.openstreetmap.org/reverse.php?lat={lat}&lon={lon}&zoom=12&format=jsonv2') as url:
-          data = json.loads(url.read().decode('utf-8'))
-          address = data['address'] if 'address' in data else {}
+        # get address from open street map API
+        if len(coords) == 2:
+          lat, lon = coords[0], coords[1]
+          with urllib.request.urlopen(f'https://nominatim.openstreetmap.org/reverse.php?lat={lat}&lon={lon}&zoom=12&format=jsonv2') as url:
+            data = json.loads(url.read().decode('utf-8'))
+            address = data['address'] if 'address' in data else {}
 
-      # check if address exists in database
-      if len(address) > 0:
-        if 'city' in address:
-          name = address['city']
-        if 'town' in address:
-          name = address['town']
+        # check if address exists in database
+        if len(address) > 0:
+          if 'city' in address:
+            name = address['city']
+          if 'town' in address:
+            name = address['town']
 
-      # update database with new place and new entity if necessary
-      if len(name) > 0:
-        entity_oid = self.upsert_entity({'name': name, 'imageUrl': self.image_url, 'data': address})
+        # update database with new place and new entity if necessary
+        if len(name) > 0:
+          entity_oid = self.upsert_entity({'name': name, 'imageUrl': self.image_url, 'data': address})
 
-        # update database with
-        self.update({ '$addToSet': { 'entities': entity_oid } })
+          # update database with
+          self.update({ '$addToSet': { 'entities': entity_oid } })
+    except Exception as e:
+      print(f'some exception while processing places: {str(e)}')
+    finally:
+      self.clear_files()
