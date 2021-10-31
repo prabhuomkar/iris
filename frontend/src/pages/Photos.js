@@ -9,7 +9,7 @@ import '@rmwc/grid/styles';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {
-    mediaItems {
+    mediaItems(page: 1, limit: 100) {
       nodes {
         id
         imageUrl
