@@ -53,7 +53,7 @@ const Search = () => {
                       <ImageListItem key={src.id} style={stylePlacesThigsList}>
                         <ImageListImageAspectContainer>
                           <ImageListImage
-                            src={src.imageUrl}
+                            src={`${src.imageUrl}?width=200&height=200`}
                             style={{ cursor: 'pointer', borderRadius: '4px' }}
                             onClick={() => history.push(`/photo/${src.id}`)}
                           />

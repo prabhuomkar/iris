@@ -189,7 +189,9 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <ListItem>
                       <ListItemGraphic icon={entityTypeIcon('people')} />
-                      <ListItemText>{people.join(', ')}</ListItemText>
+                      <ListItemText>
+                        {capThings(people.join(', '))}
+                      </ListItemText>
                     </ListItem>
                   )}
                   {places && places.length > 0 && (
