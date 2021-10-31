@@ -38,7 +38,7 @@ class FaceDetector(BaseHandler):
     result = []
     if imgs is not None:
       for i in range(1, len(imgs)+1):
-        if probs[i-1] > 0.9:
+        if probs[i-1] > 0.98:
           ten_imgs.append(imgs[i-1])
           img_path = f'{filename}.jpg' if i == 1 else f'{filename}_{i}.jpg'
           with open(img_path, 'rb') as f:
