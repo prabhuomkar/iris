@@ -15,14 +15,14 @@ Open Source Photos Platform Powered by PyTorch
 - [CDN: SeaweedFS](http://github.com/chrislusf/seaweedfs)
 - [Queue: RabbitMQ](https://www.rabbitmq.com)
 
+## Roadmap & Issues 
+You can find the roadmap for this project [here](https://github.com/prabhuomkar/iris/projects). Issues are managed via GitHub Issues [here](https://github.com/prabhuomkar/iris/issues).
+<!-- 
 ## Deployment
 TODO: Add Docker related notes
 
-## Issues
-Issues are managed via GitHub Issues [here](https://github.com/prabhuomkar/iris/issues).
+## Contributing Guide
+TODO: Add Contributing Guide -->
 
 ## Contributors
 [![Contributors](https://badges.pufler.dev/contributors/prabhuomkar/iris?size=50&padding=4&bots=true)](https://github.com/prabhuomkar/iris/graphs/contributors)
-
-## License
-TODO: Add license
