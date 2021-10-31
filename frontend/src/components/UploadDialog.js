@@ -33,11 +33,9 @@ const UploadDialog = ({ open, setOpen }) => {
   };
 
   if (data && data.upload) {
-    setTimeout(() => {
-      history.push('/');
-      history.go(0);
-      setOpen(false);
-    }, 2000);
+    history.push('/');
+    history.go(0);
+    setOpen(false);
   }
 
   return (
