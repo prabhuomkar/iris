@@ -56,7 +56,6 @@ const Photos = () => {
             </>
           ) : (
             <>
-              {/*sortPhotos(reducePhotos(data.mediaItems.nodes))*/}
               {sortPhotos(reducePhotos(data.mediaItems.nodes)).map((image) => {
                 return (
                   <div key={image.createdAt}>
