@@ -1,6 +1,10 @@
 # iris
 Open Source Photos Platform Powered by PyTorch
 
+<center>
+  <img src="https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/challenge_photos/001/635/304/datas/full_width.png" alt="PyTorch Annual Hackathon Submission">
+</center>
+
 ## About
 ![Architecture](images/iris.jpeg)
 
