@@ -12,9 +12,11 @@ const Upload = () => {
       <UploadDialog open={open} setOpen={setOpen} />
       <TopAppBarSection alignEnd>
         <Button
+          unelevated
           label="Upload"
           icon="file_upload"
           onClick={() => setOpen(true)}
+          style={{ color: '#fff' }}
         />
       </TopAppBarSection>
     </>

@@ -26,6 +26,7 @@ const GET_MEDIA_ITEM = gql`
       mimeType
       fileName
       fileSize
+      contentCategories
       entities {
         entityType
         name
@@ -175,6 +176,14 @@ const Photo = () => {
                   </>
                 )}
             </List>
+            {data.mediaItem && data.mediaItem?.contentCategories && (
+              <ListItem>
+                <ListItemGraphic icon="category" />
+                <ListItemText>
+                  {data.mediaItem?.contentCategories.join(', ')}
+                </ListItemText>
+              </ListItem>
+            )}
             {data.mediaItem?.entities && (
               <>
                 <List>
@@ -189,7 +198,9 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <ListItem>
                       <ListItemGraphic icon={entityTypeIcon('people')} />
-                      <ListItemText>{people.join(', ')}</ListItemText>
+                      <ListItemText>
+                        {capThings(people.join(', '))}
+                      </ListItemText>
                     </ListItem>
                   )}
                   {places && places.length > 0 && (
