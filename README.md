@@ -1,4 +1,7 @@
-# iris
+<h1>
+  <img src="images/logo.png" alt="iris" align="center" height="56px">
+  iris
+</h1>
 Open Source Photos Platform Powered by PyTorch
 
 <center>
