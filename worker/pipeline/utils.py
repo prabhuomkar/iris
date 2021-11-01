@@ -29,7 +29,7 @@ def get_closest_people(people, embedding):
   _ = t.build(len(people))
   # get similar images
   similar_ids, dist = t.get_nns_by_item(0, n=8, include_distances=True)
-  similar_ids = [s for s,d in zip(similar_ids, dist) if d <= 0.75][1:]
+  similar_ids = [s for s,d in zip(similar_ids, dist) if d <= 0.5][1:]
   distinct_ids = [str(peep_embeds[sid]) for sid in similar_ids]
   max_occ_dist_id = Counter(distinct_ids).most_common(1)
   if max_occ_dist_id is not None and len(max_occ_dist_id) > 0:
