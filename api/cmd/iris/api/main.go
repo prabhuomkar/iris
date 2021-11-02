@@ -48,7 +48,11 @@ func main() {
 	}
 
 	router := chi.NewRouter()
-	router.Use(cors.Default().Handler)
+	router.Use(cors.New(cors.Options{
+		AllowCredentials: true,
+		AllowedMethods:   []string{http.MethodPost, http.MethodGet, http.MethodOptions, http.MethodOptions},
+		AllowedHeaders:   []string{"*"},
+	}).Handler)
 
 	c := generated.Config{
 		Resolvers: &resolvers.Resolver{
