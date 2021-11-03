@@ -5,3 +5,4 @@ requests==2.25.1
 annoy==1.17.0
 Pillow==8.4.0
 pyseaweed==2.0.0
+dnspython==2.1.0

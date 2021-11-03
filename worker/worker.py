@@ -1,20 +1,19 @@
 """Worker"""
+import os
 import pika
 from pymongo import MongoClient
 from pipeline import Metadata, People, Places, Things
 from callback import Callback
 
-client = MongoClient('mongodb://root:root@database:5010/iris?authSource=admin')
-db = client['iris']
+client = MongoClient(os.getenv('DB_URI'))
+db = client[os.getenv('DB_NAME')]
 
 queues = ['pipeline.metadata', 'pipeline.people', 'pipeline.places', 'pipeline.things']
 components = [Metadata, People, Places, Things]
 
 def start_consumers():
   """Init rabbitmq connection and start consumers"""
-  credentials = pika.PlainCredentials('root', 'root')
-  connection = pika.BlockingConnection(pika.ConnectionParameters(
-    host='queue', port='5030', credentials=credentials))
+  connection = pika.BlockingConnection(pika.URLParameters(os.getenv('QUEUE_URI')))
   channel = connection.channel()
   for queue, component in zip(queues, components):
     callback = Callback(queue=queue, component=component, db=db)

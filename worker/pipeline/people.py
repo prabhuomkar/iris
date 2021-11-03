@@ -1,4 +1,5 @@
 """People"""
+import os
 import requests
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
@@ -18,7 +19,7 @@ class People(Component):
     with open(self.file_name, 'rb') as f:
       data = f.read()
     headers = {'Content-Type': self.mime_type}
-    res = requests.post('http://ml:5002/predictions/facenet', data=data, headers=headers)
+    res = requests.post(f'{os.getenv("ML_URL")}/predictions/facenet', data=data, headers=headers)
     if res.status_code == 200:
       data = res.json()
       return data

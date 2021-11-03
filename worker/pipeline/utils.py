@@ -29,7 +29,7 @@ def get_closest_people(people, embedding):
   _ = t.build(len(people))
   # get similar images
   similar_ids, dist = t.get_nns_by_item(0, n=8, include_distances=True)
-  similar_ids = [s for s,d in zip(similar_ids, dist) if d <= 0.5][1:]
+  similar_ids = [s for s,d in zip(similar_ids, dist) if d <= 1.0][1:]
   distinct_ids = [str(peep_embeds[sid]) for sid in similar_ids]
   max_occ_dist_id = Counter(distinct_ids).most_common(1)
   if max_occ_dist_id is not None and len(max_occ_dist_id) > 0:
@@ -44,7 +44,7 @@ def upload_image(data):
   img = Image.open(io.BytesIO(data.encode('latin1')))
   img.save(img_path)
   # connect to cdn, upload and get image url
-  w = WeedFS("cdn-master", 5020)
+  w = WeedFS(os.getenv('CDN_URL'), int(os.getenv('CDN_PORT')))
   fid = w.upload_file(img_path)
   os.remove(img_path)
   return w.get_file_url(fid)

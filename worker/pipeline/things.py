@@ -1,5 +1,6 @@
 """Things"""
 import io
+import os
 import requests
 from PIL import Image
 from bson.objectid import ObjectId
@@ -31,7 +32,7 @@ class Things(Component):
     image.save(data, format=list(Image.MIME.keys())[list(Image.MIME.values()).index(self.mime_type)])
     data = data.getvalue()
     headers = {'Content-Type': self.mime_type}
-    res = requests.post(f'http://ml:5002/predictions/{model_name}', data=data, headers=headers)
+    res = requests.post(f'{os.getenv("ML_URL")}/predictions/{model_name}', data=data, headers=headers)
     if res.status_code == 200:
       data = res.json()
       print(f'{inference_type} {data}')
