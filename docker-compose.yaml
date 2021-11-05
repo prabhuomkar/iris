@@ -2,7 +2,10 @@ version: '3'
 services:
   # applications
   frontend:
-    build: frontend
+    build:
+      context: frontend
+      args:
+        REACT_APP_API_URL: http://api:5001/graphql
     restart: always
     container_name: frontend
     ports:
@@ -19,6 +22,14 @@ services:
       - cdn-master
       - database
       - queue
+    environment:
+      DB_URI: 'mongodb://root:root@database:5010/iris?authSource=admin'
+      DB_NAME: iris
+      CDN_URL: 'http://cdn-master:5020'
+      CDN_CHUNK_SIZE: 1048576
+      CDN_TIMEOUT: 5
+      QUEUE_URI: 'amqp://root:root@queue:5030'
+      QUEUE_EXCHANGE: iris
   worker:
     build: worker
     restart: always
