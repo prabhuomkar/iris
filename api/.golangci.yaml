@@ -1,3 +1,6 @@
+run:
+  skip-dirs:
+   - internal/graph/generated
 linters:
   enable-all: true
   disable:
@@ -10,6 +13,8 @@ linters:
    - dupl
    - funlen
    - cyclop
+   - varnamelen
+   - ireturn
 linters-settings:
   lll:
     line-length: 140

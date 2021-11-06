@@ -1,7 +1,7 @@
 import io
 import os
 import uuid
-from datetime import datetime
+import datetime
 from collections import Counter
 from PIL import Image
 from annoy import AnnoyIndex
@@ -11,7 +11,7 @@ from pyseaweed import WeedFS
 
 def get_creation_time(exif_datetime):
   """This converts exif date time string into iso format"""
-  return datetime.strptime(exif_datetime, '%Y:%m:%d %H:%M:%S').isoformat()
+  return datetime.datetime.strptime(exif_datetime, '%Y:%m:%d %H:%M:%S').replace(tzinfo=datetime.timezone.utc).isoformat()
 
 def get_closest_people(people, embedding):
   """Get closest cluster name based on embedding"""

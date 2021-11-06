@@ -11,12 +11,13 @@ type MediaItem {
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  favourite: Boolean
   createdAt: Time!
   updatedAt: Time!
 }
 
 type MediaMetaData {
-  creationTime: String
+  creationTime: Time
   width: Int
   height: Int
   photo: Photo
@@ -74,9 +75,11 @@ type Query {
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!): Entity!
+  favourites(page: Int, limit: Int): MediaItemConnection!
 }
 
 type Mutation {
   upload(file: Upload!): Boolean!
   updateEntity(id: String!, name: String!): Boolean!
+  updateFavourite(id: String!, type: String!): Boolean!
 }

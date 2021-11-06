@@ -27,5 +27,6 @@ jobs:
         with:
           version: latest
           working-directory: api
+          skip-build-cache: true
       - run: make generate
       - run: make build

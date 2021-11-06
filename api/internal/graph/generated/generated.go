@@ -80,6 +80,7 @@ type ComplexityRoot struct {
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
 		Entities          func(childComplexity int) int
+		Favourite         func(childComplexity int) int
 		FileName          func(childComplexity int) int
 		FileSize          func(childComplexity int) int
 		ID                func(childComplexity int) int
@@ -103,8 +104,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		UpdateEntity func(childComplexity int, id string, name string) int
-		Upload       func(childComplexity int, file graphql.Upload) int
+		UpdateEntity    func(childComplexity int, id string, name string) int
+		UpdateFavourite func(childComplexity int, id string, typeArg string) int
+		Upload          func(childComplexity int, file graphql.Upload) int
 	}
 
 	Photo struct {
@@ -121,6 +123,7 @@ type ComplexityRoot struct {
 		Entities     func(childComplexity int, entityType string, page *int, limit *int) int
 		Entity       func(childComplexity int, id string) int
 		Explore      func(childComplexity int) int
+		Favourites   func(childComplexity int, page *int, limit *int) int
 		MediaItem    func(childComplexity int, id string) int
 		MediaItems   func(childComplexity int, page *int, limit *int) int
 		Search       func(childComplexity int, q *string, id *string, page *int, limit *int) int
@@ -136,6 +139,7 @@ type MediaItemResolver interface {
 type MutationResolver interface {
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
+	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
 }
 type QueryResolver interface {
 	MediaItem(ctx context.Context, id string) (*models.MediaItem, error)
@@ -145,6 +149,7 @@ type QueryResolver interface {
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
 	Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error)
 	Entity(ctx context.Context, id string) (*models.Entity, error)
+	Favourites(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 
 type executableSchema struct {
@@ -293,6 +298,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MediaItem.Entities(childComplexity), true
 
+	case "MediaItem.favourite":
+		if e.complexity.MediaItem.Favourite == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.Favourite(childComplexity), true
+
 	case "MediaItem.fileName":
 		if e.complexity.MediaItem.FileName == nil {
 			break
@@ -403,6 +415,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateEntity(childComplexity, args["id"].(string), args["name"].(string)), true
 
+	case "Mutation.updateFavourite":
+		if e.complexity.Mutation.UpdateFavourite == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateFavourite_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateFavourite(childComplexity, args["id"].(string), args["type"].(string)), true
+
 	case "Mutation.upload":
 		if e.complexity.Mutation.Upload == nil {
 			break
@@ -499,6 +523,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Explore(childComplexity), true
+
+	case "Query.favourites":
+		if e.complexity.Query.Favourites == nil {
+			break
+		}
+
+		args, err := ec.field_Query_favourites_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Favourites(childComplexity, args["page"].(*int), args["limit"].(*int)), true
 
 	case "Query.mediaItem":
 		if e.complexity.Query.MediaItem == nil {
@@ -613,12 +649,13 @@ type MediaItem {
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  favourite: Boolean
   createdAt: Time!
   updatedAt: Time!
 }
 
 type MediaMetaData {
-  creationTime: String
+  creationTime: Time
   width: Int
   height: Int
   photo: Photo
@@ -676,11 +713,13 @@ type Query {
   explore: ExploreResponse!
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!): Entity!
+  favourites(page: Int, limit: Int): MediaItemConnection!
 }
 
 type Mutation {
   upload(file: Upload!): Boolean!
   updateEntity(id: String!, name: String!): Boolean!
+  updateFavourite(id: String!, type: String!): Boolean!
 }
 `, BuiltIn: false},
 }
@@ -735,6 +774,30 @@ func (ec *executionContext) field_Mutation_updateEntity_args(ctx context.Context
 		}
 	}
 	args["name"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateFavourite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
 	return args, nil
 }
 
@@ -828,6 +891,30 @@ func (ec *executionContext) field_Query_entity_args(ctx context.Context, rawArgs
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_favourites_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
 	return args, nil
 }
 
@@ -1735,6 +1822,38 @@ func (ec *executionContext) _MediaItem_entities(ctx context.Context, field graph
 	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MediaItem_favourite(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favourite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1899,9 +2018,9 @@ func (ec *executionContext) _MediaMetaData_creationTime(ctx context.Context, fie
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalOTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaMetaData_width(ctx context.Context, field graphql.CollectedField, obj *models.MediaMetaData) (ret graphql.Marshaler) {
@@ -2100,6 +2219,48 @@ func (ec *executionContext) _Mutation_updateEntity(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateEntity(rctx, args["id"].(string), args["name"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateFavourite_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateFavourite(rctx, args["id"].(string), args["type"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2590,6 +2751,48 @@ func (ec *executionContext) _Query_entity(ctx context.Context, field graphql.Col
 	res := resTmp.(*models.Entity)
 	fc.Result = res
 	return ec.marshalNEntity2ᚖirisᚋapiᚋinternalᚋmodelsᚐEntity(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_favourites(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_favourites_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Favourites(rctx, args["page"].(*int), args["limit"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.MediaItemConnection)
+	fc.Result = res
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3985,6 +4188,8 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 				res = ec._MediaItem_entities(ctx, field, obj)
 				return res
 			})
+		case "favourite":
+			out.Values[i] = ec._MediaItem_favourite(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4089,6 +4294,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateEntity":
 			out.Values[i] = ec._Mutation_updateEntity(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateFavourite":
+			out.Values[i] = ec._Mutation_updateFavourite(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4242,6 +4452,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_entity(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "favourites":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_favourites(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5156,6 +5380,15 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	return graphql.MarshalTime(v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

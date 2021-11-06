@@ -15,12 +15,13 @@ type (
 		MediaMetadata     *MediaMetaData `json:"mediaMetadata"`
 		ContentCategories []string       `json:"contentCategories"`
 		Entities          []string       `json:"entities"`
+		Favourite         bool           `json:"favourite"`
 		CreatedAt         time.Time      `json:"createdAt"`
 		UpdatedAt         time.Time      `json:"updatedAt"`
 	}
 
 	MediaMetaData struct {
-		CreationTime string    `json:"creationTime"`
+		CreationTime time.Time `json:"creationTime"`
 		Width        *int      `json:"width"`
 		Height       *int      `json:"height"`
 		Photo        *Photo    `json:"photo"`
