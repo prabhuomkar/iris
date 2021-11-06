@@ -80,6 +80,7 @@ type ComplexityRoot struct {
 		CreatedAt         func(childComplexity int) int
 		Description       func(childComplexity int) int
 		Entities          func(childComplexity int) int
+		Favourite         func(childComplexity int) int
 		FileName          func(childComplexity int) int
 		FileSize          func(childComplexity int) int
 		ID                func(childComplexity int) int
@@ -296,6 +297,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MediaItem.Entities(childComplexity), true
+
+	case "MediaItem.favourite":
+		if e.complexity.MediaItem.Favourite == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.Favourite(childComplexity), true
 
 	case "MediaItem.fileName":
 		if e.complexity.MediaItem.FileName == nil {
@@ -641,6 +649,7 @@ type MediaItem {
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  favourite: Boolean
   createdAt: Time!
   updatedAt: Time!
 }
@@ -1811,6 +1820,38 @@ func (ec *executionContext) _MediaItem_entities(ctx context.Context, field graph
 	res := resTmp.([]*models.Entity)
 	fc.Result = res
 	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItem_favourite(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Favourite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -4147,6 +4188,8 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 				res = ec._MediaItem_entities(ctx, field, obj)
 				return res
 			})
+		case "favourite":
+			out.Values[i] = ec._MediaItem_favourite(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
