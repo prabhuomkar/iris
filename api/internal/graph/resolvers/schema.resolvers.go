@@ -19,6 +19,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
+
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultEnityMediaItemsLimit := 20
 	defaultEnityMediaItemsPage := 1
@@ -165,7 +167,7 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 	}
 
 	if typeArg != "add" && typeArg != "remove" {
-		return false, errors.New("incorrection action type for favourite")
+		return false, errIncorrectFavouriteActionType
 	}
 
 	action := false
@@ -173,7 +175,9 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 		action = true
 	}
 
-	_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}}})
+	_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}},
+	})
 	if err != nil {
 		return false, err
 	}

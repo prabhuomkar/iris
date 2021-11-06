@@ -1,15 +1,18 @@
+run:
+  skip-dirs:
+    - internal/graph/generated
 linters:
   enable-all: true
   disable:
-   - whitespace
-   - godot
-   - wrapcheck
-   - gofumpt
-   - gci
-   - exhaustivestruct
-   - dupl
-   - funlen
-   - cyclop
+    - whitespace
+    - godot
+    - wrapcheck
+    - gofumpt
+    - gci
+    - exhaustivestruct
+    - dupl
+    - funlen
+    - cyclop
 linters-settings:
   lll:
     line-length: 140
