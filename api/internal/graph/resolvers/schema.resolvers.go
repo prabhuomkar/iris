@@ -59,6 +59,7 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 	}
 
 	var results []*models.MediaItem
+
 	for cur.Next(ctx) {
 		var result *struct {
 			MediaItem *models.MediaItem `bson:"mediaItem"`
@@ -261,6 +262,7 @@ func (r *mutationResolver) UpdateDescription(ctx context.Context, id string, des
 
 func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (bool, error) {
 	mediaItems := make([]primitive.ObjectID, len(input.MediaItems))
+
 	for idx, mediaItem := range input.MediaItems {
 		oid, _ := primitive.ObjectIDFromHex(*mediaItem)
 		mediaItems[idx] = oid
