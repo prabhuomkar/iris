@@ -20,7 +20,7 @@ type (
 	}
 
 	MediaMetaData struct {
-		CreationTime string    `json:"creationTime"`
+		CreationTime time.Time `json:"creationTime"`
 		Width        *int      `json:"width"`
 		Height       *int      `json:"height"`
 		Photo        *Photo    `json:"photo"`

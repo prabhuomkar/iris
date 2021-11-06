@@ -16,7 +16,7 @@ type MediaItem {
 }
 
 type MediaMetaData {
-  creationTime: String
+  creationTime: Time
   width: Int
   height: Int
   photo: Photo
