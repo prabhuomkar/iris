@@ -104,9 +104,10 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		UpdateEntity    func(childComplexity int, id string, name string) int
-		UpdateFavourite func(childComplexity int, id string, typeArg string) int
-		Upload          func(childComplexity int, file graphql.Upload) int
+		UpdateDescription func(childComplexity int, id string, description string) int
+		UpdateEntity      func(childComplexity int, id string, name string) int
+		UpdateFavourite   func(childComplexity int, id string, typeArg string) int
+		Upload            func(childComplexity int, file graphql.Upload) int
 	}
 
 	Photo struct {
@@ -140,6 +141,7 @@ type MutationResolver interface {
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
 	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
+	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 }
 type QueryResolver interface {
 	MediaItem(ctx context.Context, id string) (*models.MediaItem, error)
@@ -402,6 +404,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MediaMetaData.Width(childComplexity), true
+
+	case "Mutation.updateDescription":
+		if e.complexity.Mutation.UpdateDescription == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateDescription_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateDescription(childComplexity, args["id"].(string), args["description"].(string)), true
 
 	case "Mutation.updateEntity":
 		if e.complexity.Mutation.UpdateEntity == nil {
@@ -720,6 +734,7 @@ type Mutation {
   upload(file: Upload!): Boolean!
   updateEntity(id: String!, name: String!): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
+  updateDescription(id: String!, description: String!): Boolean!
 }
 `, BuiltIn: false},
 }
@@ -750,6 +765,30 @@ func (ec *executionContext) field_Entity_mediaItems_args(ctx context.Context, ra
 		}
 	}
 	args["limit"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateDescription_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["description"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["description"] = arg1
 	return args, nil
 }
 
@@ -2261,6 +2300,48 @@ func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateFavourite(rctx, args["id"].(string), args["type"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateDescription(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateDescription_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateDescription(rctx, args["id"].(string), args["description"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4299,6 +4380,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateFavourite":
 			out.Values[i] = ec._Mutation_updateFavourite(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateDescription":
+			out.Values[i] = ec._Mutation_updateDescription(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
