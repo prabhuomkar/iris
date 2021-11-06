@@ -158,6 +158,29 @@ func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name str
 	return true, nil
 }
 
+func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	if typeArg != "add" && typeArg != "remove" {
+		return false, errors.New("incorrection action type for favourite")
+	}
+
+	action := false
+	if typeArg == "add" {
+		action = true
+	}
+
+	_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}}})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *queryResolver) MediaItem(ctx context.Context, id string) (*models.MediaItem, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -443,6 +466,63 @@ func (r *queryResolver) Entity(ctx context.Context, id string) (*models.Entity, 
 	}
 
 	return &entity, nil
+}
+
+func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error) {
+	defaultFavouritesLimit := 20
+	defaultFavouritesPage := 1
+
+	if limit == nil {
+		limit = &defaultFavouritesLimit
+	}
+
+	if page == nil {
+		page = &defaultFavouritesPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "favourite", Value: true}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "favourite", Value: true}}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		MediaItems []*models.MediaItem `bson:"mediaItems"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.MediaItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].MediaItems,
+	}, nil
 }
 
 // Entity returns generated.EntityResolver implementation.

@@ -15,6 +15,7 @@ type (
 		MediaMetadata     *MediaMetaData `json:"mediaMetadata"`
 		ContentCategories []string       `json:"contentCategories"`
 		Entities          []string       `json:"entities"`
+		Favourite         bool           `json:"favourite"`
 		CreatedAt         time.Time      `json:"createdAt"`
 		UpdatedAt         time.Time      `json:"updatedAt"`
 	}
