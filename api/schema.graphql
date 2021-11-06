@@ -82,4 +82,5 @@ type Mutation {
   upload(file: Upload!): Boolean!
   updateEntity(id: String!, name: String!): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
+  updateDescription(id: String!, description: String!): Boolean!
 }

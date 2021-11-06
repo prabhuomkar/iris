@@ -19,8 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
-
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultEnityMediaItemsLimit := 20
 	defaultEnityMediaItemsPage := 1
@@ -177,6 +175,22 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 
 	_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
 		{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}},
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateDescription(ctx context.Context, id string, description string) (bool, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{{Key: "description", Value: description}}},
 	})
 	if err != nil {
 		return false, err
@@ -545,3 +559,11 @@ type entityResolver struct{ *Resolver }
 type mediaItemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
