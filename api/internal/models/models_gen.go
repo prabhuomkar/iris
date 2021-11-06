@@ -2,9 +2,20 @@
 
 package models
 
+type AlbumConnection struct {
+	Nodes      []*Album `json:"nodes"`
+	TotalCount int      `json:"totalCount"`
+}
+
 type AutocompleteResponse struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type CreateAlbumInput struct {
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	MediaItems  []*string `json:"mediaItems"`
 }
 
 type EntityItemConnection struct {
@@ -21,4 +32,9 @@ type ExploreResponse struct {
 type MediaItemConnection struct {
 	Nodes      []*MediaItem `json:"nodes"`
 	TotalCount int          `json:"totalCount"`
+}
+
+type UpdateAlbumInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
 }

@@ -67,6 +67,31 @@ type AutocompleteResponse {
   name: String!
 }
 
+type Album {
+  id: String!
+  name: String!
+  description: String
+  mediaItems(page: Int, limit: Int): MediaItemConnection!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type AlbumConnection {
+  nodes: [Album!]
+  totalCount: Int!
+}
+
+input CreateAlbumInput {
+  name: String!
+  description: String
+  mediaItems: [String]
+}
+
+input UpdateAlbumInput {
+  name: String!
+  description: String
+}
+
 type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
@@ -76,6 +101,8 @@ type Query {
   entities(entityType: String!, page: Int, limit: Int): EntityItemConnection!
   entity(id: String!): Entity!
   favourites(page: Int, limit: Int): MediaItemConnection!
+  album(id: String!): Album!
+  albums(page: Int, limit: Int): AlbumConnection!
 }
 
 type Mutation {
@@ -83,4 +110,7 @@ type Mutation {
   updateEntity(id: String!, name: String!): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
   updateDescription(id: String!, description: String!): Boolean!
+  createAlbum(input: CreateAlbumInput!): Boolean!
+  updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
+  deleteAlbum(id: String!): Boolean!
 }
