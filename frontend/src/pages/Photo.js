@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import { Fraction } from 'fractional';
 import { useParams } from 'react-router-dom';
@@ -11,9 +11,12 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
+import { Button } from '@rmwc/button';
+import { TextField } from '@rmwc/textfield';
+import { CircularProgress } from '@rmwc/circular-progress';
 import { capThings } from '../utils';
-import { Loading, Error } from '../components';
-import { gql, useQuery } from '@apollo/client';
+import { Loading, Error, PhotoImageList } from '../components';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import '@rmwc/list/styles';
 const prettyBytes = require('pretty-bytes');
 
@@ -30,6 +33,8 @@ const GET_MEDIA_ITEM = gql`
       entities {
         entityType
         name
+        imageUrl
+        id
       }
       mediaMetadata {
         creationTime
@@ -55,12 +60,23 @@ const GET_MEDIA_ITEM = gql`
   }
 `;
 
+const UPDATE_DESCRIPTION = gql`
+  mutation updateDescription($id: String!, $description: String!) {
+    updateDescription(id: $id, description: $description)
+  }
+`;
+
 const Photo = () => {
   let { id } = useParams();
   const { error, data } = useQuery(GET_MEDIA_ITEM, {
     variables: { id },
     fetchPolicy: 'no-cache',
   });
+
+  const [
+    updateDescription,
+    { loading: updateDescriptionLoading, error: updateDescriptionError },
+  ] = useMutation(UPDATE_DESCRIPTION);
 
   if (error) return <Error />;
 
@@ -94,6 +110,17 @@ const Photo = () => {
   const places = getEntity(data?.mediaItem?.entities ?? [], 'places');
   const people = getEntity(data?.mediaItem?.entities ?? [], 'people');
 
+  const handleEditDescription = (entityId, updatedDescriptionName) => {
+    updateDescription({
+      variables: { id: entityId, description: updatedDescriptionName },
+    });
+    setEditDescription(updatedDescriptionName);
+  };
+
+  const [editDescription, setEditDescription] = useState(
+    data?.mediaItem?.description
+  );
+
   return (
     <>
       {data && data.mediaItem ? (
@@ -101,7 +128,88 @@ const Photo = () => {
           <GridCell desktop={6} tablet={6} phone={12}>
             <img src={data.mediaItem.imageUrl} width="100%" />
           </GridCell>
-          <GridCell desktop={4} tablet={4} phone={12}>
+          <GridCell desktop={6} tablet={4} phone={12}>
+            <>
+              <ListItem style={{ height: '60px' }}>
+                <ListItemGraphic icon="description" />
+                <ListItemText>
+                  <TextField
+                    placeholder="Add description"
+                    defaultValue={
+                      editDescription
+                        ? editDescription
+                        : data.mediaItem?.description
+                    }
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    style={{ height: '36px' }}
+                  />
+                  &nbsp;&nbsp;
+                  <Button
+                    label="update"
+                    disabled={editDescription ? false : true}
+                    onClick={() =>
+                      handleEditDescription(data.mediaItem?.id, editDescription)
+                    }
+                    unelevated
+                    style={{ color: '#fff' }}
+                  />
+                  &nbsp;&nbsp;&nbsp;
+                  {updateDescriptionLoading && (
+                    <CircularProgress size="medium" />
+                  )}
+                  {updateDescriptionError && (
+                    <>Sorry, some error occured while updating name</>
+                  )}
+                </ListItemText>
+              </ListItem>
+            </>
+            {data.mediaItem && data.mediaItem?.contentCategories && (
+              <ListItem>
+                <ListItemGraphic icon="category" />
+                <ListItemText>
+                  {data.mediaItem?.contentCategories.join(', ')}
+                </ListItemText>
+              </ListItem>
+            )}
+            {data.mediaItem?.entities && (
+              <>
+                <List>
+                  {people && people.length > 0 && (
+                    <>
+                      {/*
+                      <ListItem>
+                        <ListItemGraphic icon={entityTypeIcon('people')} />
+                        <ListItemText>
+                          {capThings(people.join(', '))}
+                        </ListItemText>
+                      </ListItem>
+                      */}
+                      <div style={{ marginLeft: '60px' }}>
+                        <PhotoImageList
+                          type="people"
+                          data={data.mediaItem?.entities}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {things && things.length > 0 && (
+                    <ListItem>
+                      <ListItemGraphic icon={entityTypeIcon('things')} />
+                      <ListItemText>
+                        {capThings(things.join(', '))}
+                      </ListItemText>
+                    </ListItem>
+                  )}
+                  {places && places.length > 0 && (
+                    <ListItem>
+                      <ListItemGraphic icon={entityTypeIcon('places')} />
+                      <ListItemText>{places.join(', ')}</ListItemText>
+                    </ListItem>
+                  )}
+                </List>
+              </>
+            )}
+
             <List twoLine>
               <ListItem>
                 <ListItemGraphic icon="today" />
@@ -176,42 +284,6 @@ const Photo = () => {
                   </>
                 )}
             </List>
-            {data.mediaItem && data.mediaItem?.contentCategories && (
-              <ListItem>
-                <ListItemGraphic icon="category" />
-                <ListItemText>
-                  {data.mediaItem?.contentCategories.join(', ')}
-                </ListItemText>
-              </ListItem>
-            )}
-            {data.mediaItem?.entities && (
-              <>
-                <List>
-                  {things && things.length > 0 && (
-                    <ListItem>
-                      <ListItemGraphic icon={entityTypeIcon('things')} />
-                      <ListItemText>
-                        {capThings(things.join(', '))}
-                      </ListItemText>
-                    </ListItem>
-                  )}
-                  {people && people.length > 0 && (
-                    <ListItem>
-                      <ListItemGraphic icon={entityTypeIcon('people')} />
-                      <ListItemText>
-                        {capThings(people.join(', '))}
-                      </ListItemText>
-                    </ListItem>
-                  )}
-                  {places && places.length > 0 && (
-                    <ListItem>
-                      <ListItemGraphic icon={entityTypeIcon('places')} />
-                      <ListItemText>{places.join(', ')}</ListItemText>
-                    </ListItem>
-                  )}
-                </List>
-              </>
-            )}
           </GridCell>
         </Grid>
       ) : (
