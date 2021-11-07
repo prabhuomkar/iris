@@ -6,6 +6,7 @@ import Error from './Error';
 import ExploreEntityList from './explore/ExploreEntityList';
 import ExplorePeopleList from './explore/ExplorePeopleList';
 import ExploreEntity from './explore/ExploreEntity';
+import PhotoImageList from './PhotoImageList';
 
 export {
   Content,
@@ -16,4 +17,5 @@ export {
   ExploreEntityList,
   ExplorePeopleList,
   ExploreEntity,
+  PhotoImageList,
 };
