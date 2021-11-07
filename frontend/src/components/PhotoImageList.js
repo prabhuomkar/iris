@@ -13,7 +13,7 @@ import { capThings } from '../utils';
 const PhotoImageList = (data) => {
   let history = useHistory();
   const stylePeopleList = {
-    width: '60px',
+    width: '80px',
     margin: '8px 6px 8px 6px',
   };
 
@@ -32,7 +32,7 @@ const PhotoImageList = (data) => {
           <ImageListItem key={src.id} style={stylePeopleList}>
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={`${src.imageUrl}?width=100&height=100`}
+                src={`${src.imageUrl}?width=150&height=150`}
                 onClick={() =>
                   history.push(`/explore/${src.entityType}/${src.id}`)
                 }

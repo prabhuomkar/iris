@@ -176,14 +176,6 @@ const Photo = () => {
                 <List>
                   {people && people.length > 0 && (
                     <>
-                      {/*
-                      <ListItem>
-                        <ListItemGraphic icon={entityTypeIcon('people')} />
-                        <ListItemText>
-                          {capThings(people.join(', '))}
-                        </ListItemText>
-                      </ListItem>
-                      */}
                       <div style={{ marginLeft: '60px' }}>
                         <PhotoImageList
                           type="people"
