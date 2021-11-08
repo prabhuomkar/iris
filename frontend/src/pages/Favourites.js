@@ -39,28 +39,49 @@ const Favourites = () => {
     <>
       {favData && favData.favourites && favData.favourites.nodes ? (
         <>
-          <Grid className="grid-cols">
-            <GridCell desktop={10} tablet={6} phone={3}>
-              Favourites
-            </GridCell>
-          </Grid>
-          <Grid>
-            <GridCell desktop={12} tablet={12} phone={12}>
-              <ImageList>
-                {favData.favourites.nodes.map((src) => (
-                  <ImageListItem key={src.id} style={styleFav}>
-                    <ImageListImageAspectContainer>
-                      <ImageListImage
-                        src={`${src.imageUrl}?width=200&height=200`}
-                        style={{ cursor: 'pointer', borderRadius: '4px' }}
-                        onClick={() => history.push(`/photo/${src.id}`)}
-                      />
-                    </ImageListImageAspectContainer>
-                  </ImageListItem>
-                ))}
-              </ImageList>
-            </GridCell>
-          </Grid>
+          {favData.favourites && favData.favourites.totalCount === 0 ? (
+            <>
+              <Grid>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}>
+                  <img src="/favourites.svg" width="100%" />
+                </GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}>
+                  <center>You have no favourite photos yet!</center>
+                </GridCell>
+                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <Grid className="grid-cols">
+                <GridCell desktop={10} tablet={6} phone={3}>
+                  Favourites
+                </GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={12} tablet={12} phone={12}>
+                  <ImageList>
+                    {favData.favourites.nodes.map((src) => (
+                      <ImageListItem key={src.id} style={styleFav}>
+                        <ImageListImageAspectContainer>
+                          <ImageListImage
+                            src={`${src.imageUrl}?width=200&height=200`}
+                            style={{ cursor: 'pointer', borderRadius: '4px' }}
+                            onClick={() => history.push(`/photo/${src.id}`)}
+                          />
+                        </ImageListImageAspectContainer>
+                      </ImageListItem>
+                    ))}
+                  </ImageList>
+                </GridCell>
+              </Grid>
+            </>
+          )}
         </>
       ) : (
         <Loading />
