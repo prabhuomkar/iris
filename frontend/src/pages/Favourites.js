@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Grid, GridCell } from '@rmwc/grid';
 import { gql, useQuery } from '@apollo/client';
+import { Grid, GridCell } from '@rmwc/grid';
 import { Loading, Error } from '../components';
 import {
   ImageList,
@@ -44,14 +44,11 @@ const Favourites = () => {
               <Grid>
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
                 <GridCell desktop={4} tablet={4} phone={4}>
-                  <img src="/favourites.svg" width="100%" />
-                </GridCell>
-                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-              </Grid>
-              <Grid>
-                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-                <GridCell desktop={4} tablet={4} phone={4}>
-                  <center>You have no favourite photos yet!</center>
+                  <center>
+                    <img src="/favourites.svg" width="100%" />
+                    <br />
+                    You have no favourite photos yet!
+                  </center>
                 </GridCell>
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
               </Grid>
