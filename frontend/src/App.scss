@@ -190,3 +190,14 @@ p {
 .mdc-text-field__input {
   font-family: $font;
 }
+
+.photo-grid-cell {
+  position: relative;
+}
+
+.fav-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 8px 8px 0px 0px;
+}

@@ -9,6 +9,7 @@ import SideNav from './SideNav';
 import Photo from '../pages/Photo';
 import Entity from '../pages/explore/Entity';
 import Search from '../pages/Search';
+import Favourites from '../pages/Favourites';
 
 const Content = (props) => {
   const { open } = props;
@@ -26,10 +27,10 @@ const Content = (props) => {
           <Route exact path="/explore/places/:id" component={Entity} />
           <Route exact path="/explore/things/:id" component={Entity} />
           <Route exact path="/photo/:id" component={Photo} />
+          <Route exact path="/favourites" component={Favourites} />
           <Route path="/search" component={Search} />
           {/* static */}
           <Route exact path="/sharing" component={Upcoming} />
-          <Route exact path="/favourites" component={Upcoming} />
           <Route exact path="/albums" component={Upcoming} />
           <Route exact path="/utilities" component={Upcoming} />
           <Route exact path="/archive" component={Upcoming} />

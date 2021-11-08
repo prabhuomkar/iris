@@ -7,6 +7,7 @@ import ExploreEntityList from './explore/ExploreEntityList';
 import ExplorePeopleList from './explore/ExplorePeopleList';
 import ExploreEntity from './explore/ExploreEntity';
 import PhotoImageList from './PhotoImageList';
+import FavouriteAction from './FavouriteAction';
 
 export {
   Content,
@@ -18,4 +19,5 @@ export {
   ExplorePeopleList,
   ExploreEntity,
   PhotoImageList,
+  FavouriteAction,
 };
