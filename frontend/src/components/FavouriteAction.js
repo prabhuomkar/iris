@@ -19,16 +19,9 @@ const FavouriteAction = ({ liked, id }) => {
   const [updateFavourite, { loading: favLoading }] =
     useMutation(UPDATE_FAVOURITE);
 
-  const handleAddFav = (photoId) => {
+  const handleFavButtonClick = (photoId, action) => {
     updateFavourite({
-      variables: { id: photoId, type: 'add' },
-    });
-    setFav(!fav);
-  };
-
-  const handleRemoveFav = (photoId) => {
-    updateFavourite({
-      variables: { id: photoId, type: 'remove' },
+      variables: { id: photoId, type: action },
     });
     setFav(!fav);
   };
@@ -36,21 +29,11 @@ const FavouriteAction = ({ liked, id }) => {
   if (favLoading) return null;
 
   return (
-    <>
-      {fav ? (
-        <Icon
-          icon={{ icon: 'star', size: 'large' }}
-          style={{ color: '#fff', cursor: 'pointer' }}
-          onClick={() => handleRemoveFav(id)}
-        />
-      ) : (
-        <Icon
-          icon={{ icon: 'star_outline', size: 'large' }}
-          style={{ color: '#fff', cursor: 'pointer' }}
-          onClick={() => handleAddFav(id)}
-        />
-      )}
-    </>
+    <Icon
+      icon={{ icon: fav ? 'star' : 'star_outline', size: 'large' }}
+      style={{ color: '#fff', cursor: 'pointer' }}
+      onClick={() => handleFavButtonClick(id, fav ? 'remove' : 'add')}
+    />
   );
 };
 
