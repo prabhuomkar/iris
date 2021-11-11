@@ -2,13 +2,13 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
-import { Loading, Error } from '../components';
 import {
   ImageList,
   ImageListImage,
   ImageListItem,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
+import { Loading, Error } from '../components';
 
 const GET_FAVOURITES = gql`
   query getFavourites {

@@ -3,9 +3,9 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
+import '@rmwc/grid/styles';
 import { Loading, Error } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
-import '@rmwc/grid/styles';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {

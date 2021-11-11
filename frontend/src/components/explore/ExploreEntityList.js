@@ -9,8 +9,8 @@ import {
   ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import { capThings } from '../../utils';
 import '@rmwc/image-list/styles';
+import { capThings } from '../../utils';
 
 const ExploreEntityList = ({ data, type }) => {
   let history = useHistory();

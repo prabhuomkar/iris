@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import moment from 'moment';
 import { Fraction } from 'fractional';
 import { useParams } from 'react-router-dom';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
+import { Button } from '@rmwc/button';
+import { TextField } from '@rmwc/textfield';
+import { CircularProgress } from '@rmwc/circular-progress';
 import {
   List,
   ListItem,
@@ -11,13 +15,9 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
-import { Button } from '@rmwc/button';
-import { TextField } from '@rmwc/textfield';
-import { CircularProgress } from '@rmwc/circular-progress';
+import '@rmwc/list/styles';
 import { capThings } from '../utils';
 import { Loading, Error, PhotoImageList, FavouriteAction } from '../components';
-import { gql, useQuery, useMutation } from '@apollo/client';
-import '@rmwc/list/styles';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`

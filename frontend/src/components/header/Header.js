@@ -8,8 +8,8 @@ import {
   TopAppBarFixedAdjust,
   TopAppBarNavigationIcon,
 } from '@rmwc/top-app-bar';
-import { NavLink } from 'react-router-dom';
 import '@rmwc/top-app-bar/styles';
+import { NavLink } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Upload from './Upload';
 
