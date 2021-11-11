@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import moment from 'moment';
 import { Fraction } from 'fractional';
 import { useParams } from 'react-router-dom';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
+import { Button } from '@rmwc/button';
+import { TextField } from '@rmwc/textfield';
+import { CircularProgress } from '@rmwc/circular-progress';
 import {
   List,
   ListItem,
@@ -11,13 +15,9 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
-import { Button } from '@rmwc/button';
-import { TextField } from '@rmwc/textfield';
-import { CircularProgress } from '@rmwc/circular-progress';
-import { capThings } from '../utils';
-import { Loading, Error, PhotoImageList } from '../components';
-import { gql, useQuery, useMutation } from '@apollo/client';
 import '@rmwc/list/styles';
+import { capThings } from '../utils';
+import { Loading, Error, PhotoImageList, FavouriteAction } from '../components';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
@@ -30,6 +30,7 @@ const GET_MEDIA_ITEM = gql`
       fileName
       fileSize
       contentCategories
+      favourite
       entities {
         entityType
         name
@@ -125,8 +126,21 @@ const Photo = () => {
     <>
       {data && data.mediaItem ? (
         <Grid>
-          <GridCell desktop={6} tablet={6} phone={12}>
-            <img src={data.mediaItem.imageUrl} width="100%" />
+          <GridCell
+            desktop={6}
+            tablet={6}
+            phone={12}
+            className="photo-grid-cell"
+          >
+            <div>
+              <img src={data.mediaItem.imageUrl} width="100%" />
+            </div>
+            <div className="fav-icon">
+              <FavouriteAction
+                liked={data.mediaItem.favourite}
+                id={data.mediaItem.id}
+              />
+            </div>
           </GridCell>
           <GridCell desktop={6} tablet={4} phone={12}>
             <>

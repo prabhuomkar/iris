@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useQuery, gql } from '@apollo/client';
-import { Loading, Error } from '../components';
 import { Grid, GridCell } from '@rmwc/grid';
 import {
   ImageList,
@@ -10,6 +9,7 @@ import {
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
 import '@rmwc/list/styles';
+import { Loading, Error } from '../components';
 
 const Search = () => {
   function useQueryParams() {
