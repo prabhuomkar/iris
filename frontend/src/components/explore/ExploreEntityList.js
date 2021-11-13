@@ -10,17 +10,17 @@ import {
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
-import { capThings } from '../../utils';
+import { capEntityName } from '../../utils';
 
 const ExploreEntityList = ({ data, type }) => {
   let history = useHistory();
-  const stylePeopleList = {
+  const stylePeople = {
     radius: '50%',
-    width: '140px',
+    width: '126px',
     margin: '0px 6px 8px 6px',
   };
 
-  const stylePlacesThigsList = {
+  const stylePlacesThigs = {
     radius: '4px',
     width: '180px',
     margin: '0px 6px 8px 6px',
@@ -28,11 +28,11 @@ const ExploreEntityList = ({ data, type }) => {
 
   return (
     <>
-      <ImageList withTextProtection>
+      <ImageList withTextProtection={type === 'people' ? false : true}>
         {data.map((src) => (
           <ImageListItem
             key={src.id}
-            style={type === 'people' ? stylePeopleList : stylePlacesThigsList}
+            style={type === 'people' ? stylePeople : stylePlacesThigs}
           >
             <ImageListImageAspectContainer>
               <ImageListImage
@@ -41,14 +41,25 @@ const ExploreEntityList = ({ data, type }) => {
                 style={{
                   borderRadius:
                     type === 'people'
-                      ? stylePeopleList.radius
-                      : stylePlacesThigsList.radius,
+                      ? stylePeople.radius
+                      : stylePlacesThigs.radius,
                   cursor: 'pointer',
                 }}
               />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
-              <ImageListLabel>{capThings(src.name)}</ImageListLabel>
+              {type === 'people' ? (
+                <ImageListLabel
+                  style={{
+                    justifyContent: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  {capEntityName(src.name)}
+                </ImageListLabel>
+              ) : (
+                <ImageListLabel>{capEntityName(src.name)}</ImageListLabel>
+              )}
             </ImageListSupporting>
           </ImageListItem>
         ))}

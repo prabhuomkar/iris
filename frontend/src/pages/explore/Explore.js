@@ -2,12 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
 import { gql, useQuery } from '@apollo/client';
-import {
-  Loading,
-  Error,
-  ExploreEntityList,
-  ExplorePeopleList,
-} from '../../components';
+import { Loading, Error, ExploreEntityList } from '../../components';
 import '@rmwc/grid/styles';
 
 const GET_PEOPLE = gql`
@@ -113,7 +108,7 @@ const Explore = () => {
                   </Grid>
                   <Grid>
                     <GridCell desktop={12} tablet={12} phone={12}>
-                      <ExplorePeopleList
+                      <ExploreEntityList
                         type="people"
                         data={peopleData.entities.nodes}
                       />

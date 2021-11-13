@@ -18,7 +18,7 @@ const Search = () => {
   const query = useQueryParams();
   const history = useHistory();
 
-  const searchQuery = gql`
+  const SEARCH_QUERY = gql`
     query {
       search(q: "${query.get('q')}") {
         totalCount
@@ -30,7 +30,7 @@ const Search = () => {
     }
   `;
 
-  const { error, data } = useQuery(searchQuery, { fetchPolicy: 'no-cache' });
+  const { error, data } = useQuery(SEARCH_QUERY, { fetchPolicy: 'no-cache' });
 
   if (error) return <Error />;
 

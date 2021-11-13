@@ -16,8 +16,8 @@ import {
   ListItemText,
 } from '@rmwc/list';
 import '@rmwc/list/styles';
-import { capThings } from '../utils';
-import { Loading, Error, PhotoImageList, FavouriteAction } from '../components';
+import { capEntityName } from '../utils';
+import { Loading, Error, PeopleList, FavouriteAction } from '../components';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
@@ -191,7 +191,7 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <>
                       <div style={{ marginLeft: '60px' }}>
-                        <PhotoImageList
+                        <PeopleList
                           type="people"
                           data={data.mediaItem?.entities}
                         />
@@ -202,7 +202,7 @@ const Photo = () => {
                     <ListItem>
                       <ListItemGraphic icon={entityTypeIcon('things')} />
                       <ListItemText>
-                        {capThings(things.join(', '))}
+                        {capEntityName(things.join(', '))}
                       </ListItemText>
                     </ListItem>
                   )}
