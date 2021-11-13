@@ -16,6 +16,7 @@ type (
 		ContentCategories []string       `json:"contentCategories"`
 		Entities          []string       `json:"entities"`
 		Favourite         bool           `json:"favourite"`
+		Deleted           bool           `json:"deleted"`
 		CreatedAt         time.Time      `json:"createdAt"`
 		UpdatedAt         time.Time      `json:"updatedAt"`
 	}

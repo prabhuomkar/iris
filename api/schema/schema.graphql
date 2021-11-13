@@ -9,9 +9,11 @@ extend type Query {
   search(q: String, id: String, page: Int, limit: Int): MediaItemConnection!
   autocomplete(q: String!): [AutocompleteResponse]
   favourites(page: Int, limit: Int): MediaItemConnection!
+  deleted(page: Int, limit: Int): MediaItemConnection!
 }
 
 extend type Mutation {
   upload(file: Upload!): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
+  delete(id: String!, type: String!): Boolean!
 }
