@@ -17,6 +17,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var (
+	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
+	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")
+)
+
+const (
+	actionTypeAdd       = "add"
+	actionTypeRemove    = "remove"
+	actionTypePermanent = "permanent"
+)
+
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (bool, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
@@ -62,12 +73,12 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 		return false, err
 	}
 
-	if typeArg != "add" && typeArg != "remove" {
+	if typeArg != actionTypeAdd && typeArg != actionTypeRemove {
 		return false, errIncorrectFavouriteActionType
 	}
 
 	action := false
-	if typeArg == "add" {
+	if typeArg == actionTypeAdd {
 		action = true
 	}
 
@@ -78,6 +89,36 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 		return false, err
 	}
 
+	return true, nil
+}
+
+func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string) (bool, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	if typeArg != actionTypeAdd && typeArg != actionTypeRemove && typeArg != actionTypePermanent {
+		return false, errIncorrectDeleteActionType
+	}
+
+	if typeArg != "permanent" {
+		action := false
+		if typeArg == actionTypeAdd {
+			action = true
+		}
+
+		_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
+			{Key: "$set", Value: bson.D{{Key: "deleted", Value: action}}},
+		})
+		if err != nil {
+			return false, err
+		}
+
+		return true, nil
+	}
+
+	// FOR(omkar): handle complex operations for permanent delete here
 	return true, nil
 }
 
@@ -214,13 +255,23 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
-		bson.D{{Key: "$match", Value: bson.D{{Key: "favourite", Value: true}}}},
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "$and", Value: bson.A{
+				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
+				bson.D{{Key: "favourite", Value: true}},
+			}},
+		}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
 	cntQuery := bson.A{
-		bson.D{{Key: "$match", Value: bson.D{{Key: "favourite", Value: true}}}},
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "$and", Value: bson.A{
+				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
+				bson.D{{Key: "favourite", Value: true}},
+			}},
+		}}},
 		bson.D{{Key: "$count", Value: "count"}},
 	}
 	facetStage := bson.D{{
@@ -255,10 +306,59 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 	}, nil
 }
 
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-var errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
+func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error) {
+	defaultDeletedLimit := 20
+	defaultDeletedPage := 1
+
+	if limit == nil {
+		limit = &defaultDeletedLimit
+	}
+
+	if page == nil {
+		page = &defaultDeletedPage
+	}
+
+	skip := int64(*limit * (*page - 1))
+	itemsPerPage := int64(*limit)
+
+	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "deleted", Value: true}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: skip}},
+		bson.D{{Key: "$limit", Value: itemsPerPage}},
+	}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{{Key: "deleted", Value: true}}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
+	facetStage := bson.D{{
+		Key:   "$facet",
+		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
+	}}
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*struct {
+		MediaItems []*models.MediaItem `bson:"mediaItems"`
+		TotalCount []*struct {
+			Count *int `bson:"count"`
+		} `bson:"totalCount"`
+	}
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	totalCount := 0
+	if len(result) != 0 && len(result[0].TotalCount) != 0 {
+		totalCount = *result[0].TotalCount[0].Count
+	}
+
+	return &models.MediaItemConnection{
+		TotalCount: totalCount,
+		Nodes:      result[0].MediaItems,
+	}, nil
+}

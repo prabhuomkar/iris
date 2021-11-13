@@ -93,6 +93,7 @@ type ComplexityRoot struct {
 	MediaItem struct {
 		ContentCategories func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
+		Deleted           func(childComplexity int) int
 		Description       func(childComplexity int) int
 		Entities          func(childComplexity int) int
 		Favourite         func(childComplexity int) int
@@ -120,6 +121,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateAlbum       func(childComplexity int, input models.CreateAlbumInput) int
+		Delete            func(childComplexity int, id string, typeArg string) int
 		DeleteAlbum       func(childComplexity int, id string) int
 		UpdateAlbum       func(childComplexity int, id string, input models.UpdateAlbumInput) int
 		UpdateDescription func(childComplexity int, id string, description string) int
@@ -141,6 +143,7 @@ type ComplexityRoot struct {
 		Album        func(childComplexity int, id string) int
 		Albums       func(childComplexity int, page *int, limit *int) int
 		Autocomplete func(childComplexity int, q string) int
+		Deleted      func(childComplexity int, page *int, limit *int) int
 		Entities     func(childComplexity int, entityType string, page *int, limit *int) int
 		Entity       func(childComplexity int, id string) int
 		Explore      func(childComplexity int) int
@@ -168,6 +171,7 @@ type MutationResolver interface {
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 	Upload(ctx context.Context, file graphql.Upload) (bool, error)
 	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
+	Delete(ctx context.Context, id string, typeArg string) (bool, error)
 }
 type QueryResolver interface {
 	Album(ctx context.Context, id string) (*models.Album, error)
@@ -180,6 +184,7 @@ type QueryResolver interface {
 	Search(ctx context.Context, q *string, id *string, page *int, limit *int) (*models.MediaItemConnection, error)
 	Autocomplete(ctx context.Context, q string) ([]*models.AutocompleteResponse, error)
 	Favourites(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
+	Deleted(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 
 type executableSchema struct {
@@ -375,6 +380,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MediaItem.CreatedAt(childComplexity), true
 
+	case "MediaItem.deleted":
+		if e.complexity.MediaItem.Deleted == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.Deleted(childComplexity), true
+
 	case "MediaItem.description":
 		if e.complexity.MediaItem.Description == nil {
 			break
@@ -505,6 +517,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateAlbum(childComplexity, args["input"].(models.CreateAlbumInput)), true
+
+	case "Mutation.delete":
+		if e.complexity.Mutation.Delete == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_delete_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Delete(childComplexity, args["id"].(string), args["type"].(string)), true
 
 	case "Mutation.deleteAlbum":
 		if e.complexity.Mutation.DeleteAlbum == nil {
@@ -655,6 +679,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Autocomplete(childComplexity, args["q"].(string)), true
+
+	case "Query.deleted":
+		if e.complexity.Query.Deleted == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deleted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Deleted(childComplexity, args["page"].(*int), args["limit"].(*int)), true
 
 	case "Query.entities":
 		if e.complexity.Query.Entities == nil {
@@ -877,6 +913,7 @@ type MediaItem {
   contentCategories: [String]
   entities: [Entity!]
   favourite: Boolean
+  deleted: Boolean
   createdAt: Time!
   updatedAt: Time!
 }
@@ -928,11 +965,13 @@ extend type Query {
   search(q: String, id: String, page: Int, limit: Int): MediaItemConnection!
   autocomplete(q: String!): [AutocompleteResponse]
   favourites(page: Int, limit: Int): MediaItemConnection!
+  deleted(page: Int, limit: Int): MediaItemConnection!
 }
 
 extend type Mutation {
   upload(file: Upload!): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
+  delete(id: String!, type: String!): Boolean!
 }
 `, BuiltIn: false},
 }
@@ -1017,6 +1056,30 @@ func (ec *executionContext) field_Mutation_deleteAlbum_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_delete_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
 	return args, nil
 }
 
@@ -1197,6 +1260,30 @@ func (ec *executionContext) field_Query_autocomplete_args(ctx context.Context, r
 		}
 	}
 	args["q"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_deleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int
+	if tmp, ok := rawArgs["page"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
+		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
 	return args, nil
 }
 
@@ -2489,6 +2576,38 @@ func (ec *executionContext) _MediaItem_favourite(ctx context.Context, field grap
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _MediaItem_deleted(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deleted, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _MediaItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3064,6 +3183,48 @@ func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateFavourite(rctx, args["id"].(string), args["type"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_delete(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_delete_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Delete(rctx, args["id"].(string), args["type"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3666,6 +3827,48 @@ func (ec *executionContext) _Query_favourites(ctx context.Context, field graphql
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Favourites(rctx, args["page"].(*int), args["limit"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.MediaItemConnection)
+	fc.Result = res
+	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_deleted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_deleted_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Deleted(rctx, args["page"].(*int), args["limit"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5228,6 +5431,8 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			})
 		case "favourite":
 			out.Values[i] = ec._MediaItem_favourite(ctx, field, obj)
+		case "deleted":
+			out.Values[i] = ec._MediaItem_deleted(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._MediaItem_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5357,6 +5562,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateFavourite":
 			out.Values[i] = ec._Mutation_updateFavourite(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "delete":
+			out.Values[i] = ec._Mutation_delete(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -5552,6 +5762,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_favourites(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "deleted":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deleted(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

@@ -11,6 +11,7 @@ type MediaItem {
   contentCategories: [String]
   entities: [Entity!]
   favourite: Boolean
+  deleted: Boolean
   createdAt: Time!
   updatedAt: Time!
 }

@@ -89,11 +89,19 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}},
+		}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
-	cntQuery := bson.A{bson.D{{Key: "$count", Value: "count"}}}
+	cntQuery := bson.A{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}},
+		}}},
+		bson.D{{Key: "$count", Value: "count"}},
+	}
 	facetStage := bson.D{{
 		Key:   "$facet",
 		Value: bson.D{{Key: "mediaItems", Value: colQuery}, {Key: "totalCount", Value: cntQuery}},
