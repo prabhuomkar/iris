@@ -2,14 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { DrawerAppContent } from '@rmwc/drawer';
-import Photos from '../pages/Photos';
-import { Explore, People, Places, Things } from '../pages/explore';
-import Upcoming from '../pages/Upcoming';
+import { Photo, Photos, Search, Upcoming, Favourites } from '../pages';
+import { Explore, People, Places, Things, Entity } from '../pages/explore';
 import SideNav from './SideNav';
-import Photo from '../pages/Photo';
-import Entity from '../pages/explore/Entity';
-import Search from '../pages/Search';
-import Favourites from '../pages/Favourites';
 
 const Content = (props) => {
   const { open } = props;

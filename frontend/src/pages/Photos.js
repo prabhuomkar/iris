@@ -42,14 +42,12 @@ const Photos = () => {
               <Grid>
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
                 <GridCell desktop={4} tablet={4} phone={4}>
-                  <img src="/images.svg" width="100%" />
-                </GridCell>
-                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-              </Grid>
-              <Grid>
-                <GridCell desktop={4} tablet={4} phone={4}></GridCell>
-                <GridCell desktop={4} tablet={4} phone={4}>
-                  <center>Upload your photos to iris!</center>
+                  <center>
+                    <img src="/images.svg" width="100%" />
+                    <br />
+                    <br />
+                    Upload your photos to iris!
+                  </center>
                 </GridCell>
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
               </Grid>

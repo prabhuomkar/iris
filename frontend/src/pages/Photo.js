@@ -17,7 +17,7 @@ import {
 } from '@rmwc/list';
 import '@rmwc/list/styles';
 import { capThings } from '../utils';
-import { Loading, Error, PhotoImageList, FavouriteAction } from '../components';
+import { Loading, Error, FaceList, FavouriteAction } from '../components';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
@@ -191,7 +191,7 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <>
                       <div style={{ marginLeft: '60px' }}>
-                        <PhotoImageList
+                        <FaceList
                           type="people"
                           data={data.mediaItem?.entities}
                         />

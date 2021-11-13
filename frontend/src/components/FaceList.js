@@ -10,7 +10,7 @@ import {
 } from '@rmwc/image-list';
 import { capThings } from '../utils';
 
-const PhotoImageList = (data) => {
+const FaceList = (data) => {
   let history = useHistory();
   const stylePeopleList = {
     width: '80px',
@@ -56,4 +56,4 @@ const PhotoImageList = (data) => {
   );
 };
 
-export default PhotoImageList;
+export default FaceList;

@@ -47,6 +47,7 @@ const Favourites = () => {
                   <center>
                     <img src="/favourites.svg" width="100%" />
                     <br />
+                    <br />
                     You have no favourite photos yet!
                   </center>
                 </GridCell>
