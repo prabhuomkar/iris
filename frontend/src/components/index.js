@@ -4,9 +4,8 @@ import Header from './header/Header';
 import Loading from './Loading';
 import Error from './Error';
 import ExploreEntityList from './explore/ExploreEntityList';
-import ExplorePeopleList from './explore/ExplorePeopleList';
 import ExploreEntity from './explore/ExploreEntity';
-import FaceList from './FaceList';
+import PeopleList from './PeopleList';
 import FavouriteAction from './FavouriteAction';
 
 export {
@@ -16,8 +15,7 @@ export {
   Loading,
   Error,
   ExploreEntityList,
-  ExplorePeopleList,
   ExploreEntity,
-  FaceList,
+  PeopleList,
   FavouriteAction,
 };

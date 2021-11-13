@@ -1,4 +1,4 @@
-const capThings = (things) => {
+const capEntityName = (things) => {
   if (things !== '' && things !== ' ') {
     const words = things.trim().split(' ');
 
@@ -10,4 +10,4 @@ const capThings = (things) => {
   }
 };
 
-export default capThings;
+export default capEntityName;

@@ -10,7 +10,7 @@ import {
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
-import { capThings } from '../../utils';
+import { capEntityName } from '../../utils';
 
 const ExploreEntity = ({ type, data }) => {
   let history = useHistory();
@@ -32,7 +32,7 @@ const ExploreEntity = ({ type, data }) => {
               />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
-              <ImageListLabel>{capThings(src.name)}</ImageListLabel>
+              <ImageListLabel>{capEntityName(src.name)}</ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>
         ))}

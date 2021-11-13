@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import {
   ImageList,
@@ -9,33 +8,35 @@ import {
   ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import '@rmwc/image-list/styles';
-import { capThings } from '../../utils';
+import { capEntityName } from '../utils';
 
-const ExplorePeopleList = ({ data, type }) => {
+const PeopleList = (data) => {
   let history = useHistory();
   const stylePeopleList = {
-    radius: '50%',
-    width: '126px',
-    margin: '0px 6px 8px 6px',
+    width: '80px',
+    margin: '8px 6px 8px 6px',
   };
+
+  const getEntity = (data) =>
+    data
+      .filter((e) => e.entityType === 'people')
+      .reduce((prev, curr) => {
+        prev.push(curr);
+        return prev;
+      }, []);
 
   return (
     <>
       <ImageList>
-        {data.map((src) => (
+        {getEntity(data.data).map((src) => (
           <ImageListItem key={src.id} style={stylePeopleList}>
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={`${src.imageUrl}?width=200&height=200`}
-                onClick={() => history.push(`/explore/${type}/${src.id}`)}
-                style={{
-                  borderRadius:
-                    type === 'people'
-                      ? stylePeopleList.radius
-                      : stylePlacesThigsList.radius,
-                  cursor: 'pointer',
-                }}
+                src={`${src.imageUrl}?width=150&height=150`}
+                onClick={() =>
+                  history.push(`/explore/${src.entityType}/${src.id}`)
+                }
+                style={{ borderRadius: '6px', cursor: 'pointer' }}
               />
             </ImageListImageAspectContainer>
             <ImageListSupporting>
@@ -45,7 +46,7 @@ const ExplorePeopleList = ({ data, type }) => {
                   display: 'flex',
                 }}
               >
-                {capThings(src.name)}
+                {capEntityName(src.name)}
               </ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>
@@ -55,9 +56,4 @@ const ExplorePeopleList = ({ data, type }) => {
   );
 };
 
-ExplorePeopleList.propTypes = {
-  type: PropTypes.string,
-  data: PropTypes.array,
-};
-
-export default ExplorePeopleList;
+export default PeopleList;
