@@ -26,7 +26,6 @@ const SideNav = (props) => {
         { id: 'Favourites', link_to: 'favourites', icon: 'star_rate' },
         { id: 'Albums', link_to: 'albums', icon: 'photo_album' },
         { id: 'Utilities', link_to: 'utilities', icon: 'filter_none' },
-        { id: 'Archive', link_to: 'archive', icon: 'archive' },
         { id: 'Trash', link_to: 'trash', icon: 'delete' },
       ],
     },
