@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { DrawerAppContent } from '@rmwc/drawer';
-import { Photo, Photos, Search, Upcoming, Favourites } from '../pages';
+import { Photo, Photos, Search, Upcoming, Favourites, Trash } from '../pages';
 import { Explore, People, Places, Things, Entity } from '../pages/explore';
 import SideNav from './SideNav';
 
@@ -29,7 +29,7 @@ const Content = (props) => {
           <Route exact path="/albums" component={Upcoming} />
           <Route exact path="/utilities" component={Upcoming} />
           <Route exact path="/archive" component={Upcoming} />
-          <Route exact path="/trash" component={Upcoming} />
+          <Route exact path="/trash" component={Trash} />
         </Switch>
       </DrawerAppContent>
     </div>
