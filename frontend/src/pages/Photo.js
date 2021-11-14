@@ -17,7 +17,13 @@ import {
 } from '@rmwc/list';
 import '@rmwc/list/styles';
 import { capEntityName } from '../utils';
-import { Loading, Error, PeopleList, FavouriteAction } from '../components';
+import {
+  Loading,
+  Error,
+  PeopleList,
+  FavouriteAction,
+  DeleteAction,
+} from '../components';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
@@ -31,6 +37,7 @@ const GET_MEDIA_ITEM = gql`
       fileSize
       contentCategories
       favourite
+      deleted
       entities {
         entityType
         name
@@ -138,6 +145,12 @@ const Photo = () => {
             <div className="fav-icon">
               <FavouriteAction
                 liked={data.mediaItem.favourite}
+                id={data.mediaItem.id}
+              />
+            </div>
+            <div className="del-icon">
+              <DeleteAction
+                deleted={data.mediaItem.deleted}
                 id={data.mediaItem.id}
               />
             </div>
