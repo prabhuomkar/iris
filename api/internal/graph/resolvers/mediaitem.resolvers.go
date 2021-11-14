@@ -8,6 +8,7 @@ import (
 	"errors"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -132,6 +133,52 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 		TotalCount: totalCount,
 		Nodes:      result[0].MediaItems,
 	}, nil
+}
+
+func (r *queryResolver) OnThisDay(ctx context.Context) ([]*models.OnThisDayResponse, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{
+		Key: "$expr", Value: bson.D{{
+			Key: "$and", Value: bson.A{
+				bson.D{{Key: "$eq", Value: bson.A{
+					bson.D{{Key: "$dayOfMonth", Value: "$mediaMetadata.creationTime"}},
+					bson.D{{Key: "$dayOfMonth", Value: time.Now()}},
+				}}},
+				bson.D{{Key: "$eq", Value: bson.A{
+					bson.D{{Key: "$month", Value: "$mediaMetadata.creationTime"}},
+					bson.D{{Key: "$month", Value: time.Now()}},
+				}}},
+			},
+		}},
+	}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.D{
+		{
+			Key: "_id", Value: bson.D{{
+				Key: "year", Value: bson.D{{Key: "$year", Value: "$mediaMetadata.creationTime"}},
+			}},
+		},
+		{
+			Key: "mediaItems", Value: bson.D{{
+				Key: "$push", Value: "$$ROOT",
+			}},
+		},
+	}}}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
+		matchStage,
+		groupStage,
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "_id", Value: -1}}}},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.OnThisDayResponse
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // MediaItem returns generated.MediaItemResolver implementation.
