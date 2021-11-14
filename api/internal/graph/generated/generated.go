@@ -127,7 +127,7 @@ type ComplexityRoot struct {
 		UpdateDescription func(childComplexity int, id string, description string) int
 		UpdateEntity      func(childComplexity int, id string, name string) int
 		UpdateFavourite   func(childComplexity int, id string, typeArg string) int
-		Upload            func(childComplexity int, file graphql.Upload) int
+		Upload            func(childComplexity int, file graphql.Upload, albumID *string) int
 	}
 
 	OnThisDayResponse struct {
@@ -175,7 +175,7 @@ type MutationResolver interface {
 	DeleteAlbum(ctx context.Context, id string) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
-	Upload(ctx context.Context, file graphql.Upload) (bool, error)
+	Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error)
 	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
 	Delete(ctx context.Context, id string, typeArg string) (bool, error)
 }
@@ -607,7 +607,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Upload(childComplexity, args["file"].(graphql.Upload)), true
+		return e.complexity.Mutation.Upload(childComplexity, args["file"].(graphql.Upload), args["albumId"].(*string)), true
 
 	case "OnThisDayResponse.mediaItems":
 		if e.complexity.OnThisDayResponse.MediaItems == nil {
@@ -1003,7 +1003,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  upload(file: Upload!): Boolean!
+  upload(file: Upload!, albumId: String): Boolean!
   updateFavourite(id: String!, type: String!): Boolean!
   delete(id: String!, type: String!): Boolean!
 }
@@ -1225,6 +1225,15 @@ func (ec *executionContext) field_Mutation_upload_args(ctx context.Context, rawA
 		}
 	}
 	args["file"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["albumId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["albumId"] = arg1
 	return args, nil
 }
 
@@ -3174,7 +3183,7 @@ func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Upload(rctx, args["file"].(graphql.Upload))
+		return ec.resolvers.Mutation().Upload(rctx, args["file"].(graphql.Upload), args["albumId"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
