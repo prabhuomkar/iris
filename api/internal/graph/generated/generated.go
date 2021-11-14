@@ -130,6 +130,11 @@ type ComplexityRoot struct {
 		Upload            func(childComplexity int, file graphql.Upload) int
 	}
 
+	OnThisDayResponse struct {
+		MediaItems func(childComplexity int) int
+		Year       func(childComplexity int) int
+	}
+
 	Photo struct {
 		ApertureFNumber func(childComplexity int) int
 		CameraMake      func(childComplexity int) int
@@ -150,6 +155,7 @@ type ComplexityRoot struct {
 		Favourites   func(childComplexity int, page *int, limit *int) int
 		MediaItem    func(childComplexity int, id string) int
 		MediaItems   func(childComplexity int, page *int, limit *int) int
+		OnThisDay    func(childComplexity int) int
 		Search       func(childComplexity int, q *string, id *string, page *int, limit *int) int
 	}
 }
@@ -181,6 +187,7 @@ type QueryResolver interface {
 	Entity(ctx context.Context, id string) (*models.Entity, error)
 	MediaItem(ctx context.Context, id string) (*models.MediaItem, error)
 	MediaItems(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
+	OnThisDay(ctx context.Context) ([]*models.OnThisDayResponse, error)
 	Search(ctx context.Context, q *string, id *string, page *int, limit *int) (*models.MediaItemConnection, error)
 	Autocomplete(ctx context.Context, q string) ([]*models.AutocompleteResponse, error)
 	Favourites(ctx context.Context, page *int, limit *int) (*models.MediaItemConnection, error)
@@ -602,6 +609,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Upload(childComplexity, args["file"].(graphql.Upload)), true
 
+	case "OnThisDayResponse.mediaItems":
+		if e.complexity.OnThisDayResponse.MediaItems == nil {
+			break
+		}
+
+		return e.complexity.OnThisDayResponse.MediaItems(childComplexity), true
+
+	case "OnThisDayResponse.year":
+		if e.complexity.OnThisDayResponse.Year == nil {
+			break
+		}
+
+		return e.complexity.OnThisDayResponse.Year(childComplexity), true
+
 	case "Photo.apertureFNumber":
 		if e.complexity.Photo.ApertureFNumber == nil {
 			break
@@ -758,6 +779,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.MediaItems(childComplexity, args["page"].(*int), args["limit"].(*int)), true
+
+	case "Query.onThisDay":
+		if e.complexity.Query.OnThisDay == nil {
+			break
+		}
+
+		return e.complexity.Query.OnThisDay(childComplexity), true
 
 	case "Query.search":
 		if e.complexity.Query.Search == nil {
@@ -945,9 +973,15 @@ type MediaItemConnection {
   totalCount: Int!
 }
 
+type OnThisDayResponse {
+  year: Int!
+  mediaItems: [MediaItem!]
+}
+
 extend type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
+  onThisDay: [OnThisDayResponse!]
 }
 
 extend type Mutation {
@@ -3241,6 +3275,73 @@ func (ec *executionContext) _Mutation_delete(ctx context.Context, field graphql.
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _OnThisDayResponse_year(ctx context.Context, field graphql.CollectedField, obj *models.OnThisDayResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OnThisDayResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Year, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _OnThisDayResponse_mediaItems(ctx context.Context, field graphql.CollectedField, obj *models.OnThisDayResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "OnThisDayResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MediaItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.MediaItem)
+	fc.Result = res
+	return ec.marshalOMediaItem2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Photo_cameraMake(ctx context.Context, field graphql.CollectedField, obj *models.Photo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3718,6 +3819,38 @@ func (ec *executionContext) _Query_mediaItems(ctx context.Context, field graphql
 	res := resTmp.(*models.MediaItemConnection)
 	fc.Result = res
 	return ec.marshalNMediaItemConnection2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItemConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_onThisDay(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().OnThisDay(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.OnThisDayResponse)
+	fc.Result = res
+	return ec.marshalOOnThisDayResponse2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐOnThisDayResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5581,6 +5714,35 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var onThisDayResponseImplementors = []string{"OnThisDayResponse"}
+
+func (ec *executionContext) _OnThisDayResponse(ctx context.Context, sel ast.SelectionSet, obj *models.OnThisDayResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, onThisDayResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OnThisDayResponse")
+		case "year":
+			out.Values[i] = ec._OnThisDayResponse_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mediaItems":
+			out.Values[i] = ec._OnThisDayResponse_mediaItems(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var photoImplementors = []string{"Photo"}
 
 func (ec *executionContext) _Photo(ctx context.Context, sel ast.SelectionSet, obj *models.Photo) graphql.Marshaler {
@@ -5726,6 +5888,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "onThisDay":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_onThisDay(ctx, field)
 				return res
 			})
 		case "search":
@@ -6187,6 +6360,16 @@ func (ec *executionContext) marshalNMediaItemConnection2ᚖirisᚋapiᚋinternal
 		return graphql.Null
 	}
 	return ec._MediaItemConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNOnThisDayResponse2ᚖirisᚋapiᚋinternalᚋmodelsᚐOnThisDayResponse(ctx context.Context, sel ast.SelectionSet, v *models.OnThisDayResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._OnThisDayResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -6701,6 +6884,46 @@ func (ec *executionContext) marshalOMediaMetaData2ᚖirisᚋapiᚋinternalᚋmod
 		return graphql.Null
 	}
 	return ec._MediaMetaData(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOOnThisDayResponse2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐOnThisDayResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.OnThisDayResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNOnThisDayResponse2ᚖirisᚋapiᚋinternalᚋmodelsᚐOnThisDayResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOPhoto2ᚖirisᚋapiᚋinternalᚋmodelsᚐPhoto(ctx context.Context, sel ast.SelectionSet, v *models.Photo) graphql.Marshaler {

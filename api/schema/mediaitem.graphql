@@ -43,9 +43,15 @@ type MediaItemConnection {
   totalCount: Int!
 }
 
+type OnThisDayResponse {
+  year: Int!
+  mediaItems: [MediaItem!]
+}
+
 extend type Query {
   mediaItem(id: String!): MediaItem!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
+  onThisDay: [OnThisDayResponse!]
 }
 
 extend type Mutation {

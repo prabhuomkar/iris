@@ -34,6 +34,11 @@ type MediaItemConnection struct {
 	TotalCount int          `json:"totalCount"`
 }
 
+type OnThisDayResponse struct {
+	Year       int          `json:"year"`
+	MediaItems []*MediaItem `json:"mediaItems"`
+}
+
 type UpdateAlbumInput struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
