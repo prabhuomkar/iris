@@ -28,7 +28,7 @@ const (
 	actionTypePermanent = "permanent"
 )
 
-func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (bool, error) {
+func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
 		return false, err
@@ -62,6 +62,22 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload) (boo
 		}(insertedID.Hex(), imageURL, result.MimeType)
 	} else {
 		return false, nil
+	}
+
+	if albumID != nil {
+		albumOID, err := primitive.ObjectIDFromHex(*albumID)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, albumOID, bson.D{
+			{Key: "$set", Value: bson.D{
+				{Key: "$push", Value: bson.D{{Key: "mediaItems", Value: insertedID}}},
+			}},
+		})
+		if err != nil {
+			return false, err
+		}
 	}
 
 	return true, nil
