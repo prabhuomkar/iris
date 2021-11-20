@@ -158,7 +158,6 @@ p {
 
 .mdc-image-list--with-text-protection .mdc-image-list__supporting {
   background: rgba(0, 0, 0, 0.2) !important;
-  justify-content: center !important;
 }
 
 .mdc-layout-grid {
@@ -184,6 +183,10 @@ p {
 
 .mdc-image-list__supporting {
   justify-content: center !important;
+}
+
+.album-list-info {
+  justify-content: left !important;
 }
 
 .mdc-image-list__label,
