@@ -8,6 +8,8 @@ import ExploreEntity from './explore/ExploreEntity';
 import PeopleList from './PeopleList';
 import FavouriteAction from './FavouriteAction';
 import DeleteAction from './DeleteAction';
+import DeleteAlbumDialog from './DeleteAlbumDialog';
+import EditAlbum from './EditAlbum';
 
 export {
   Content,
@@ -20,4 +22,6 @@ export {
   PeopleList,
   FavouriteAction,
   DeleteAction,
+  DeleteAlbumDialog,
+  EditAlbum,
 };

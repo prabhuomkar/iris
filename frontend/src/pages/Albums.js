@@ -30,7 +30,7 @@ const GET_ALBUMS = gql`
   }
 `;
 
-const Favourites = () => {
+const Albums = () => {
   const { error: albumsError, data: albumsData } = useQuery(GET_ALBUMS, {
     fetchPolicy: 'no-cache',
   });
@@ -53,7 +53,7 @@ const Favourites = () => {
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
                 <GridCell desktop={4} tablet={4} phone={4}>
                   <center>
-                    <img src="/favourites.svg" width="100%" />
+                    <img src="/albums.svg" width="100%" />
                     <br />
                     <br />
                     You have not created any albums yet!
@@ -85,7 +85,9 @@ const Favourites = () => {
                           <ImageListLabel>
                             {album.name}
                             <br />
-                            <small>{album.mediaItems?.totalCount} items</small>
+                            <small style={{ color: '#424242' }}>
+                              {album.mediaItems?.totalCount} items
+                            </small>
                           </ImageListLabel>
                         </ImageListSupporting>
                       </ImageListItem>
@@ -103,4 +105,4 @@ const Favourites = () => {
   );
 };
 
-export default Favourites;
+export default Albums;
