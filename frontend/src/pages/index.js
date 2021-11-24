@@ -4,6 +4,18 @@ import Photo from './Photo';
 import Photos from './Photos';
 import Search from './Search';
 import Sharing from './Sharing';
+import Albums from './Albums';
+import Album from './Album';
 import Upcoming from './Upcoming';
 
-export { Trash, Favourites, Photo, Photos, Search, Sharing, Upcoming };
+export {
+  Trash,
+  Favourites,
+  Photo,
+  Photos,
+  Search,
+  Sharing,
+  Albums,
+  Album,
+  Upcoming,
+};
