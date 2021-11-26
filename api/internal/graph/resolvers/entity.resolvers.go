@@ -14,6 +14,24 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
+	mediaItemID, err := primitive.ObjectIDFromHex(obj.MediaItems[0])
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.D{{Key: "_id", Value: mediaItemID}}
+
+	var result *models.MediaItem
+
+	err = r.DB.Collection(models.ColMediaItems).FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultEntityMediaItemsLimit := 20
 	defaultEntityMediaItemsPage := 1
@@ -33,10 +51,7 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 
 	colQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{
-			{Key: "$and", Value: bson.A{
-				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-				bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-			}},
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
 		}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
@@ -44,10 +59,7 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 	}
 	cntQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{
-			{Key: "$and", Value: bson.A{
-				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-				bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-			}},
+			{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}},
 		}}},
 		bson.D{{Key: "$count", Value: "count"}},
 	}

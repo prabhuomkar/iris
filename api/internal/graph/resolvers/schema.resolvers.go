@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -118,23 +119,58 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		return false, errIncorrectDeleteActionType
 	}
 
-	if typeArg != "permanent" {
-		action := false
-		if typeArg == actionTypeAdd {
-			action = true
-		}
+	action := false
+	if typeArg == actionTypeAdd {
+		action = true
+	}
 
-		_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
-			{Key: "$set", Value: bson.D{{Key: "deleted", Value: action}}},
-		})
+	filter := bson.D{{Key: "_id", Value: oid}}
+	after := options.After
+
+	result := r.DB.Collection(models.ColMediaItems).FindOneAndUpdate(ctx, filter,
+		bson.D{{Key: "$set", Value: bson.D{{Key: "deleted", Value: action}}}},
+		&options.FindOneAndUpdateOptions{ReturnDocument: &after},
+	)
+	if result.Err() != nil {
+		return false, result.Err()
+	}
+
+	var deleteMediaItem *models.MediaItem
+
+	err = result.Decode(&deleteMediaItem)
+	if err != nil {
+		return false, err
+	}
+
+	toUpdateEntities := make([]primitive.ObjectID, len(deleteMediaItem.Entities))
+
+	for idx, entityID := range deleteMediaItem.Entities {
+		oEntityID, _ := primitive.ObjectIDFromHex(entityID)
+		toUpdateEntities[idx] = oEntityID
+	}
+
+	_, err = r.DB.Collection(models.ColEntity).UpdateMany(ctx,
+		bson.D{{Key: "_id", Value: bson.D{
+			{Key: "$in", Value: toUpdateEntities},
+		}}},
+		bson.D{{Key: "$pull", Value: bson.D{
+			{Key: "mediaItems", Value: oid},
+		}}},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	// TASK(omkar): Delete the entity if no mediaitems exist in array
+	// TASK(omkar): Delete the image from CDN if actionType is permanent
+
+	if typeArg == actionTypePermanent {
+		_, err := r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
 		if err != nil {
 			return false, err
 		}
-
-		return true, nil
 	}
 
-	// FOR(omkar): handle complex operations for permanent delete here
 	return true, nil
 }
 
