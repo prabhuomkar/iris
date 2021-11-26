@@ -32,13 +32,22 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 
 	albumID, _ := primitive.ObjectIDFromHex(obj.ID)
 
-	lookupStage := bson.D{{Key: "$match", Value: bson.D{
+	matchStage := bson.D{{Key: "$match", Value: bson.D{
 		{Key: "_id", Value: albumID},
 	}}}
-	matchStage := bson.D{{Key: "$lookup", Value: bson.D{
+	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: "mediaitems"},
-		{Key: "localField", Value: "mediaItems"},
-		{Key: "foreignField", Value: "_id"},
+		{Key: "let", Value: bson.D{
+			{Key: "mediaItems", Value: "$mediaItems"},
+		}},
+		{Key: "pipeline", Value: bson.A{
+			bson.D{{Key: "$match", Value: bson.D{
+				{Key: "$expr", Value: bson.D{{Key: "$cond", Value: bson.A{
+					bson.D{{Key: "$ne", Value: bson.A{"$deleted", true}}},
+					bson.D{{Key: "$in", Value: bson.A{"$_id", "$$mediaItems"}}},
+				}}}},
+			}}},
+		}},
 		{Key: "as", Value: "mediaItem"},
 	}}}
 
