@@ -16,13 +16,9 @@ class Places(Component):
     """Upserts places entity"""
     result = self.db['entities'].find_one_and_update(
       {'name': data['name'], 'entityType': 'places'},
-      {'$set': data},
+      {'$addToSet': {'mediaItems': ObjectId(self.oid)}, '$set': data},
       upsert=True,
       return_document=ReturnDocument.AFTER
-    )
-    self.db['entities'].update_one(
-      {'_id': result['_id']},
-      {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
     )
     print(f'[places]: {result}')
     return result['_id']
@@ -57,7 +53,7 @@ class Places(Component):
 
         # update database with new place and new entity if necessary
         if len(name) > 0:
-          entity_oid = self.upsert_entity({'name': name, 'imageUrl': self.image_url, 'data': address})
+          entity_oid = self.upsert_entity({'name': name, 'data': address})
 
           # update database with
           self.update({ '$addToSet': { 'entities': entity_oid } })
