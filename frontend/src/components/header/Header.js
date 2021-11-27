@@ -12,6 +12,7 @@ import '@rmwc/top-app-bar/styles';
 import { NavLink } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Upload from './Upload';
+import CreateAlbum from './CreateAlbum';
 
 const Header = ({ toggleSideNav }) => {
   return (
@@ -29,8 +30,14 @@ const Header = ({ toggleSideNav }) => {
           <TopAppBarSection>
             <SearchBar />
           </TopAppBarSection>
-
-          <TopAppBarSection alignEnd>
+          <TopAppBarSection
+            style={{
+              display: 'flex',
+              justifyContent: 'right',
+            }}
+          >
+            <CreateAlbum />
+            &nbsp;&nbsp;
             <Upload />
             {/*
             <TopAppBarActionItem icon="help" />
