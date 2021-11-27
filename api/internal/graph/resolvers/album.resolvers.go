@@ -15,6 +15,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var errIncorrectUpdateAlbumMediaItemsActionType = errors.New("incorrect action type for updating album mediaItems")
+
 func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultAlbumMediaItemsLimit := 20
 	defaultAlbumMediaItemsPage := 1
@@ -124,6 +126,42 @@ func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (bool, er
 	}
 
 	_, err = r.DB.Collection(models.ColAlbums).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string, typeArg string, mediaItems []string) (bool, error) {
+	albumID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	mediaItemIDs := []primitive.ObjectID{}
+
+	for _, mediaItem := range mediaItems {
+		oid, err := primitive.ObjectIDFromHex(mediaItem)
+		if err != nil {
+			return false, err
+		}
+
+		mediaItemIDs = append(mediaItemIDs, oid)
+	}
+
+	if typeArg != actionTypeAdd && typeArg != actionTypeRemove {
+		return false, errIncorrectUpdateAlbumMediaItemsActionType
+	}
+
+	update := bson.D{{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}}
+	if typeArg == actionTypeAdd {
+		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: mediaItemIDs}}}}
+	}
+
+	filter := bson.D{{Key: "_id", Value: albumID}}
+
+	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, update)
 	if err != nil {
 		return false, err
 	}
