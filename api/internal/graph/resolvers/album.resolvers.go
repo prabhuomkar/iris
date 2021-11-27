@@ -42,7 +42,7 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		}},
 		{Key: "pipeline", Value: bson.A{
 			bson.D{{Key: "$match", Value: bson.D{
-				{Key: "$expr", Value: bson.D{{Key: "$cond", Value: bson.A{
+				{Key: "$expr", Value: bson.D{{Key: "$and", Value: bson.A{
 					bson.D{{Key: "$ne", Value: bson.A{"$deleted", true}}},
 					bson.D{{Key: "$in", Value: bson.A{"$_id", "$$mediaItems"}}},
 				}}}},
