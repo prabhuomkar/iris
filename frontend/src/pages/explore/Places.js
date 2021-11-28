@@ -10,7 +10,9 @@ const GET_PLACES = gql`
       nodes {
         id
         name
-        imageUrl
+        displayMediaItem {
+          imageUrl
+        }
       }
     }
   }

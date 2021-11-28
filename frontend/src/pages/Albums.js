@@ -75,11 +75,24 @@ const Albums = () => {
                     {albumsData.albums.nodes.map((album) => (
                       <ImageListItem key={album.id} style={styleFav}>
                         <ImageListImageAspectContainer>
-                          <ImageListImage
-                            src={`${album.mediaItems?.nodes[0]?.imageUrl}?width=200&height=200`}
-                            style={{ cursor: 'pointer', borderRadius: '4px' }}
-                            onClick={() => history.push(`/album/${album.id}`)}
-                          />
+                          {album.mediaItems?.totalCount !== 0 ? (
+                            <ImageListImage
+                              src={`${album.mediaItems?.nodes[0]?.imageUrl}?width=200&height=200`}
+                              style={{
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                              }}
+                              onClick={() => history.push(`/album/${album.id}`)}
+                            />
+                          ) : (
+                            <ImageListImage
+                              style={{
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                              }}
+                              onClick={() => history.push(`/album/${album.id}`)}
+                            />
+                          )}
                         </ImageListImageAspectContainer>
                         <ImageListSupporting className="album-list-info">
                           <ImageListLabel>

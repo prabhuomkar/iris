@@ -41,7 +41,9 @@ const GET_MEDIA_ITEM = gql`
       entities {
         entityType
         name
-        imageUrl
+        displayMediaItem {
+          imageUrl
+        }
         id
       }
       mediaMetadata {
