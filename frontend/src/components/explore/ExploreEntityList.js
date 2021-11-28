@@ -36,7 +36,7 @@ const ExploreEntityList = ({ data, type }) => {
           >
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={`${src.imageUrl}?width=200&height=200`}
+                src={`${src?.displayMediaItem?.imageUrl}?width=200&height=200`}
                 onClick={() => history.push(`/explore/${type}/${src.id}`)}
                 style={{
                   borderRadius:

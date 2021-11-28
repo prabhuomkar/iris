@@ -10,6 +10,7 @@ import {
   ImageListItem,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
+import { Button } from '@rmwc/button';
 import { Grid, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../components';
@@ -56,54 +57,68 @@ const Album = () => {
         <Loading />
       ) : (
         <>
-          <Grid>
-            <GridCell span={12}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'start',
-                  alignItems: 'center',
-                }}
-              >
-                <EditAlbum
-                  albumName={data.album.name}
-                  albumId={data.album.id}
-                />
-                &nbsp;&nbsp;&nbsp;
-                <Icon
-                  onClick={() => setOpen(true)}
-                  style={{ cursor: 'pointer', color: '#424242' }}
-                  icon={{ icon: 'delete', size: 'small' }}
-                />
-                <DeleteAlbumDialog
-                  open={open}
-                  setOpen={setOpen}
-                  albumName={data.album.name}
-                  albumId={data.album.id}
-                />
-              </div>
-              <span style={{ color: '#424242' }}>
-                {moment(data.album.createdAt).format('MMMM D, YYYY')}
-              </span>
-            </GridCell>
-          </Grid>
-          <Grid>
-            <GridCell desktop={12} tablet={12} phone={12}>
-              <ImageList>
-                {data.album.mediaItems.nodes.map((img) => (
-                  <ImageListItem key={img.id} style={styleFav}>
-                    <ImageListImageAspectContainer>
-                      <ImageListImage
-                        src={`${img.imageUrl}?width=200&height=200`}
-                        style={{ cursor: 'pointer', borderRadius: '4px' }}
-                        onClick={() => history.push(`/photo/${img.id}`)}
-                      />
-                    </ImageListImageAspectContainer>
-                  </ImageListItem>
-                ))}
-              </ImageList>
-            </GridCell>
-          </Grid>
+          {data?.album?.mediaItems?.totalCount !== 0 ? (
+            <>
+              <Grid>
+                <GridCell span={12}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'start',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <EditAlbum
+                      albumName={data.album.name}
+                      albumId={data.album.id}
+                    />
+                    &nbsp;&nbsp;&nbsp;
+                    <Icon
+                      onClick={() => setOpen(true)}
+                      style={{ cursor: 'pointer', color: '#424242' }}
+                      icon={{ icon: 'delete', size: 'small' }}
+                    />
+                    <DeleteAlbumDialog
+                      open={open}
+                      setOpen={setOpen}
+                      albumName={data.album.name}
+                      albumId={data.album.id}
+                    />
+                  </div>
+                  <span style={{ color: '#424242' }}>
+                    {moment(data.album.createdAt).format('MMMM D, YYYY')}
+                  </span>
+                </GridCell>
+              </Grid>
+              <Grid>
+                <GridCell desktop={12} tablet={12} phone={12}>
+                  <ImageList>
+                    {data.album.mediaItems.nodes.map((img) => (
+                      <ImageListItem key={img.id} style={styleFav}>
+                        <ImageListImageAspectContainer>
+                          <ImageListImage
+                            src={`${img.imageUrl}?width=200&height=200`}
+                            style={{ cursor: 'pointer', borderRadius: '4px' }}
+                            onClick={() => history.push(`/photo/${img.id}`)}
+                          />
+                        </ImageListImageAspectContainer>
+                      </ImageListItem>
+                    ))}
+                  </ImageList>
+                </GridCell>
+              </Grid>
+            </>
+          ) : (
+            <>
+              <Grid>
+                <GridCell span={12}>
+                  {data.album.name}
+                  &nbsp;&nbsp;&nbsp;
+                  <Button icon="add" label="Add photos" outlined />
+                </GridCell>
+              </Grid>
+            </>
+          )}
         </>
       )}
     </>

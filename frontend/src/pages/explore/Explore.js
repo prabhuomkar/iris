@@ -12,7 +12,9 @@ const GET_PEOPLE = gql`
       nodes {
         id
         name
-        imageUrl
+        displayMediaItem {
+          imageUrl
+        }
       }
     }
   }
@@ -25,7 +27,9 @@ const GET_PLACES = gql`
       nodes {
         id
         name
-        imageUrl
+        displayMediaItem {
+          imageUrl
+        }
       }
     }
   }
@@ -38,7 +42,9 @@ const GET_THINGS = gql`
       nodes {
         id
         name
-        imageUrl
+        displayMediaItem {
+          imageUrl
+        }
       }
     }
   }
