@@ -135,37 +135,36 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		return false, result.Err()
 	}
 
-	var deleteMediaItem *models.MediaItem
-
-	err = result.Decode(&deleteMediaItem)
-	if err != nil {
-		return false, err
-	}
-
-	toUpdateEntities := make([]primitive.ObjectID, len(deleteMediaItem.Entities))
-
-	for idx, entityID := range deleteMediaItem.Entities {
-		oEntityID, _ := primitive.ObjectIDFromHex(entityID)
-		toUpdateEntities[idx] = oEntityID
-	}
-
-	_, err = r.DB.Collection(models.ColEntity).UpdateMany(ctx,
-		bson.D{{Key: "_id", Value: bson.D{
-			{Key: "$in", Value: toUpdateEntities},
-		}}},
-		bson.D{{Key: "$pull", Value: bson.D{
-			{Key: "mediaItems", Value: oid},
-		}}},
-	)
-	if err != nil {
-		return false, err
-	}
-
-	// TASK(omkar): Delete the entity if no mediaitems exist in array
 	// TASK(omkar): Delete the image from CDN if actionType is permanent
 
 	if typeArg == actionTypePermanent {
-		_, err := r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
+		var deleteMediaItem *models.MediaItem
+
+		err := result.Decode(&deleteMediaItem)
+		if err != nil {
+			return false, err
+		}
+
+		toUpdateEntities := make([]primitive.ObjectID, len(deleteMediaItem.Entities))
+
+		for idx, entityID := range deleteMediaItem.Entities {
+			oEntityID, _ := primitive.ObjectIDFromHex(entityID)
+			toUpdateEntities[idx] = oEntityID
+		}
+
+		_, err = r.DB.Collection(models.ColEntity).UpdateMany(ctx,
+			bson.D{{Key: "_id", Value: bson.D{
+				{Key: "$in", Value: toUpdateEntities},
+			}}},
+			bson.D{{Key: "$pull", Value: bson.D{
+				{Key: "mediaItems", Value: oid},
+			}}},
+		)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
 		if err != nil {
 			return false, err
 		}

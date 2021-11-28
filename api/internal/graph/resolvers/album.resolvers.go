@@ -77,7 +77,7 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		results = append(results, result.MediaItem)
 	}
 
-	totalCount := len(obj.MediaItems)
+	totalCount := len(results)
 
 	return &models.MediaItemConnection{
 		TotalCount: totalCount,
