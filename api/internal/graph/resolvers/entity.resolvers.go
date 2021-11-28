@@ -154,14 +154,40 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	skip := int64(*limit * (*page - 1))
 	itemsPerPage := int64(*limit)
 
+	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "mediaitems"},
+		{Key: "let", Value: bson.D{
+			{Key: "mediaItems", Value: "$mediaItems"},
+		}},
+		{Key: "pipeline", Value: bson.A{
+			bson.D{{Key: "$match", Value: bson.D{
+				{Key: "$expr", Value: bson.D{{Key: "$and", Value: bson.A{
+					bson.D{{Key: "$ne", Value: bson.A{"$deleted", true}}},
+					bson.D{{Key: "$in", Value: bson.A{"$_id", "$$mediaItems"}}},
+				}}}},
+			}}},
+		}},
+		{Key: "as", Value: "mediaItem"},
+	}}}
+
+	filterStage := bson.D{{Key: "$match", Value: bson.D{
+		{Key: "$expr", Value: bson.D{{Key: "$gt", Value: bson.A{
+			bson.D{{Key: "$size", Value: "$mediaItem"}}, 0,
+		}}}},
+	}}}
+
 	colQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		lookupStage,
+		filterStage,
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
 	cntQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		lookupStage,
+		filterStage,
 		bson.D{{Key: "$count", Value: "count"}},
 	}
 	facetStage := bson.D{{
