@@ -15,21 +15,34 @@ import (
 )
 
 func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
-	mediaItemID, err := primitive.ObjectIDFromHex(obj.MediaItems[0])
+	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "$and", Value: bson.A{
+				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
+				bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
+			}},
+		}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
+		bson.D{{Key: "$skip", Value: 1}},
+		bson.D{{Key: "$limit", Value: 1}},
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	filter := bson.D{{Key: "_id", Value: mediaItemID}}
+	var result []*models.MediaItem
 
-	var result *models.MediaItem
-
-	err = r.DB.Collection(models.ColMediaItems).FindOne(ctx, filter).Decode(&result)
-	if err != nil {
+	if err = cur.All(ctx, &result); err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	if len(result) == 0 {
+		return nil, nil
+	}
+
+	return result[0], nil
 }
 
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {

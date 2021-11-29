@@ -15,6 +15,7 @@ linters:
    - cyclop
    - varnamelen
    - ireturn
+   - nilnil
 linters-settings:
   lll:
     line-length: 140
