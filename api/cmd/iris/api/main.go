@@ -23,7 +23,6 @@ import (
 )
 
 func main() {
-	// later(omkar): Initialize gRPC clients
 	// later(omkar): Handle graceful shutdowns
 	cfg, err := config.Init()
 	if err != nil {

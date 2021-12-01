@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"iris/api/internal/models"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -135,8 +136,6 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		return false, result.Err()
 	}
 
-	// TASK(omkar): Delete the image from CDN if actionType is permanent
-
 	if typeArg == actionTypePermanent {
 		var deleteMediaItem *models.MediaItem
 
@@ -165,6 +164,14 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		}
 
 		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
+		if err != nil {
+			return false, err
+		}
+
+		splits := strings.Split(deleteMediaItem.ImageURL, "/")
+		fileID := splits[len(splits)-1]
+
+		err = r.CDN.DeleteFile(fileID, nil)
 		if err != nil {
 			return false, err
 		}
