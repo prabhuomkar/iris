@@ -58,6 +58,7 @@ class People(Component):
       if len(people) == 0:
         image_url = upload_image(val['data'])
         # task(omkar): use image_url for the entity display mediaMetadata
+        print(image_url)
         insert_people = {'name': 'Face #1', 'embedding': val['embedding']}
       else:
         _id = get_closest_people(people, val['embedding'])
@@ -65,6 +66,7 @@ class People(Component):
         if _id is None:
           image_url = upload_image(val['data'])
           # task(omkar): use image_url for the entity display mediaMetadata
+          print(image_url)
           insert_people = {'name': f'Face #{len(people)+1}', 'embedding': val['embedding']}
       entity_oids.append(self.upsert_entity(insert_people))
     return entity_oids

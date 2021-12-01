@@ -151,6 +151,7 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			toUpdateEntities[idx] = oEntityID
 		}
 
+		// remove the mediaitem from entities
 		_, err = r.DB.Collection(models.ColEntity).UpdateMany(ctx,
 			bson.D{{Key: "_id", Value: bson.D{
 				{Key: "$in", Value: toUpdateEntities},
@@ -163,11 +164,13 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			return false, err
 		}
 
+		// delete from mediaitems collection
 		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
 		if err != nil {
 			return false, err
 		}
 
+		// delete the image from CDN
 		splits := strings.Split(deleteMediaItem.ImageURL, "/")
 		fileID := splits[len(splits)-1]
 
