@@ -25,7 +25,7 @@ func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entit
 			}},
 		}}},
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
-		bson.D{{Key: "$skip", Value: 1}},
+		bson.D{{Key: "$skip", Value: 0}},
 		bson.D{{Key: "$limit", Value: 1}},
 	})
 	if err != nil {
