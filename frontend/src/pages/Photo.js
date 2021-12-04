@@ -20,7 +20,7 @@ import { capEntityName } from '../utils';
 import {
   Loading,
   Error,
-  PeopleList,
+  //PeopleList,
   FavouriteAction,
   DeleteAction,
 } from '../components';
@@ -41,9 +41,6 @@ const GET_MEDIA_ITEM = gql`
       entities {
         entityType
         name
-        displayMediaItem {
-          imageUrl
-        }
         id
       }
       mediaMetadata {
@@ -155,6 +152,14 @@ const Photo = () => {
                 deleted={data.mediaItem.deleted}
                 id={data.mediaItem.id}
               />
+              &nbsp;&nbsp;
+              {data.mediaItem.deleted && (
+                <DeleteAction
+                  deleted={data.mediaItem.deleted}
+                  id={data.mediaItem.id}
+                  deleteType="permanent"
+                />
+              )}
             </div>
           </GridCell>
           <GridCell desktop={6} tablet={4} phone={12}>
@@ -206,10 +211,12 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <>
                       <div style={{ marginLeft: '60px' }}>
+                        {/*
                         <PeopleList
                           type="people"
                           data={data.mediaItem?.entities}
                         />
+                        */}
                       </div>
                     </>
                   )}

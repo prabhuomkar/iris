@@ -12,7 +12,7 @@ const DELETE_ITEM = gql`
   }
 `;
 
-const DeleteAction = ({ deleted, id }) => {
+const DeleteAction = ({ deleted, id, deleteType }) => {
   const history = useHistory();
   const [deleteItem, { data: delData, loading: delLoading }] =
     useMutation(DELETE_ITEM);
@@ -25,10 +25,16 @@ const DeleteAction = ({ deleted, id }) => {
 
   if (delLoading)
     return (
-      <Snackbar
-        open={true}
-        message={deleted ? 'Restoring...' : 'Moving to Trash...'}
-      />
+      <>
+        {deleteType ? (
+          <Snackbar open={true} message={'Deleting...'} />
+        ) : (
+          <Snackbar
+            open={true}
+            message={deleted ? 'Restoring...' : 'Moving to Trash...'}
+          />
+        )}
+      </>
     );
 
   if (delData && delData.delete) {
@@ -37,22 +43,42 @@ const DeleteAction = ({ deleted, id }) => {
     }, 2000);
 
     return (
-      <Snackbar open={true} message={deleted ? 'Restored' : 'Moved to Trash'} />
+      <>
+        {deleteType ? (
+          <Snackbar open={true} message={'This photo is permanently deleted'} />
+        ) : (
+          <Snackbar
+            open={true}
+            message={deleted ? 'Restored' : 'Moved to Trash'}
+          />
+        )}
+      </>
     );
   }
 
   return (
-    <Icon
-      icon={{ icon: deleted ? 'restore' : 'delete_outline', size: 'large' }}
-      style={{ color: '#fff', cursor: 'pointer' }}
-      onClick={() => handleDelButtonClick(id, deleted ? 'remove' : 'add')}
-    />
+    <>
+      {deleteType === 'permanent' ? (
+        <Icon
+          icon={{ icon: 'delete_outline', size: 'large' }}
+          style={{ color: '#fff', cursor: 'pointer' }}
+          onClick={() => handleDelButtonClick(id, 'permanent')}
+        />
+      ) : (
+        <Icon
+          icon={{ icon: deleted ? 'restore' : 'delete_outline', size: 'large' }}
+          style={{ color: '#fff', cursor: 'pointer' }}
+          onClick={() => handleDelButtonClick(id, deleted ? 'remove' : 'add')}
+        />
+      )}
+    </>
   );
 };
 
 DeleteAction.propTypes = {
   deleted: PropTypes.bool,
   id: PropTypes.string,
+  deleteType: PropTypes.string,
 };
 
 export default DeleteAction;
