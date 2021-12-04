@@ -67,11 +67,11 @@ type ComplexityRoot struct {
 	}
 
 	Entity struct {
-		EntityType func(childComplexity int) int
-		ID         func(childComplexity int) int
-		ImageURL   func(childComplexity int) int
-		MediaItems func(childComplexity int, page *int, limit *int) int
-		Name       func(childComplexity int) int
+		DisplayMediaItem func(childComplexity int) int
+		EntityType       func(childComplexity int) int
+		ID               func(childComplexity int) int
+		MediaItems       func(childComplexity int, page *int, limit *int) int
+		Name             func(childComplexity int) int
 	}
 
 	EntityItemConnection struct {
@@ -164,6 +164,8 @@ type AlbumResolver interface {
 	MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 type EntityResolver interface {
+	DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error)
+
 	MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 type MediaItemResolver interface {
@@ -284,6 +286,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AutocompleteResponse.Name(childComplexity), true
 
+	case "Entity.displayMediaItem":
+		if e.complexity.Entity.DisplayMediaItem == nil {
+			break
+		}
+
+		return e.complexity.Entity.DisplayMediaItem(childComplexity), true
+
 	case "Entity.entityType":
 		if e.complexity.Entity.EntityType == nil {
 			break
@@ -297,13 +306,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Entity.ID(childComplexity), true
-
-	case "Entity.imageUrl":
-		if e.complexity.Entity.ImageURL == nil {
-			break
-		}
-
-		return e.complexity.Entity.ImageURL(childComplexity), true
 
 	case "Entity.mediaItems":
 		if e.complexity.Entity.MediaItems == nil {
@@ -902,7 +904,7 @@ extend type Mutation {
 	{Name: "schema/entity.graphql", Input: `type Entity {
   id: String!
   name: String!
-  imageUrl: String!
+  displayMediaItem: MediaItem!
   entityType: String!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
 }
@@ -1942,7 +1944,7 @@ func (ec *executionContext) _Entity_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Entity_imageUrl(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
+func (ec *executionContext) _Entity_displayMediaItem(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1953,14 +1955,14 @@ func (ec *executionContext) _Entity_imageUrl(ctx context.Context, field graphql.
 		Object:     "Entity",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ImageURL, nil
+		return ec.resolvers.Entity().DisplayMediaItem(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1972,9 +1974,9 @@ func (ec *executionContext) _Entity_imageUrl(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*models.MediaItem)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNMediaItem2ᚖirisᚋapiᚋinternalᚋmodelsᚐMediaItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Entity_entityType(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
@@ -5397,11 +5399,20 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "imageUrl":
-			out.Values[i] = ec._Entity_imageUrl(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+		case "displayMediaItem":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_displayMediaItem(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "entityType":
 			out.Values[i] = ec._Entity_entityType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

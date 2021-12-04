@@ -14,6 +14,36 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
+	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
+		bson.D{{Key: "$match", Value: bson.D{
+			{Key: "$and", Value: bson.A{
+				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
+				bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
+			}},
+		}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
+		bson.D{{Key: "$limit", Value: 1}},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.MediaItem
+
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	if len(result) == 0 {
+		return nil, nil
+	}
+
+	return result[0], nil
+}
+
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultEntityMediaItemsLimit := 20
 	defaultEntityMediaItemsPage := 1
@@ -136,14 +166,40 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	skip := int64(*limit * (*page - 1))
 	itemsPerPage := int64(*limit)
 
+	lookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "mediaitems"},
+		{Key: "let", Value: bson.D{
+			{Key: "mediaItems", Value: "$mediaItems"},
+		}},
+		{Key: "pipeline", Value: bson.A{
+			bson.D{{Key: "$match", Value: bson.D{
+				{Key: "$expr", Value: bson.D{{Key: "$and", Value: bson.A{
+					bson.D{{Key: "$ne", Value: bson.A{"$deleted", true}}},
+					bson.D{{Key: "$in", Value: bson.A{"$_id", "$$mediaItems"}}},
+				}}}},
+			}}},
+		}},
+		{Key: "as", Value: "mediaItem"},
+	}}}
+
+	filterStage := bson.D{{Key: "$match", Value: bson.D{
+		{Key: "$expr", Value: bson.D{{Key: "$gt", Value: bson.A{
+			bson.D{{Key: "$size", Value: "$mediaItem"}}, 0,
+		}}}},
+	}}}
+
 	colQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		lookupStage,
+		filterStage,
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
 	cntQuery := bson.A{
 		bson.D{{Key: "$match", Value: bson.D{{Key: "entityType", Value: entityType}}}},
+		lookupStage,
+		filterStage,
 		bson.D{{Key: "$count", Value: "count"}},
 	}
 	facetStage := bson.D{{

@@ -47,13 +47,9 @@ class Things(Component):
       cat_class = cat_class.replace('_', ' ')
       result = self.db['entities'].find_one_and_update(
         {'name': cat_class, 'entityType': 'things'},
-        {'$set': { 'name': cat_class, 'imageUrl': self.image_url }},
+        {'$addToSet': {'mediaItems': ObjectId(self.oid)}, '$set': {'name': cat_class}},
         upsert=True,
         return_document=ReturnDocument.AFTER
-      )
-      self.db['entities'].update_one(
-        {'_id': result['_id']},
-        {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
       )
       entity_oids.append(result['_id'])
     print(f'[things]: {entity_oids}')

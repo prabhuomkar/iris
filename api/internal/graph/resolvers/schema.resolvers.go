@@ -9,12 +9,14 @@ import (
 	"fmt"
 	"iris/api/internal/models"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -118,23 +120,66 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		return false, errIncorrectDeleteActionType
 	}
 
-	if typeArg != "permanent" {
-		action := false
-		if typeArg == actionTypeAdd {
-			action = true
-		}
+	action := false
+	if typeArg == actionTypeAdd {
+		action = true
+	}
 
-		_, err = r.DB.Collection(models.ColMediaItems).UpdateByID(ctx, oid, bson.D{
-			{Key: "$set", Value: bson.D{{Key: "deleted", Value: action}}},
-		})
+	filter := bson.D{{Key: "_id", Value: oid}}
+	after := options.After
+
+	result := r.DB.Collection(models.ColMediaItems).FindOneAndUpdate(ctx, filter,
+		bson.D{{Key: "$set", Value: bson.D{{Key: "deleted", Value: action}}}},
+		&options.FindOneAndUpdateOptions{ReturnDocument: &after},
+	)
+	if result.Err() != nil {
+		return false, result.Err()
+	}
+
+	if typeArg == actionTypePermanent {
+		var deleteMediaItem *models.MediaItem
+
+		err := result.Decode(&deleteMediaItem)
 		if err != nil {
 			return false, err
 		}
 
-		return true, nil
+		toUpdateEntities := make([]primitive.ObjectID, len(deleteMediaItem.Entities))
+
+		for idx, entityID := range deleteMediaItem.Entities {
+			oEntityID, _ := primitive.ObjectIDFromHex(entityID)
+			toUpdateEntities[idx] = oEntityID
+		}
+
+		// remove the mediaitem from entities
+		_, err = r.DB.Collection(models.ColEntity).UpdateMany(ctx,
+			bson.D{{Key: "_id", Value: bson.D{
+				{Key: "$in", Value: toUpdateEntities},
+			}}},
+			bson.D{{Key: "$pull", Value: bson.D{
+				{Key: "mediaItems", Value: oid},
+			}}},
+		)
+		if err != nil {
+			return false, err
+		}
+
+		// delete from mediaitems collection
+		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
+		if err != nil {
+			return false, err
+		}
+
+		// delete the image from CDN
+		splits := strings.Split(deleteMediaItem.ImageURL, "/")
+		fileID := splits[len(splits)-1]
+
+		err = r.CDN.DeleteFile(fileID, nil)
+		if err != nil {
+			return false, err
+		}
 	}
 
-	// FOR(omkar): handle complex operations for permanent delete here
 	return true, nil
 }
 

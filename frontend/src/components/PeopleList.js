@@ -32,7 +32,7 @@ const PeopleList = (data) => {
           <ImageListItem key={src.id} style={stylePeopleList}>
             <ImageListImageAspectContainer>
               <ImageListImage
-                src={`${src.imageUrl}?width=150&height=150`}
+                src={`${src?.displayMediaItem?.imageUrl}?width=150&height=150`}
                 onClick={() =>
                   history.push(`/explore/${src.entityType}/${src.id}`)
                 }
