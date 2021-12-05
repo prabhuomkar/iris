@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
   TopAppBar,
@@ -13,8 +13,11 @@ import { NavLink } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Upload from './Upload';
 import CreateAlbum from './CreateAlbum';
+import { CreateAlbumContext } from '../../App';
 
 const Header = ({ toggleSideNav }) => {
+  const { imageList } = useContext(CreateAlbumContext);
+
   return (
     <div>
       <TopAppBar className="top-app-bar" fixed>
@@ -36,7 +39,11 @@ const Header = ({ toggleSideNav }) => {
               justifyContent: 'right',
             }}
           >
-            <CreateAlbum />
+            {imageList.length > 0 ? (
+              <CreateAlbum imageList={imageList} disabled={false} />
+            ) : (
+              <CreateAlbum disabled={true} />
+            )}
             &nbsp;&nbsp;
             <Upload />
             {/*
@@ -53,6 +60,7 @@ const Header = ({ toggleSideNav }) => {
 
 Header.propTypes = {
   toggleSideNav: PropTypes.func,
+  showAdd: PropTypes.bool,
 };
 
 export default Header;

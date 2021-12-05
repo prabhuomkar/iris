@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
 import { Loading, Error } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
+import { CreateAlbumContext } from '../App';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {
@@ -27,20 +28,17 @@ const GET_MEDIA_ITEMS = gql`
   }
 `;
 
-const Photo = ({ imageId, imageUrl, imageList }) => {
+const Photo = ({ imageId, imageUrl, imageList, setImageList }) => {
   const [isSelected, setIsSelected] = useState(false);
 
-  const handleSelected = () => {
+  const onSelect = () => {
     if (imageList.includes(imageId)) {
-      const index = imageList.indexOf(imageId);
-      if (index > -1) {
-        imageList.splice(index, 1);
-      }
+      setImageList((arr) => arr.filter((_imageId) => _imageId !== imageId));
+      setIsSelected(!isSelected);
     } else {
-      imageList.push(imageId);
+      setImageList((arr) => [...arr, imageId]);
+      setIsSelected(!isSelected);
     }
-    console.log(imageList);
-    setIsSelected(!isSelected);
   };
 
   return (
@@ -55,7 +53,7 @@ const Photo = ({ imageId, imageUrl, imageList }) => {
           color: isSelected ? '#4800b2' : '#ffffff',
           cursor: 'pointer',
         }}
-        onClick={() => handleSelected()}
+        onClick={onSelect}
       />
       <Link to={`photo/${imageId}`}>
         <img
@@ -79,7 +77,7 @@ const Photos = () => {
     fetchPolicy: 'no-cache',
   });
 
-  const imageList = [];
+  const { imageList, setImageList } = useContext(CreateAlbumContext);
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -126,6 +124,7 @@ const Photos = () => {
                               imageId={image.id[index]}
                               imageUrl={img}
                               imageList={imageList}
+                              setImageList={setImageList}
                             />
                           </GridCell>
                         );
@@ -146,6 +145,7 @@ Photo.propTypes = {
   imageId: PropTypes.string,
   imageUrl: PropTypes.string,
   imageList: PropTypes.array,
+  setImageList: PropTypes.func,
 };
 
 export default Photos;

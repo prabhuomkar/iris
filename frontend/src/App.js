@@ -1,39 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, createContext } from 'react';
 import { ThemeProvider } from '@rmwc/theme';
 import { BrowserRouter } from 'react-router-dom';
-import { createUploadLink } from 'apollo-upload-client';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import { Header, Content } from './components';
+import { DrawerAppContent } from '@rmwc/drawer';
 import '@rmwc/theme/styles';
+import { Header, Content } from './components';
+import SideNav from './components/SideNav';
 import './App.scss';
+export const CreateAlbumContext = createContext();
 
 const App = () => {
-  const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
-  const client = new ApolloClient({
-    link,
-    cache: new InMemoryCache(),
-  });
   const [open, setOpen] = useState(true);
   const toggle = () => setOpen(!open);
 
+  const [imageList, setImageList] = useState([]);
+
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider
-        options={{
-          primary: '#812ce5',
-          secondary: '#ffffff',
-          onPrimary: '#812ce5',
-          textPrimaryOnBackground: '#000',
-        }}
-      >
+    <ThemeProvider
+      options={{
+        primary: '#812ce5',
+        secondary: '#ffffff',
+        onPrimary: '#812ce5',
+        textPrimaryOnBackground: '#000',
+      }}
+    >
+      <CreateAlbumContext.Provider value={{ imageList, setImageList }}>
         <BrowserRouter>
           <div className="App">
             <Header toggleSideNav={toggle} />
-            <Content open={open} />
+            <SideNav open={open} />
+            <DrawerAppContent>
+              <Content />
+            </DrawerAppContent>
           </div>
         </BrowserRouter>
-      </ThemeProvider>
-    </ApolloProvider>
+      </CreateAlbumContext.Provider>
+    </ThemeProvider>
   );
 };
 
