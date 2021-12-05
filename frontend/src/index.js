@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { createUploadLink } from 'apollo-upload-client';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloProvider } from '@apollo/react-hooks';
 import reportWebVitals from './reportWebVitals';
 
 const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
