@@ -32,4 +32,5 @@ extend type Mutation {
   createAlbum(input: CreateAlbumInput!): Boolean!
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
   deleteAlbum(id: String!): Boolean!
+  updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }

@@ -120,14 +120,15 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAlbum       func(childComplexity int, input models.CreateAlbumInput) int
-		Delete            func(childComplexity int, id string, typeArg string) int
-		DeleteAlbum       func(childComplexity int, id string) int
-		UpdateAlbum       func(childComplexity int, id string, input models.UpdateAlbumInput) int
-		UpdateDescription func(childComplexity int, id string, description string) int
-		UpdateEntity      func(childComplexity int, id string, name string) int
-		UpdateFavourite   func(childComplexity int, id string, typeArg string) int
-		Upload            func(childComplexity int, file graphql.Upload, albumID *string) int
+		CreateAlbum           func(childComplexity int, input models.CreateAlbumInput) int
+		Delete                func(childComplexity int, id string, typeArg string) int
+		DeleteAlbum           func(childComplexity int, id string) int
+		UpdateAlbum           func(childComplexity int, id string, input models.UpdateAlbumInput) int
+		UpdateAlbumMediaItems func(childComplexity int, id string, typeArg string, mediaItems []string) int
+		UpdateDescription     func(childComplexity int, id string, description string) int
+		UpdateEntity          func(childComplexity int, id string, name string) int
+		UpdateFavourite       func(childComplexity int, id string, typeArg string) int
+		Upload                func(childComplexity int, file graphql.Upload, albumID *string) int
 	}
 
 	OnThisDayResponse struct {
@@ -175,6 +176,7 @@ type MutationResolver interface {
 	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (bool, error)
 	UpdateAlbum(ctx context.Context, id string, input models.UpdateAlbumInput) (bool, error)
 	DeleteAlbum(ctx context.Context, id string) (bool, error)
+	UpdateAlbumMediaItems(ctx context.Context, id string, typeArg string, mediaItems []string) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 	Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error)
@@ -563,6 +565,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAlbum(childComplexity, args["id"].(string), args["input"].(models.UpdateAlbumInput)), true
 
+	case "Mutation.updateAlbumMediaItems":
+		if e.complexity.Mutation.UpdateAlbumMediaItems == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAlbumMediaItems_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAlbumMediaItems(childComplexity, args["id"].(string), args["type"].(string), args["mediaItems"].([]string)), true
+
 	case "Mutation.updateDescription":
 		if e.complexity.Mutation.UpdateDescription == nil {
 			break
@@ -899,6 +913,7 @@ extend type Mutation {
   createAlbum(input: CreateAlbumInput!): Boolean!
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
   deleteAlbum(id: String!): Boolean!
+  updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }
 `, BuiltIn: false},
 	{Name: "schema/entity.graphql", Input: `type Entity {
@@ -1116,6 +1131,39 @@ func (ec *executionContext) field_Mutation_delete_args(ctx context.Context, rawA
 		}
 	}
 	args["type"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateAlbumMediaItems_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
+	var arg2 []string
+	if tmp, ok := rawArgs["mediaItems"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mediaItems"))
+		arg2, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["mediaItems"] = arg2
 	return args, nil
 }
 
@@ -3060,6 +3108,48 @@ func (ec *executionContext) _Mutation_deleteAlbum(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteAlbum(rctx, args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAlbumMediaItems(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAlbumMediaItems_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAlbumMediaItems(rctx, args["id"].(string), args["type"].(string), args["mediaItems"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5698,6 +5788,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateAlbumMediaItems":
+			out.Values[i] = ec._Mutation_updateAlbumMediaItems(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateEntity":
 			out.Values[i] = ec._Mutation_updateEntity(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6405,6 +6500,36 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
