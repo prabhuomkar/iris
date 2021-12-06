@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
+import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
 import { Loading, Error } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
+import { CreateAlbumContext } from '../App';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {
@@ -25,10 +28,56 @@ const GET_MEDIA_ITEMS = gql`
   }
 `;
 
+const Photo = ({ imageId, imageUrl, imageList, setImageList }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const onSelect = () => {
+    if (imageList.includes(imageId)) {
+      setImageList((arr) => arr.filter((_imageId) => _imageId !== imageId));
+      setIsSelected(!isSelected);
+    } else {
+      setImageList((arr) => [...arr, imageId]);
+      setIsSelected(!isSelected);
+    }
+  };
+
+  return (
+    <div className="select-photo">
+      <Icon
+        icon={{
+          icon: 'check_circle',
+          size: 'medium',
+        }}
+        className="select-icon"
+        style={{
+          color: isSelected ? '#4800b2' : '#ffffff',
+          cursor: 'pointer',
+        }}
+        onClick={onSelect}
+      />
+      <Link to={`photo/${imageId}`}>
+        <img
+          key={imageId}
+          src={`${imageUrl}?width=200&height=200`}
+          width="100%"
+          style={{
+            cursor: 'pointer',
+            borderRadius: '4px',
+            height: '180px',
+            objectFit: 'cover',
+          }}
+        />
+      </Link>
+    </div>
+  );
+};
+
 const Photos = () => {
   const { loading, error, data } = useQuery(GET_MEDIA_ITEMS, {
     fetchPolicy: 'no-cache',
   });
+
+  const { imageList, setImageList } = useContext(CreateAlbumContext);
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -71,19 +120,12 @@ const Photos = () => {
                             tablet={4}
                             phone={12}
                           >
-                            <Link to={`photo/${image.id[index]}`}>
-                              <img
-                                key={image.id[index]}
-                                src={`${img}?width=200&height=200`}
-                                width="100%"
-                                style={{
-                                  cursor: 'pointer',
-                                  borderRadius: '4px',
-                                  height: '180px',
-                                  objectFit: 'cover',
-                                }}
-                              />
-                            </Link>
+                            <Photo
+                              imageId={image.id[index]}
+                              imageUrl={img}
+                              imageList={imageList}
+                              setImageList={setImageList}
+                            />
                           </GridCell>
                         );
                       })}
@@ -97,6 +139,13 @@ const Photos = () => {
       )}
     </>
   );
+};
+
+Photo.propTypes = {
+  imageId: PropTypes.string,
+  imageUrl: PropTypes.string,
+  imageList: PropTypes.array,
+  setImageList: PropTypes.func,
 };
 
 export default Photos;
