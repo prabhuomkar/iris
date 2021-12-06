@@ -6,7 +6,7 @@ import (
 
 type (
 	Database struct {
-		URI  string `envconfig:"DB_URI" default:"mongodb://root:root@database:5010/iris?authSource=admin"`
+		URI  string `envconfig:"DB_URI" default:"mongodb://root:root@127.0.0.1:5010/iris?authSource=admin"`
 		Name string `enconfig:"DB_NAME" default:"iris"`
 	}
 
@@ -17,7 +17,7 @@ type (
 	}
 
 	Queue struct {
-		URI      string `envconfig:"QUEUE_URI" default:"amqp://root:root@queue:5030"`
+		URI      string `envconfig:"QUEUE_URI" default:"amqp://root:root@127.0.0.1:5030"`
 		Exchange string `envconfig:"QUEUE_EXCHANGE" default:"iris"`
 	}
 
