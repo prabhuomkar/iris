@@ -15,8 +15,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var errIncorrectUpdateAlbumMediaItemsActionType = errors.New("incorrect action type for updating album mediaItems")
-
 func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultAlbumMediaItemsLimit := 20
 	defaultAlbumMediaItemsPage := 1
@@ -87,7 +85,7 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 	}, nil
 }
 
-func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (bool, error) {
+func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (*string, error) {
 	mediaItems := make([]primitive.ObjectID, len(input.MediaItems))
 
 	for idx, mediaItem := range input.MediaItems {
@@ -95,7 +93,7 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		mediaItems[idx] = oid
 	}
 
-	_, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
+	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
 		{Key: "mediaItems", Value: mediaItems},
@@ -103,10 +101,12 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		{Key: "updatedAt", Value: time.Now()},
 	})
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return true, nil
+	albumID := result.InsertedID.(primitive.ObjectID).Hex()
+
+	return &albumID, nil
 }
 
 func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input models.UpdateAlbumInput) (bool, error) {
@@ -265,3 +265,11 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 type albumResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var errIncorrectUpdateAlbumMediaItemsActionType = errors.New("incorrect action type for updating album mediaItems")

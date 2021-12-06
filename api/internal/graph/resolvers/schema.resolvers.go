@@ -19,17 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
-	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")
-)
-
-const (
-	actionTypeAdd       = "add"
-	actionTypeRemove    = "remove"
-	actionTypePermanent = "permanent"
-)
-
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
@@ -423,3 +412,20 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 		Nodes:      result[0].MediaItems,
 	}, nil
 }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var (
+	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
+	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")
+)
+
+const (
+	actionTypeAdd       = "add"
+	actionTypeRemove    = "remove"
+	actionTypePermanent = "permanent"
+)

@@ -173,7 +173,7 @@ type MediaItemResolver interface {
 	Entities(ctx context.Context, obj *models.MediaItem) ([]*models.Entity, error)
 }
 type MutationResolver interface {
-	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (bool, error)
+	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (*string, error)
 	UpdateAlbum(ctx context.Context, id string, input models.UpdateAlbumInput) (bool, error)
 	DeleteAlbum(ctx context.Context, id string) (bool, error)
 	UpdateAlbumMediaItems(ctx context.Context, id string, typeArg string, mediaItems []string) (bool, error)
@@ -910,7 +910,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  createAlbum(input: CreateAlbumInput!): Boolean!
+  createAlbum(input: CreateAlbumInput!): String
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
   deleteAlbum(id: String!): Boolean!
   updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
@@ -3030,14 +3030,11 @@ func (ec *executionContext) _Mutation_createAlbum(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5775,9 +5772,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createAlbum":
 			out.Values[i] = ec._Mutation_createAlbum(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateAlbum":
 			out.Values[i] = ec._Mutation_updateAlbum(ctx, field)
 			if out.Values[i] == graphql.Null {
