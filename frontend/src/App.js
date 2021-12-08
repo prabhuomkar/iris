@@ -9,6 +9,7 @@ import { DrawerAppContent } from '@rmwc/drawer';
 import '@rmwc/theme/styles';
 import './App.scss';
 export const CreateAlbumContext = createContext();
+export const RemoveAlbumPhotosContext = createContext();
 
 const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
 const client = new ApolloClient({
@@ -21,27 +22,32 @@ const App = () => {
   const toggle = () => setOpen(!open);
 
   const [imageList, setImageList] = useState([]);
+  const [removeImageList, setRemoveImageList] = useState([]);
 
   return (
     <ApolloProvider client={client}>
       <div className="App">
         <CreateAlbumContext.Provider value={{ imageList, setImageList }}>
-          <ThemeProvider
-            options={{
-              primary: '#812ce5',
-              secondary: '#ffffff',
-              onPrimary: '#812ce5',
-              textPrimaryOnBackground: '#000',
-            }}
+          <RemoveAlbumPhotosContext.Provider
+            value={{ removeImageList, setRemoveImageList }}
           >
-            <BrowserRouter>
-              <Header toggleSideNav={toggle} />
-              <SideNav open={open} />
-              <DrawerAppContent>
-                <Content />
-              </DrawerAppContent>
-            </BrowserRouter>
-          </ThemeProvider>
+            <ThemeProvider
+              options={{
+                primary: '#812ce5',
+                secondary: '#ffffff',
+                onPrimary: '#812ce5',
+                textPrimaryOnBackground: '#000',
+              }}
+            >
+              <BrowserRouter>
+                <Header toggleSideNav={toggle} />
+                <SideNav open={open} />
+                <DrawerAppContent>
+                  <Content />
+                </DrawerAppContent>
+              </BrowserRouter>
+            </ThemeProvider>
+          </RemoveAlbumPhotosContext.Provider>
         </CreateAlbumContext.Provider>
       </div>
     </ApolloProvider>

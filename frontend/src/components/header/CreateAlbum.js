@@ -27,7 +27,7 @@ const CreateAlbum = ({ disabled, imageList }) => {
 
   if (data && data.createAlbum) {
     setTimeout(() => {
-      history.push('/albums');
+      history.push(`/album/${data.createAlbum}`);
       history.go(0);
     });
     return <Snackbar open={true} message={'New album created'} />;
