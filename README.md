@@ -4,14 +4,8 @@
 </h1>
 Open Source Photos Platform Powered by PyTorch
 
-<center>
-  <img src="https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/challenge_photos/001/635/304/datas/full_width.png" alt="PyTorch Annual Hackathon Submission">
-</center>
-
-## About
-![Architecture](images/iris.jpeg)
-
 ## Services
+**Application Services:**
 - [Frontend](frontend/README.md) [![Frontend](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml)
 - [API](api/README.md) [![API](https://github.com/prabhuomkar/iris/actions/workflows/api.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/api.yaml)
 - [Worker](worker/README.md) [![Worker](https://github.com/prabhuomkar/iris/actions/workflows/worker.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/worker.yaml)
@@ -24,12 +18,13 @@ Open Source Photos Platform Powered by PyTorch
 
 ## Roadmap & Issues 
 You can find the roadmap for this project [here](https://github.com/prabhuomkar/iris/projects). Issues are managed via GitHub Issues [here](https://github.com/prabhuomkar/iris/issues).
-<!-- 
-## Deployment
-TODO: Add Docker related notes
 
-## Contributing Guide
-TODO: Add Contributing Guide -->
+<!-- ## Deployment
+TODO: Add Docker related notes -->
+
+## Contributions
+iris is open to contributions, but if you plan to contribute new features, utility functions, or refactoring to the core, please first open an issue and discuss it with us. Sending a PR without discussion might end up resulting in a rejected PR.  
+Please read [Contributing Guide](CONTRIBUTING.md) for details on how to contribute to this project.
 
 ## Contributors
 [![Contributors](https://badges.pufler.dev/contributors/prabhuomkar/iris?size=50&padding=4&bots=true)](https://github.com/prabhuomkar/iris/graphs/contributors)
