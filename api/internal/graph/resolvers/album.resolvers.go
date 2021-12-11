@@ -165,7 +165,7 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 
 	update := bson.D{{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}}
 	if typeArg == actionTypeAdd {
-		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: mediaItemIDs}}}}
+		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}}
 	}
 
 	filter := bson.D{{Key: "_id", Value: albumID}}
