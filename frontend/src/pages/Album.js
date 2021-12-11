@@ -15,7 +15,7 @@ import { Button } from '@rmwc/button';
 import { Grid, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../components';
-import { RemoveAlbumPhotosContext } from '../App';
+import { AlbumsContext } from '../App';
 
 const GET_ALBUM = gql`
   query getAlbum($id: String!) {
@@ -84,14 +84,14 @@ const AlbumPhoto = ({
 
 const Album = () => {
   let { id } = useParams();
+  let history = useHistory();
   const { error, loading, data } = useQuery(GET_ALBUM, {
     variables: { id },
     fetchPolicy: 'no-cache',
   });
 
-  const { removeImageList, setRemoveImageList } = useContext(
-    RemoveAlbumPhotosContext
-  );
+  const { removePhotos } = useContext(AlbumsContext);
+  const [removeImageList, setRemoveImageList] = removePhotos;
 
   if (error) return <Error />;
 
@@ -137,7 +137,12 @@ const Album = () => {
                       albumId={data.album.id}
                     />
                     &nbsp;&nbsp;&nbsp;
-                    <Button icon="add" label="Add photos" outlined />
+                    <Button
+                      icon="add"
+                      label="Add photos"
+                      outlined
+                      onClick={() => history.push(`/album/${id}/add`)}
+                    />
                   </div>
                   <span style={{ color: '#424242' }}>
                     {moment(data.album.createdAt).format('MMMM D, YYYY')}
@@ -189,7 +194,12 @@ const Album = () => {
                       albumId={data.album.id}
                     />
                     &nbsp;&nbsp;&nbsp;
-                    <Button icon="add" label="Add photos" outlined />
+                    <Button
+                      icon="add"
+                      label="Add photos"
+                      outlined
+                      onClick={() => history.push(`/album/${id}/add`)}
+                    />
                   </div>
                 </GridCell>
               </Grid>

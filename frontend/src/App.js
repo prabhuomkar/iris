@@ -8,8 +8,7 @@ import SideNav from './components/SideNav';
 import { DrawerAppContent } from '@rmwc/drawer';
 import '@rmwc/theme/styles';
 import './App.scss';
-export const CreateAlbumContext = createContext();
-export const RemoveAlbumPhotosContext = createContext();
+export const AlbumsContext = createContext();
 
 const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
 const client = new ApolloClient({
@@ -23,32 +22,35 @@ const App = () => {
 
   const [imageList, setImageList] = useState([]);
   const [removeImageList, setRemoveImageList] = useState([]);
+  const [addImageList, setAddImageList] = useState([]);
 
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <CreateAlbumContext.Provider value={{ imageList, setImageList }}>
-          <RemoveAlbumPhotosContext.Provider
-            value={{ removeImageList, setRemoveImageList }}
+        <AlbumsContext.Provider
+          value={{
+            createAlbum: [imageList, setImageList],
+            removePhotos: [removeImageList, setRemoveImageList],
+            addPhotos: [addImageList, setAddImageList],
+          }}
+        >
+          <ThemeProvider
+            options={{
+              primary: '#812ce5',
+              secondary: '#ffffff',
+              onPrimary: '#812ce5',
+              textPrimaryOnBackground: '#000',
+            }}
           >
-            <ThemeProvider
-              options={{
-                primary: '#812ce5',
-                secondary: '#ffffff',
-                onPrimary: '#812ce5',
-                textPrimaryOnBackground: '#000',
-              }}
-            >
-              <BrowserRouter>
-                <Header toggleSideNav={toggle} />
-                <SideNav open={open} />
-                <DrawerAppContent>
-                  <Content />
-                </DrawerAppContent>
-              </BrowserRouter>
-            </ThemeProvider>
-          </RemoveAlbumPhotosContext.Provider>
-        </CreateAlbumContext.Provider>
+            <BrowserRouter>
+              <Header toggleSideNav={toggle} />
+              <SideNav open={open} />
+              <DrawerAppContent>
+                <Content />
+              </DrawerAppContent>
+            </BrowserRouter>
+          </ThemeProvider>
+        </AlbumsContext.Provider>
       </div>
     </ApolloProvider>
   );

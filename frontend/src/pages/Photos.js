@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useRouteMatch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -8,7 +9,8 @@ import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
 import { Loading, Error } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
-import { CreateAlbumContext } from '../App';
+import UpdateAlbum from '../components/header/UpdateAlbum';
+import { AlbumsContext } from '../App';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {
@@ -28,7 +30,7 @@ const GET_MEDIA_ITEMS = gql`
   }
 `;
 
-const Photo = ({ imageId, imageUrl, imageList, setImageList }) => {
+const Photo = ({ imageId, imageUrl, imageList, setImageList, match }) => {
   const [isSelected, setIsSelected] = useState(false);
 
   const onSelect = () => {
@@ -55,7 +57,8 @@ const Photo = ({ imageId, imageUrl, imageList, setImageList }) => {
         }}
         onClick={onSelect}
       />
-      <Link to={`photo/${imageId}`}>
+
+      <Link to={match ? '#' : `photo/${imageId}`}>
         <img
           key={imageId}
           src={`${imageUrl}?width=200&height=200`}
@@ -76,8 +79,12 @@ const Photos = () => {
   const { loading, error, data } = useQuery(GET_MEDIA_ITEMS, {
     fetchPolicy: 'no-cache',
   });
+  let match = useRouteMatch('/album/:id/add');
 
-  const { imageList, setImageList } = useContext(CreateAlbumContext);
+  const { createAlbum, addPhotos } = useContext(AlbumsContext);
+
+  const [imageList, setImageList] = createAlbum;
+  const [addImageList, setAddImageList] = addPhotos;
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -103,6 +110,21 @@ const Photos = () => {
             </>
           ) : (
             <>
+              {match?.isExact && (
+                <Grid>
+                  <GridCell desktop={10} tablet={6} phone={3}>
+                    <h3
+                      style={{ display: 'inline-block', marginRight: '16px' }}
+                    >
+                      Select Photos
+                    </h3>
+                    <UpdateAlbum
+                      addImageList={addImageList}
+                      disabled={addImageList.length === 0}
+                    />
+                  </GridCell>
+                </Grid>
+              )}
               {sortPhotos(reducePhotos(data.mediaItems.nodes)).map((image) => {
                 return (
                   <div key={image.createdAt}>
@@ -123,8 +145,13 @@ const Photos = () => {
                             <Photo
                               imageId={image.id[index]}
                               imageUrl={img}
-                              imageList={imageList}
-                              setImageList={setImageList}
+                              imageList={
+                                match?.isExact ? addImageList : imageList
+                              }
+                              setImageList={
+                                match?.isExact ? setAddImageList : setImageList
+                              }
+                              match={match?.isExact}
                             />
                           </GridCell>
                         );
@@ -146,6 +173,7 @@ Photo.propTypes = {
   imageUrl: PropTypes.string,
   imageList: PropTypes.array,
   setImageList: PropTypes.func,
+  match: PropTypes.bool,
 };
 
 export default Photos;
