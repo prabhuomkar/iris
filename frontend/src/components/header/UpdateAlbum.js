@@ -18,16 +18,12 @@ const UPDATE_ALBUM = gql`
 `;
 
 var pageURL = window.location.href;
-//var albumId = pageURL.substring(pageURL.lastIndexOf('/') + 1);
-//console.log(albumId);
 var albumId = pageURL.split('/');
-console.log(String(albumId[albumId.length - 2]));
 
 const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
   const history = useHistory();
   const [updateAlbum, { data, error, loading }] = useMutation(UPDATE_ALBUM);
   const handleUpdate = (updatedList, type) => {
-    console.log(updatedList);
     type === 'add'
       ? updateAlbum({
           variables: {

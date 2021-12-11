@@ -7,6 +7,7 @@ import Sharing from './Sharing';
 import Albums from './Albums';
 import Album from './Album';
 import Upcoming from './Upcoming';
+import PageNotFound from './PageNotFound';
 
 export {
   Trash,
@@ -18,4 +19,5 @@ export {
   Albums,
   Album,
   Upcoming,
+  PageNotFound,
 };
