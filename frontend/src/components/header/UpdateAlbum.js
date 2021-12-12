@@ -42,13 +42,35 @@ const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
   };
 
   if (loading)
-    return <Snackbar open={true} message={'Removing photos from album...'} />;
+    return (
+      <Snackbar
+        open={true}
+        message={
+          removeImageList
+            ? 'Removing photos from album...'
+            : 'Adding photos to album...'
+        }
+      />
+    );
 
   if (data && data.updateAlbumMediaItems) {
     setTimeout(() => {
-      history.go(0);
+      if (removeImageList) {
+        history.go(0);
+      } else {
+        history.push(`/album/${albumId[albumId.length - 2]}`);
+      }
     });
-    return <Snackbar open={true} message={'Photo has been deleted'} />;
+    return (
+      <Snackbar
+        open={true}
+        message={
+          removeImageList
+            ? 'Photo has been deleted'
+            : 'Photo has been added to album'
+        }
+      />
+    );
   }
 
   if (error) return <Error />;
