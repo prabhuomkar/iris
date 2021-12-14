@@ -17,13 +17,23 @@ import (
 func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
 	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
 
-	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
-		bson.D{{Key: "$match", Value: bson.D{
+	matchStage := bson.D{{Key: "$match", Value: bson.D{
+		{Key: "$and", Value: bson.A{
+			bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
+			bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
+		}},
+	}}}
+	if obj.EntityType == "people" {
+		matchStage = bson.D{{Key: "$match", Value: bson.D{
 			{Key: "$and", Value: bson.A{
 				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-				bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
+				bson.D{{Key: "faces.entityId", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
 			}},
-		}}},
+		}}}
+	}
+
+	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
+		matchStage,
 		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
 		bson.D{{Key: "$limit", Value: 1}},
 	})
