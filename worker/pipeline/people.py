@@ -37,14 +37,14 @@ class People(Component):
       )
       self.db['entities'].update_one(
         {'_id': result['_id']},
-        {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
+        {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
       )
       print(f'[people]: {result["_id"]}')
       return result['_id']
 
     self.db['entities'].update_one(
       {'_id': data['_id']},
-      {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
+      {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
     )
     print(f'[people]: {data["_id"]}')
     return data['_id']
@@ -52,30 +52,31 @@ class People(Component):
   def cluster_people(self, result):
     """Cluster people from detected faces and embeddings"""
     entity_oids = []
+    entity_images = []
     for val in result:
       people = list(self.db['entities'].find({'entityType': 'people'}))
       insert_people = None
+      image_url = upload_image(val['data'])
       if len(people) == 0:
-        image_url = upload_image(val['data'])
-        # task(omkar): use image_url for the entity display mediaMetadata
-        print(image_url)
         insert_people = {'name': 'Face #1', 'embedding': val['embedding']}
       else:
         _id = get_closest_people(people, val['embedding'])
         insert_people = {'_id': _id, 'embedding': val['embedding']}
         if _id is None:
-          image_url = upload_image(val['data'])
-          # task(omkar): use image_url for the entity display mediaMetadata
-          print(image_url)
           insert_people = {'name': f'Face #{len(people)+1}', 'embedding': val['embedding']}
-      entity_oids.append(self.upsert_entity(insert_people))
-    return entity_oids
+      entity_id = self.upsert_entity(insert_people)
+      entity_oids.append(entity_id)
+      entity_images.append({'entityId': entity_id, 'imageUrl': image_url})
+    return entity_oids, entity_images
 
   def process(self):
     try:
       result = self.get_inference_results()
-      entity_oids = self.cluster_people(result)
-      self.update({ '$addToSet': { 'entities': { '$each': entity_oids } } })
+      entity_oids, entity_images = self.cluster_people(result)
+      self.update({ '$addToSet': {
+        'entities': { '$each': entity_oids },
+        'faces': { '$each': entity_images },
+      }})
     except Exception as e:
       print(f'some exception while processing people: {str(e)}')
     finally:
