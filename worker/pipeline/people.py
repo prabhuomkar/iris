@@ -37,14 +37,14 @@ class People(Component):
       )
       self.db['entities'].update_one(
         {'_id': result['_id']},
-        {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
+        {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
       )
       print(f'[people]: {result["_id"]}')
       return result['_id']
 
     self.db['entities'].update_one(
       {'_id': data['_id']},
-      {'$addToSet': {'mediaItems': ObjectId(self.oid)}},
+      {'$addToSet': {'embeddings': data['embedding'], 'mediaItems': ObjectId(self.oid)}},
     )
     print(f'[people]: {data["_id"]}')
     return data['_id']
