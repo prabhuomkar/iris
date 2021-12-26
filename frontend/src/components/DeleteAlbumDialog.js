@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import { CircularProgress } from '@rmwc/circular-progress';
+import { Snackbar } from '@rmwc/snackbar';
 import { Dialog, DialogTitle, DialogActions, DialogButton } from '@rmwc/dialog';
 import '@rmwc/dialog/styles';
 
@@ -27,6 +28,7 @@ const DeleteAlbumDialog = ({ open, setOpen, albumName, albumId }) => {
     setTimeout(() => {
       history.push('/albums');
     }, 2000);
+    return <Snackbar open={true} message={'Album has been deleted'} />;
   }
 
   return (

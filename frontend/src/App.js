@@ -8,7 +8,7 @@ import SideNav from './components/SideNav';
 import { DrawerAppContent } from '@rmwc/drawer';
 import '@rmwc/theme/styles';
 import './App.scss';
-export const CreateAlbumContext = createContext();
+export const AlbumsContext = createContext();
 
 const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
 const client = new ApolloClient({
@@ -21,11 +21,19 @@ const App = () => {
   const toggle = () => setOpen(!open);
 
   const [imageList, setImageList] = useState([]);
+  const [removeImageList, setRemoveImageList] = useState([]);
+  const [addImageList, setAddImageList] = useState([]);
 
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <CreateAlbumContext.Provider value={{ imageList, setImageList }}>
+        <AlbumsContext.Provider
+          value={{
+            createAlbum: [imageList, setImageList],
+            removePhotos: [removeImageList, setRemoveImageList],
+            addPhotos: [addImageList, setAddImageList],
+          }}
+        >
           <ThemeProvider
             options={{
               primary: '#812ce5',
@@ -42,7 +50,7 @@ const App = () => {
               </DrawerAppContent>
             </BrowserRouter>
           </ThemeProvider>
-        </CreateAlbumContext.Provider>
+        </AlbumsContext.Provider>
       </div>
     </ApolloProvider>
   );

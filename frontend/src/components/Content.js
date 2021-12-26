@@ -5,6 +5,7 @@ import {
   Photos,
   Search,
   Upcoming,
+  PageNotFound,
   Favourites,
   Trash,
   Albums,
@@ -28,12 +29,14 @@ const Content = () => {
         <Route exact path="/favourites" component={Favourites} />
         <Route exact path="/albums" component={Albums} />
         <Route exact path="/album/:id" component={Album} />
+        <Route exact path="/album/:id/add" component={Photos} />
         <Route path="/search" component={Search} />
         {/* static */}
         <Route exact path="/sharing" component={Upcoming} />
         <Route exact path="/utilities" component={Upcoming} />
         <Route exact path="/archive" component={Upcoming} />
         <Route exact path="/trash" component={Trash} />
+        <Route component={PageNotFound} />
       </Switch>
     </>
   );

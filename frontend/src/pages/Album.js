@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -14,6 +15,7 @@ import { Button } from '@rmwc/button';
 import { Grid, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../components';
+import { AlbumsContext } from '../App';
 
 const GET_ALBUM = gql`
   query getAlbum($id: String!) {
@@ -33,13 +35,63 @@ const GET_ALBUM = gql`
   }
 `;
 
-const Album = () => {
+const AlbumPhoto = ({
+  imageUrl,
+  imageId,
+  removeImageList,
+  setRemoveImageList,
+}) => {
   let history = useHistory();
+
+  const [isSelected, setIsSelected] = useState(false);
+
+  const onSelect = () => {
+    if (removeImageList.includes(imageId)) {
+      setRemoveImageList((arr) =>
+        arr.filter((_imageId) => _imageId !== imageId)
+      );
+      setIsSelected(!isSelected);
+    } else {
+      setRemoveImageList((arr) => [...arr, imageId]);
+      setIsSelected(!isSelected);
+    }
+  };
+  return (
+    <div className="select-photo">
+      <Icon
+        icon={{
+          icon: 'check_circle',
+          size: 'medium',
+        }}
+        className="select-icon"
+        style={{
+          color: isSelected ? '#4800b2' : '#ffffff',
+          cursor: 'pointer',
+          zIndex: '1',
+        }}
+        onClick={onSelect}
+      />
+      <ImageListImageAspectContainer>
+        <ImageListImage
+          src={`${imageUrl}?width=200&height=200`}
+          style={{ cursor: 'pointer', borderRadius: '4px' }}
+          onClick={() => history.push(`/photo/${imageId}`)}
+        />
+      </ImageListImageAspectContainer>
+    </div>
+  );
+};
+
+const Album = () => {
   let { id } = useParams();
+  let history = useHistory();
   const { error, loading, data } = useQuery(GET_ALBUM, {
     variables: { id },
     fetchPolicy: 'no-cache',
   });
+
+  const { removePhotos } = useContext(AlbumsContext);
+  const [removeImageList, setRemoveImageList] = removePhotos;
 
   if (error) return <Error />;
 
@@ -84,6 +136,13 @@ const Album = () => {
                       albumName={data.album.name}
                       albumId={data.album.id}
                     />
+                    &nbsp;&nbsp;&nbsp;
+                    <Button
+                      icon="add"
+                      label="Add photos"
+                      outlined
+                      onClick={() => history.push(`/album/${id}/add`)}
+                    />
                   </div>
                   <span style={{ color: '#424242' }}>
                     {moment(data.album.createdAt).format('MMMM D, YYYY')}
@@ -95,13 +154,12 @@ const Album = () => {
                   <ImageList>
                     {data.album.mediaItems.nodes.map((img) => (
                       <ImageListItem key={img.id} style={styleFav}>
-                        <ImageListImageAspectContainer>
-                          <ImageListImage
-                            src={`${img.imageUrl}?width=200&height=200`}
-                            style={{ cursor: 'pointer', borderRadius: '4px' }}
-                            onClick={() => history.push(`/photo/${img.id}`)}
-                          />
-                        </ImageListImageAspectContainer>
+                        <AlbumPhoto
+                          imageUrl={img.imageUrl}
+                          imageId={img.id}
+                          removeImageList={removeImageList}
+                          setRemoveImageList={setRemoveImageList}
+                        />
                       </ImageListItem>
                     ))}
                   </ImageList>
@@ -112,9 +170,37 @@ const Album = () => {
             <>
               <Grid>
                 <GridCell span={12}>
-                  {data.album.name}
-                  &nbsp;&nbsp;&nbsp;
-                  <Button icon="add" label="Add photos" outlined />
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'start',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <EditAlbum
+                      albumName={data.album.name}
+                      albumId={data.album.id}
+                    />
+                    &nbsp;&nbsp;&nbsp;
+                    <Icon
+                      onClick={() => setOpen(true)}
+                      style={{ cursor: 'pointer', color: '#424242' }}
+                      icon={{ icon: 'delete', size: 'small' }}
+                    />
+                    <DeleteAlbumDialog
+                      open={open}
+                      setOpen={setOpen}
+                      albumName={data.album.name}
+                      albumId={data.album.id}
+                    />
+                    &nbsp;&nbsp;&nbsp;
+                    <Button
+                      icon="add"
+                      label="Add photos"
+                      outlined
+                      onClick={() => history.push(`/album/${id}/add`)}
+                    />
+                  </div>
                 </GridCell>
               </Grid>
             </>
@@ -123,6 +209,13 @@ const Album = () => {
       )}
     </>
   );
+};
+
+AlbumPhoto.propTypes = {
+  imageUrl: PropTypes.string,
+  imageId: PropTypes.string,
+  removeImageList: PropTypes.array,
+  setRemoveImageList: PropTypes.func,
 };
 
 export default Album;

@@ -13,10 +13,13 @@ import { NavLink } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Upload from './Upload';
 import CreateAlbum from './CreateAlbum';
-import { CreateAlbumContext } from '../../App';
+import UpdateAlbum from './UpdateAlbum';
+import { AlbumsContext } from '../../App';
 
 const Header = ({ toggleSideNav }) => {
-  const { imageList } = useContext(CreateAlbumContext);
+  const { createAlbum, removePhotos } = useContext(AlbumsContext);
+  const [removeImageList] = removePhotos;
+  const [imageList] = createAlbum;
 
   return (
     <div>
@@ -34,6 +37,10 @@ const Header = ({ toggleSideNav }) => {
             <SearchBar />
           </TopAppBarSection>
           <TopAppBarSection alignEnd>
+            <UpdateAlbum
+              removeImageList={removeImageList}
+              disabled={removeImageList.length === 0}
+            />
             <CreateAlbum
               imageList={imageList}
               disabled={imageList.length === 0}
