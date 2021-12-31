@@ -121,7 +121,6 @@ const Photos = () => {
                     <UpdateAlbum
                       addImageList={addImageList}
                       disabled={addImageList.length === 0}
-                      //albumId={albumId[albumId.length - 2]}
                       albumId={params.id}
                     />
                   </GridCell>
