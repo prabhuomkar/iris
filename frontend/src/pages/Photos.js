@@ -7,9 +7,8 @@ import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
 import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
-import { Loading, Error } from '../components';
+import { Loading, Error, UpdateAlbum } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
-import UpdateAlbum from '../components/header/UpdateAlbum';
 import { AlbumsContext } from '../App';
 
 const GET_MEDIA_ITEMS = gql`
@@ -86,6 +85,9 @@ const Photos = () => {
   const [imageList, setImageList] = createAlbum;
   const [addImageList, setAddImageList] = addPhotos;
 
+  var pageURL = window.location.href;
+  var albumId = pageURL.split('/');
+
   if (loading) return <Loading />;
   if (error) return <Error />;
 
@@ -121,6 +123,7 @@ const Photos = () => {
                     <UpdateAlbum
                       addImageList={addImageList}
                       disabled={addImageList.length === 0}
+                      albumId={albumId[albumId.length - 2]}
                     />
                   </GridCell>
                 </Grid>
