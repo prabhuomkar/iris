@@ -21,21 +21,11 @@ const UpdateAlbum = ({ disabled, albumId, removeImageList, addImageList }) => {
   const history = useHistory();
   const [updateAlbum, { data, error, loading }] = useMutation(UPDATE_ALBUM);
 
-  const addToAlbum = (updatedList) => {
+  const handleUpdateAlbum = (updatedList, type) => {
     updateAlbum({
       variables: {
         id: albumId,
-        type: 'add',
-        mediaItems: updatedList,
-      },
-    });
-  };
-
-  const removeFromAlbum = (updatedList) => {
-    updateAlbum({
-      variables: {
-        id: albumId,
-        type: 'remove',
+        type: type,
         mediaItems: updatedList,
       },
     });
@@ -66,7 +56,7 @@ const UpdateAlbum = ({ disabled, albumId, removeImageList, addImageList }) => {
         open={true}
         message={
           removeImageList
-            ? 'Photo has been deleted'
+            ? 'Photo has been removed'
             : 'Photo has been added to album'
         }
       />
@@ -82,7 +72,7 @@ const UpdateAlbum = ({ disabled, albumId, removeImageList, addImageList }) => {
           icon={disabled ? '' : 'remove_circle_outline'}
           style={{ color: 'red' }}
           disabled={disabled ? true : false}
-          onClick={() => removeFromAlbum(removeImageList)}
+          onClick={() => handleUpdateAlbum(removeImageList, 'remove')}
         />
       ) : (
         <Button
@@ -91,7 +81,7 @@ const UpdateAlbum = ({ disabled, albumId, removeImageList, addImageList }) => {
           unelevated
           style={{ color: '#fff' }}
           disabled={disabled ? true : false}
-          onClick={() => addToAlbum(addImageList)}
+          onClick={() => handleUpdateAlbum(addImageList, 'add')}
         />
       )}
     </>
