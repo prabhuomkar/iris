@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Grid, GridCell } from '@rmwc/grid';
 import { gql, useQuery } from '@apollo/client';
 import { Loading, Error, ExploreEntity } from '../../components';
@@ -19,8 +20,8 @@ const GET_PLACES = gql`
 `;
 
 const Places = () => {
-  const url = window.location.pathname;
-  const type = url.split('/').pop();
+  const location = useLocation();
+  const type = location.pathname.split('/').pop();
 
   const { error: placesError, data: placesData } = useQuery(GET_PLACES, {
     variables: { entityType: 'places' },

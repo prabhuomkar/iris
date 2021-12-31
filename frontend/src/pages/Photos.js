@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useRouteMatch, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -78,15 +78,13 @@ const Photos = () => {
   const { loading, error, data } = useQuery(GET_MEDIA_ITEMS, {
     fetchPolicy: 'no-cache',
   });
+  const params = useParams();
   let match = useRouteMatch('/album/:id/add');
 
   const { createAlbum, addPhotos } = useContext(AlbumsContext);
 
   const [imageList, setImageList] = createAlbum;
   const [addImageList, setAddImageList] = addPhotos;
-
-  var pageURL = window.location.href;
-  var albumId = pageURL.split('/');
 
   if (loading) return <Loading />;
   if (error) return <Error />;
@@ -123,7 +121,8 @@ const Photos = () => {
                     <UpdateAlbum
                       addImageList={addImageList}
                       disabled={addImageList.length === 0}
-                      albumId={albumId[albumId.length - 2]}
+                      //albumId={albumId[albumId.length - 2]}
+                      albumId={params.id}
                     />
                   </GridCell>
                 </Grid>
