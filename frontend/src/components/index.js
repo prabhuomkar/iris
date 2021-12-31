@@ -10,6 +10,7 @@ import FavouriteAction from './FavouriteAction';
 import DeleteAction from './DeleteAction';
 import DeleteAlbumDialog from './DeleteAlbumDialog';
 import EditAlbum from './EditAlbum';
+import UpdateAlbum from './UpdateAlbum';
 
 export {
   Content,
@@ -24,4 +25,5 @@ export {
   DeleteAction,
   DeleteAlbumDialog,
   EditAlbum,
+  UpdateAlbum,
 };

@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
   TopAppBar,
@@ -13,10 +14,12 @@ import { NavLink } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Upload from './Upload';
 import CreateAlbum from './CreateAlbum';
-import UpdateAlbum from './UpdateAlbum';
+import UpdateAlbum from '../UpdateAlbum';
 import { AlbumsContext } from '../../App';
 
 const Header = ({ toggleSideNav }) => {
+  const location = useLocation();
+  const albumId = location.pathname.split('/').pop();
   const { createAlbum, removePhotos } = useContext(AlbumsContext);
   const [removeImageList] = removePhotos;
   const [imageList] = createAlbum;
@@ -40,6 +43,7 @@ const Header = ({ toggleSideNav }) => {
             <UpdateAlbum
               removeImageList={removeImageList}
               disabled={removeImageList.length === 0}
+              albumId={albumId}
             />
             <CreateAlbum
               imageList={imageList}

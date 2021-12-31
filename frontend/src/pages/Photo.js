@@ -20,7 +20,7 @@ import { capEntityName } from '../utils';
 import {
   Loading,
   Error,
-  //PeopleList,
+  PeopleList,
   FavouriteAction,
   DeleteAction,
 } from '../components';
@@ -39,9 +39,13 @@ const GET_MEDIA_ITEM = gql`
       favourite
       deleted
       entities {
-        entityType
-        name
         id
+        name
+        entityType
+        displayMediaItem {
+          imageUrl
+          id
+        }
       }
       mediaMetadata {
         creationTime
@@ -211,12 +215,10 @@ const Photo = () => {
                   {people && people.length > 0 && (
                     <>
                       <div style={{ marginLeft: '60px' }}>
-                        {/*
                         <PeopleList
                           type="people"
-                          data={data.mediaItem?.entities}
+                          data={data?.mediaItem?.entities}
                         />
-                        */}
                       </div>
                     </>
                   )}

@@ -5,7 +5,7 @@ import { gql, useMutation } from '@apollo/client';
 import { TopAppBarActionItem } from '@rmwc/top-app-bar';
 import { Snackbar } from '@rmwc/snackbar';
 import { Button } from '@rmwc/button';
-import { Error } from '..';
+import { Error } from '.';
 
 const UPDATE_ALBUM = gql`
   mutation updateAlbumMediaItems(
@@ -17,28 +17,18 @@ const UPDATE_ALBUM = gql`
   }
 `;
 
-var pageURL = window.location.href;
-var albumId = pageURL.split('/');
-
-const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
+const UpdateAlbum = ({ disabled, albumId, removeImageList, addImageList }) => {
   const history = useHistory();
   const [updateAlbum, { data, error, loading }] = useMutation(UPDATE_ALBUM);
-  const handleUpdate = (updatedList, type) => {
-    type === 'add'
-      ? updateAlbum({
-          variables: {
-            id: String(albumId[albumId.length - 2]),
-            type: type,
-            mediaItems: updatedList,
-          },
-        })
-      : updateAlbum({
-          variables: {
-            id: String(albumId[albumId.length - 1]),
-            type: type,
-            mediaItems: updatedList,
-          },
-        });
+
+  const handleUpdateAlbum = (updatedList, type) => {
+    updateAlbum({
+      variables: {
+        id: albumId,
+        type: type,
+        mediaItems: updatedList,
+      },
+    });
   };
 
   if (loading)
@@ -58,7 +48,7 @@ const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
       if (removeImageList) {
         history.go(0);
       } else {
-        history.push(`/album/${albumId[albumId.length - 2]}`);
+        history.push(`/album/${albumId}`);
       }
     });
     return (
@@ -66,7 +56,7 @@ const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
         open={true}
         message={
           removeImageList
-            ? 'Photo has been deleted'
+            ? 'Photo has been removed'
             : 'Photo has been added to album'
         }
       />
@@ -82,7 +72,7 @@ const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
           icon={disabled ? '' : 'remove_circle_outline'}
           style={{ color: 'red' }}
           disabled={disabled ? true : false}
-          onClick={() => handleUpdate(removeImageList, 'remove')}
+          onClick={() => handleUpdateAlbum(removeImageList, 'remove')}
         />
       ) : (
         <Button
@@ -91,7 +81,7 @@ const UpdateAlbum = ({ disabled, removeImageList, addImageList }) => {
           unelevated
           style={{ color: '#fff' }}
           disabled={disabled ? true : false}
-          onClick={() => handleUpdate(addImageList, 'add')}
+          onClick={() => handleUpdateAlbum(addImageList, 'add')}
         />
       )}
     </>
@@ -102,6 +92,7 @@ UpdateAlbum.propTypes = {
   disabled: PropTypes.bool,
   removeImageList: PropTypes.array,
   addImageList: PropTypes.array,
+  albumId: PropTypes.string,
 };
 
 export default UpdateAlbum;

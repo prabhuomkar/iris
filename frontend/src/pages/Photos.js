@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useRouteMatch, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -7,9 +7,8 @@ import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
 import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
-import { Loading, Error } from '../components';
+import { Loading, Error, UpdateAlbum } from '../components';
 import { reducePhotos, sortPhotos } from '../utils';
-import UpdateAlbum from '../components/header/UpdateAlbum';
 import { AlbumsContext } from '../App';
 
 const GET_MEDIA_ITEMS = gql`
@@ -79,6 +78,7 @@ const Photos = () => {
   const { loading, error, data } = useQuery(GET_MEDIA_ITEMS, {
     fetchPolicy: 'no-cache',
   });
+  const params = useParams();
   let match = useRouteMatch('/album/:id/add');
 
   const { createAlbum, addPhotos } = useContext(AlbumsContext);
@@ -121,6 +121,7 @@ const Photos = () => {
                     <UpdateAlbum
                       addImageList={addImageList}
                       disabled={addImageList.length === 0}
+                      albumId={params.id}
                     />
                   </GridCell>
                 </Grid>
