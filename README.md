@@ -4,6 +4,8 @@
 </h1>
 Open Source Photos Platform Powered by PyTorch
 
+**NOTE: This project is currently at its ALPHA stage, we are aiming for BETA Release in February 2022**
+
 ## Services
 **Application Services:**
 - [Frontend](frontend/README.md) [![Frontend](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml/badge.svg)](https://github.com/prabhuomkar/iris/actions/workflows/frontend.yaml)
