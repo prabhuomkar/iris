@@ -1,58 +1,33 @@
-import React, { useState, createContext } from 'react';
-import { createUploadLink } from 'apollo-upload-client';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
-import { ThemeProvider } from '@rmwc/theme';
-import { BrowserRouter } from 'react-router-dom';
-import { Header, Content } from './components';
-import SideNav from './components/SideNav';
-import { DrawerAppContent } from '@rmwc/drawer';
-import '@rmwc/theme/styles';
-import './App.scss';
-export const AlbumsContext = createContext();
-
-const link = createUploadLink({ uri: process.env.REACT_APP_API_URL });
-const client = new ApolloClient({
-  link,
-  cache: new InMemoryCache(),
-});
+import React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const App = () => {
-  const [open, setOpen] = useState(true);
-  const toggle = () => setOpen(!open);
-
-  const [imageList, setImageList] = useState([]);
-  const [removeImageList, setRemoveImageList] = useState([]);
-  const [addImageList, setAddImageList] = useState([]);
-
   return (
-    <ApolloProvider client={client}>
-      <div className="App">
-        <AlbumsContext.Provider
-          value={{
-            createAlbum: [imageList, setImageList],
-            removePhotos: [removeImageList, setRemoveImageList],
-            addPhotos: [addImageList, setAddImageList],
-          }}
-        >
-          <ThemeProvider
-            options={{
-              primary: '#812ce5',
-              secondary: '#ffffff',
-              onPrimary: '#812ce5',
-              textPrimaryOnBackground: '#000',
-            }}
-          >
-            <BrowserRouter>
-              <Header toggleSideNav={toggle} />
-              <SideNav open={open} />
-              <DrawerAppContent>
-                <Content />
-              </DrawerAppContent>
-            </BrowserRouter>
-          </ThemeProvider>
-        </AlbumsContext.Provider>
-      </div>
-    </ApolloProvider>
+    <div className="App">
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static" style={{ background: '#812ce5' }}>
+          <Toolbar>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              iris
+            </Typography>
+          </Toolbar>
+        </AppBar>
+      </Box>
+    </div>
   );
 };
 
