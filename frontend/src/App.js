@@ -1,33 +1,44 @@
-import React from 'react';
-import AppBar from '@mui/material/AppBar';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
+import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import IDrawer from './components/drawer/Drawer';
+import Header from './components/header/Header';
 
 const App = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   return (
-    <div className="App">
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static" style={{ background: '#812ce5' }}>
-          <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              iris
-            </Typography>
-          </Toolbar>
-        </AppBar>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <Header handleDrawerToggle={handleDrawerToggle} />
+      <Box
+        component="nav"
+        sx={{ width: { sm: 240 }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        <IDrawer
+          mobileOpen={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+        />
       </Box>
-    </div>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - 240px)` },
+        }}
+      >
+        <Toolbar />
+        {/* content goes here */}
+        <div>Home</div>
+      </Box>
+    </Box>
   );
 };
 
