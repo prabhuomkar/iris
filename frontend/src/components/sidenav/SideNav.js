@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
 import Drawer from '@mui/material/Drawer';
@@ -15,41 +16,64 @@ import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const drawerItems1 = [
-  { id: 'Photos', link_to: '', icon: <InsertPhotoIcon /> },
-  { id: 'Explore', link_to: 'explore', icon: <SearchIcon /> },
-  { id: 'Sharing', link_to: 'sharing', icon: <PeopleAltIcon /> },
+const sideNavItems1 = [
+  { id: 'Photos', to: '/', icon: <InsertPhotoIcon /> },
+  { id: 'Explore', to: '/explore', icon: <SearchIcon /> },
+  { id: 'Sharing', to: '/sharing', icon: <PeopleAltIcon /> },
 ];
 
-const drawerItems2 = [
-  { id: 'Favourites', link_to: 'favourites', icon: <StarIcon /> },
-  { id: 'Albums', link_to: 'albums', icon: <CollectionsBookmarkIcon /> },
-  { id: 'Utilities', link_to: 'utilities', icon: <LibraryAddCheckIcon /> },
-  { id: 'Trash', link_to: 'trash', icon: <DeleteIcon /> },
+const sideNavItems2 = [
+  { id: 'Favourites', to: '/favourites', icon: <StarIcon /> },
+  { id: 'Albums', to: '/albums', icon: <CollectionsBookmarkIcon /> },
+  { id: 'Utilities', to: '/utilities', icon: <LibraryAddCheckIcon /> },
+  { id: 'Trash', to: '/trash', icon: <DeleteIcon /> },
 ];
 
-const IDrawer = ({ mobileOpen, handleDrawerToggle }) => {
+const SideNav = ({ mobileOpen, handleDrawerToggle }) => {
   const drawerWidth = 240;
+  const location = useLocation();
 
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
-        {drawerItems1.map((dr1) => (
-          <ListItem button key={dr1.id}>
-            <ListItemIcon>{dr1.icon}</ListItemIcon>
-            <ListItemText primary={dr1.id} />
-          </ListItem>
+        {sideNavItems1.map((sn1) => (
+          <Link
+            to={sn1.to}
+            key={sn1.to}
+            onClick={() => handleDrawerToggle()}
+            className="link"
+          >
+            <ListItem
+              button
+              key={sn1.id}
+              selected={sn1.to === location.pathname}
+            >
+              <ListItemIcon>{sn1.icon}</ListItemIcon>
+              <ListItemText primary={sn1.id} />
+            </ListItem>
+          </Link>
         ))}
       </List>
       <Divider />
       <List subheader={<ListSubheader>LIBRARY</ListSubheader>}>
-        {drawerItems2.map((dr2) => (
-          <ListItem button key={dr2.id}>
-            <ListItemIcon>{dr2.icon}</ListItemIcon>
-            <ListItemText primary={dr2.id} />
-          </ListItem>
+        {sideNavItems2.map((sn2) => (
+          <Link
+            to={sn2.to}
+            key={sn2.to}
+            onClick={() => handleDrawerToggle()}
+            className="link"
+          >
+            <ListItem
+              button
+              key={sn2.id}
+              selected={sn2.to === location.pathname}
+            >
+              <ListItemIcon>{sn2.icon}</ListItemIcon>
+              <ListItemText primary={sn2.id} />
+            </ListItem>
+          </Link>
         ))}
       </List>
     </div>
@@ -91,4 +115,4 @@ const IDrawer = ({ mobileOpen, handleDrawerToggle }) => {
   );
 };
 
-export default IDrawer;
+export default SideNav;

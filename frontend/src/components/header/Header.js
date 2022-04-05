@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -6,6 +7,12 @@ import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 
 const Header = ({ handleDrawerToggle }) => {
+  const navigate = useNavigate();
+
+  const refresh = () => {
+    window.location.reload();
+  };
+
   return (
     <AppBar
       position="fixed"
@@ -23,7 +30,16 @@ const Header = ({ handleDrawerToggle }) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div">
-          iris
+          <div
+            style={{ display: 'flex', cursor: 'pointer' }}
+            onClick={() => {
+              navigate('/');
+              refresh();
+            }}
+          >
+            <img src="/logo.png" width="32px" />
+            &nbsp; <div>iris</div>
+          </div>
         </Typography>
       </Toolbar>
     </AppBar>

@@ -2,3 +2,8 @@ body {
   font-family: sans-serif;
   margin: 0px auto;
 }
+
+.link {
+  text-decoration: none;
+  color: #000000de;
+}
