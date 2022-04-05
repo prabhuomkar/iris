@@ -6,6 +6,7 @@ package resolvers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"time"
@@ -93,9 +94,20 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		mediaItems[idx] = oid
 	}
 
+	if len(mediaItems) == 0 {
+		return nil, errInvalidMediaItemsForAlbum
+	}
+
+	var thumbnailMediaItem models.MediaItem
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&thumbnailMediaItem)
+	if err != nil {
+		return nil, err
+	}
+
 	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
+		{Key: "thumbnailUrl", Value: thumbnailMediaItem.ThumbnailURL},
 		{Key: "mediaItems", Value: mediaItems},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
@@ -126,6 +138,10 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) UpdateAlbumThumbnailURL(ctx context.Context, id string, mediaItemID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (bool, error) {
@@ -272,4 +288,5 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var errInvalidMediaItemsForAlbum = errors.New("invalid number of media items for album")
 var errIncorrectUpdateAlbumMediaItemsActionType = errors.New("incorrect action type for updating album mediaItems")

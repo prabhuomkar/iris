@@ -5,6 +5,7 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
@@ -13,46 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
-	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
-
-	matchStage := bson.D{{Key: "$match", Value: bson.D{
-		{Key: "$and", Value: bson.A{
-			bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-			bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-		}},
-	}}}
-	if obj.EntityType == "people" {
-		matchStage = bson.D{{Key: "$match", Value: bson.D{
-			{Key: "$and", Value: bson.A{
-				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-				bson.D{{Key: "faces.entityId", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-			}},
-		}}}
-	}
-
-	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
-		matchStage,
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
-		bson.D{{Key: "$limit", Value: 1}},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var result []*models.MediaItem
-
-	if err = cur.All(ctx, &result); err != nil {
-		return nil, err
-	}
-
-	if len(result) == 0 {
-		return nil, nil
-	}
-
-	return result[0], nil
-}
 
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultEntityMediaItemsLimit := 20
@@ -137,6 +98,10 @@ func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name str
 	}
 
 	return true, nil
+}
+
+func (r *mutationResolver) UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, error) {

@@ -28,7 +28,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	imageURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
 
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
-		{Key: "imageUrl", Value: imageURL},
+		{Key: "sourceUrl", Value: imageURL},
 		{Key: "description", Value: nil},
 		{Key: "mimeType", Value: result.MimeType},
 		{Key: "fileName", Value: result.FileName},
@@ -159,9 +159,18 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			return false, err
 		}
 
-		// delete the image from CDN
-		splits := strings.Split(deleteMediaItem.ImageURL, "/")
+		// delete the source image from CDN
+		splits := strings.Split(deleteMediaItem.SourceURL, "/")
 		fileID := splits[len(splits)-1]
+
+		err = r.CDN.DeleteFile(fileID, nil)
+		if err != nil {
+			return false, err
+		}
+
+		// delete the thumbnail image from CDN
+		splits = strings.Split(deleteMediaItem.ThumbnailURL, "/")
+		fileID = splits[len(splits)-1]
 
 		err = r.CDN.DeleteFile(fileID, nil)
 		if err != nil {
