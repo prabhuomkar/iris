@@ -6,7 +6,6 @@ package resolvers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"time"
@@ -141,7 +140,28 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 }
 
 func (r *mutationResolver) UpdateAlbumThumbnailURL(ctx context.Context, id string, mediaItemID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	mediaItemOID, err := primitive.ObjectIDFromHex(mediaItemID)
+	if err != nil {
+		return false, err
+	}
+
+	var mediaItem models.MediaItem
+	err = r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "thumbnailUrl", Value: mediaItem.ThumbnailURL}}}})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (bool, error) {

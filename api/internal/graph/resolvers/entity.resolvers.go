@@ -5,7 +5,6 @@ package resolvers
 
 import (
 	"context"
-	"fmt"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
@@ -101,7 +100,28 @@ func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name str
 }
 
 func (r *mutationResolver) UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	entityOID, err := primitive.ObjectIDFromHex(entityID)
+	if err != nil {
+		return false, err
+	}
+
+	var entity models.Entity
+	err = r.DB.Collection(models.ColEntity).FindOne(ctx, bson.D{{Key: "_id", Value: entityOID}}).Decode(&entity)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "thumbnailUrl", Value: entity.ThumbnailURL}}}})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, error) {
