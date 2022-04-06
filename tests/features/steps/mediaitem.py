@@ -34,36 +34,83 @@ def step_file_updated(context):
 
 @step('user favourites "{mime_type}" file')
 def step_favourite_file(context, mime_type):
-    pass
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = favourite_mediaitem(context.file_id, 'add')
+    assert context.response == True
 
 @step('file is marked as favourite')
 def step_validate_file_is_marked_favourite(context):
-    pass
+    context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
+    assert context.response['favourite'] == True
 
 @step('file is listed in favourites')
 def step_validate_file_in_favourites(context):
-    pass
+    context.response = get_favourites()
+    ids = [node['id'] for node in context.response]
+    assert context.file_id in ids
+
+@step('user unfavourites "{mime_type}" file')
+def step_favourite_file(context, mime_type):
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = favourite_mediaitem(context.file_id, 'remove')
+    assert context.response == True
+
+@step('file is not marked as favourite')
+def step_validate_file_is_not_marked_favourite(context):
+    context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
+    assert context.response['favourite'] == False
+
+@step('file is not listed in favourites')
+def step_validate_file_in_favourites(context):
+    context.response = get_favourites()
+    ids = [node['id'] for node in context.response]
+    assert context.file_id not in ids
 
 @step('user deletes "{mime_type}" file')
 def step_delete_file(context, mime_type):
-    pass
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = delete_mediaitem(context.file_id, 'add')
+    assert context.response == True
 
 @step('file is marked as deleted')
 def step_validate_file_is_marked_deleted(context):
-    pass
+    context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
+    assert context.response['deleted'] == True
 
 @step('file is listed in trash')
 def step_validate_file_in_trash(context):
-    pass
+    context.response = get_deleted()
+    ids = [node['id'] for node in context.response]
+    assert context.file_id in ids
+
+@step('user undeletes "{mime_type}" file')
+def step_permanently_delete_file(context, mime_type):
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = delete_mediaitem(context.file_id, 'remove')
+    assert context.response == True
+
+@step('file is not marked as deleted')
+def step_validate_file_is_not_marked_deleted(context):
+    context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
+    assert context.response['deleted'] == False
 
 @step('user permanently deletes "{mime_type}" file')
 def step_permanently_delete_file(context, mime_type):
-    pass
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = delete_mediaitem(context.file_id, 'permanent')
+    assert context.response == True
 
 @step('file is deleted')
 def step_validate_file_is_deleted(context):
-    pass
+    context.response = get_mediaitem(context.file_id)
+    assert context.response == None
 
 @step('file is not listed in trash')
 def step_validate_file_not_in_trash(context):
-    pass
+    context.response = get_deleted()
+    ids = [node['id'] for node in context.response]
+    assert context.file_id not in ids

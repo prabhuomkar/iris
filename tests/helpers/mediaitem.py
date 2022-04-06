@@ -7,7 +7,7 @@ def get_file_name(ext: str):
 def upload(file_type):
     file_name = get_file_name(file_type)
     with open(f'data/mediaitem/images/{file_name}', 'rb') as f:
-        response = get_response(
+        res = get_response(
             query="""
                 mutation Upload($file: Upload!) {
                     upload(file: $file)
@@ -16,8 +16,7 @@ def upload(file_type):
             variables={"file": f},
             upload_files=True
         )
-        file_id = response['upload']
-        return file_id
+        return res['upload'] if res is not None else None
 
 def get_mediaitem(id):
     res = get_response(
@@ -29,12 +28,14 @@ def get_mediaitem(id):
                     fileName
                     mimeType
                     fileSize
+                    favourite
+                    deleted
                 }
             }
         """,
         variables={"id": id}
     )
-    return res['mediaItem']
+    return res['mediaItem'] if res is not None else None
 
 def get_mediaitems():
     pass
@@ -48,11 +49,62 @@ def update_mediaitem_description(id, description):
         """,
         variables={"id": id, "description": description}
     )
-    return res['updateDescription']
+    return res['updateDescription'] if res is not None else None
 
-def validate_uploaded():
-    pass
+def favourite_mediaitem(id, type):
+    res = get_response(
+        query="""
+            mutation Favourite($id: String!, $type: String!) {
+                favourite(id: $id, type: $type)
+            }
+        """,
+        variables={"id": id, "type": type}
+    )
+    return res['favourite'] if res is not None else None
+
+def get_favourites():
+    res = get_response(
+        query="""
+            query Favourites {
+                favourites {
+                    nodes {
+                        id
+                    }
+                }
+            }
+        """,
+        variables={}
+    )
+    return res['favourites']['nodes'] if res is not None else None
+
+def delete_mediaitem(id, type):
+    res = get_response(
+        query="""
+            mutation Delete($id: String!, $type: String!) {
+                delete(id: $id, type: $type)
+            }
+        """,
+        variables={"id": id, "type": type}
+    )
+    return res['delete'] if res is not None else None
+
+def get_deleted():
+    res = get_response(
+        query="""
+            query Deleted {
+                deleted {
+                    nodes {
+                        id
+                    }
+                }
+            }
+        """,
+        variables={}
+    )
+    return res['deleted']['nodes'] if res is not None else None
 
 def get_mediaitem_by_file_type(db, mime_type):
     res = db['mediaitems'].find_one({'mimeType': mime_type})
-    return str(res['_id'])
+    if res is not None:
+        return str(res['_id'])
+    return None

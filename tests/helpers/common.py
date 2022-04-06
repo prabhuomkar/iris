@@ -8,5 +8,8 @@ transport = AIOHTTPTransport(url="http://localhost:5001/graphql")
 client = Client(transport=transport, fetch_schema_from_transport=True)
 
 def get_response(query: str, variables: Dict, upload_files: bool = False):
-    query = gql(query)
-    return client.execute(query, variable_values=variables, upload_files=upload_files)
+    try:
+        query = gql(query)
+        return client.execute(query, variable_values=variables, upload_files=upload_files)
+    except:
+        return None

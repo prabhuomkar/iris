@@ -31,6 +31,9 @@ Feature: MediaItems
     When user favourites "<mime_type>" file
     Then file is marked as favourite
     And file is listed in favourites
+    When user unfavourites "<mime_type>" file
+    Then file is not marked as favourite
+    And file is not listed in favourites
 
     Examples: Photos
       | file_type | mime_type  |
@@ -39,10 +42,13 @@ Feature: MediaItems
   
   Scenario Outline: Delete MediaItems
     Given api service is running
-    When user deletes "<file_type>" file
+    When user deletes "<mime_type>" file
     Then file is marked as deleted
     And file is listed in trash
-    When user permanently deletes "<file_type>" file
+    When user undeletes "<mime_type>" file
+    Then file is not marked as deleted
+    And file is not listed in trash
+    When user permanently deletes "<mime_type>" file
     Then file is deleted
     And file is not listed in trash
 

@@ -14,6 +14,6 @@ extend type Query {
 
 extend type Mutation {
   upload(file: Upload!, albumId: String): String!
-  updateFavourite(id: String!, type: String!): Boolean!
+  favourite(id: String!, type: String!): Boolean!
   delete(id: String!, type: String!): Boolean!
 }

@@ -126,13 +126,13 @@ type ComplexityRoot struct {
 		CreateAlbum              func(childComplexity int, input models.CreateAlbumInput) int
 		Delete                   func(childComplexity int, id string, typeArg string) int
 		DeleteAlbum              func(childComplexity int, id string) int
+		Favourite                func(childComplexity int, id string, typeArg string) int
 		UpdateAlbum              func(childComplexity int, id string, input models.UpdateAlbumInput) int
 		UpdateAlbumMediaItems    func(childComplexity int, id string, typeArg string, mediaItems []string) int
 		UpdateAlbumThumbnailURL  func(childComplexity int, id string, mediaItemID string) int
 		UpdateDescription        func(childComplexity int, id string, description string) int
 		UpdateEntity             func(childComplexity int, id string, name string) int
 		UpdateEntityThumbnailURL func(childComplexity int, id string, entityID string) int
-		UpdateFavourite          func(childComplexity int, id string, typeArg string) int
 		Upload                   func(childComplexity int, file graphql.Upload, albumID *string) int
 	}
 
@@ -192,7 +192,7 @@ type MutationResolver interface {
 	UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 	Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error)
-	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
+	Favourite(ctx context.Context, id string, typeArg string) (bool, error)
 	Delete(ctx context.Context, id string, typeArg string) (bool, error)
 }
 type QueryResolver interface {
@@ -586,6 +586,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteAlbum(childComplexity, args["id"].(string)), true
 
+	case "Mutation.favourite":
+		if e.complexity.Mutation.Favourite == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_favourite_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Favourite(childComplexity, args["id"].(string), args["type"].(string)), true
+
 	case "Mutation.updateAlbum":
 		if e.complexity.Mutation.UpdateAlbum == nil {
 			break
@@ -657,18 +669,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEntityThumbnailURL(childComplexity, args["id"].(string), args["entityId"].(string)), true
-
-	case "Mutation.updateFavourite":
-		if e.complexity.Mutation.UpdateFavourite == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateFavourite_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateFavourite(childComplexity, args["id"].(string), args["type"].(string)), true
 
 	case "Mutation.upload":
 		if e.complexity.Mutation.Upload == nil {
@@ -1118,7 +1118,7 @@ extend type Query {
 
 extend type Mutation {
   upload(file: Upload!, albumId: String): String!
-  updateFavourite(id: String!, type: String!): Boolean!
+  favourite(id: String!, type: String!): Boolean!
   delete(id: String!, type: String!): Boolean!
 }
 `, BuiltIn: false},
@@ -1208,6 +1208,30 @@ func (ec *executionContext) field_Mutation_deleteAlbum_args(ctx context.Context,
 }
 
 func (ec *executionContext) field_Mutation_delete_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_favourite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1381,30 +1405,6 @@ func (ec *executionContext) field_Mutation_updateEntity_args(ctx context.Context
 		}
 	}
 	args["name"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateFavourite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["type"] = arg1
 	return args, nil
 }
 
@@ -3620,7 +3620,7 @@ func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_favourite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3637,7 +3637,7 @@ func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateFavourite_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_favourite_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3645,7 +3645,7 @@ func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateFavourite(rctx, args["id"].(string), args["type"].(string))
+		return ec.resolvers.Mutation().Favourite(rctx, args["id"].(string), args["type"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6274,8 +6274,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateFavourite":
-			out.Values[i] = ec._Mutation_updateFavourite(ctx, field)
+		case "favourite":
+			out.Values[i] = ec._Mutation_favourite(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

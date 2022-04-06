@@ -81,7 +81,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	return insertedID.Hex(), nil
 }
 
-func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error) {
+func (r *mutationResolver) Favourite(ctx context.Context, id string, typeArg string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -167,21 +167,25 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		}
 
 		// delete the source image from CDN
-		splits := strings.Split(deleteMediaItem.SourceURL, "/")
-		fileID := splits[len(splits)-1]
+		if len(deleteMediaItem.SourceURL) > 0 {
+			splits := strings.Split(deleteMediaItem.SourceURL, "/")
+			fileID := splits[len(splits)-1]
 
-		err = r.CDN.DeleteFile(fileID, nil)
-		if err != nil {
-			return false, err
+			err = r.CDN.DeleteFile(fileID, nil)
+			if err != nil {
+				return false, err
+			}
 		}
 
 		// delete the thumbnail image from CDN
-		splits = strings.Split(deleteMediaItem.ThumbnailURL, "/")
-		fileID = splits[len(splits)-1]
+		if len(deleteMediaItem.ThumbnailURL) > 0 {
+			splits := strings.Split(deleteMediaItem.ThumbnailURL, "/")
+			fileID := splits[len(splits)-1]
 
-		err = r.CDN.DeleteFile(fileID, nil)
-		if err != nil {
-			return false, err
+			err = r.CDN.DeleteFile(fileID, nil)
+			if err != nil {
+				return false, err
+			}
 		}
 	}
 
@@ -435,6 +439,7 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+
 var (
 	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
 	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")
