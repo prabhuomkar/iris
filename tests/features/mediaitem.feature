@@ -11,6 +11,11 @@ Feature: MediaItems
       | file_type |
       | GIF       |
       | HEIC      |
+      | ICO       |
+      | JPEG      |
+      | PNG       |
+      | TIFF      |
+      | WEBP      |
   
   Scenario Outline: Update MediaItem Description
     Given api service is running
@@ -20,7 +25,7 @@ Feature: MediaItems
     Examples: Photos
       | file_type |
       | HEIC      |
-      | JPG       |
+      | JPEG      |
       | PNG       |
   
   Scenario Outline: Favourite MediaItems
@@ -32,7 +37,7 @@ Feature: MediaItems
     Examples: Photos
       | file_type |
       | HEIC      |
-      | JPG       |
+      | JPEG      |
       | PNG       |
   
   Scenario Outline: Delete MediaItems
@@ -47,5 +52,5 @@ Feature: MediaItems
     Examples: Photos
       | file_type |
       | HEIC      |
-      | JPG       |
+      | JPEG      |
       | PNG       |
