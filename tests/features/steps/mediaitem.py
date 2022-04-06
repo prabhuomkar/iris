@@ -1,4 +1,5 @@
 from behave import *
+from helpers.mediaitem import *
 
 
 @step('user uploads "{file_type}" file')
@@ -11,6 +12,14 @@ def step_validate_file_upload(context, file_type):
 
 @step('metadata for "{file_type}" file is validated')
 def step_validate_metadata(context, file_type):
+    pass
+
+@step('user updates "{file_type}" file')
+def step_update_file(context, file_type):
+    pass
+
+@step('"{file_type}" file is updated')
+def step_file_updated(context, file_type):
     pass
 
 @step('user favourites "{file_type}" file')

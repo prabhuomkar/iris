@@ -21,6 +21,17 @@ Feature: MediaItems
       | file_type |
       | MOV       |
   
+  Scenario Outline: Update MediaItem Description
+    Given api service is running
+    When user updates "<file_type>" file
+    Then "<file_type>" file is updated
+
+    Examples: Photos
+      | file_type |
+      | HEIC      |
+      | JPG       |
+      | PNG       |
+  
   Scenario Outline: Favourite MediaItems
     Given api service is running
     When user favourites "<file_type>" file
