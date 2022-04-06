@@ -4,18 +4,18 @@ Feature: MediaItems
   Scenario Outline: Upload and Validate Metadata
     Given api service is running
     When user uploads "<file_type>" file
-    Then "<file_type>" file is uploaded
-    And metadata for "<file_type>" file is validated
+    Then file is uploaded
+    And metadata "<metadata>" is validated
 
     Examples: Photos
-      | file_type |
-      | GIF       |
-      | HEIC      |
-      | ICO       |
-      | JPEG      |
-      | PNG       |
-      | TIFF      |
-      | WEBP      |
+      | file_type | metadata          |
+      | GIF       | image/gif,2080761 |
+      | HEIC      | ,107760           |
+      | ICO       | ,432254           |
+      | JPEG      | image/jpeg,239829 |
+      | PNG       | image/png,446687  |
+      | TIFF      | ,153116           |
+      | WEBP      | image/webp,280032 |
   
   Scenario Outline: Update MediaItem Description
     Given api service is running

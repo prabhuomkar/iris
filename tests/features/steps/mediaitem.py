@@ -2,17 +2,17 @@ from behave import *
 from helpers.mediaitem import *
 
 
-@step('user uploads "{file_type}" file')
+@when('user uploads "{file_type}" file')
 def step_upload_file(context, file_type):
-    upload(context, file_type)
+    context.file_id = upload(file_type)
 
-@step('"{file_type}" file is uploaded')
-def step_validate_file_upload(context, file_type):
-    pass
+@then('file is uploaded')
+def step_validate_file_upload(context):
+    context.response = get_mediaitem(context.file_id)
 
-@step('metadata for "{file_type}" file is validated')
-def step_validate_metadata(context, file_type):
-    pass
+@step('metadata "{metadata}" is validated')
+def step_validate_metadata(context, metadata):
+    validate_metadata(context.response, metadata)
 
 @step('user updates "{file_type}" file')
 def step_update_file(context, file_type):
