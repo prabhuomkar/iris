@@ -1,3 +1,4 @@
+from turtle import update
 from behave import *
 from helpers.mediaitem import *
 
@@ -5,55 +6,64 @@ from helpers.mediaitem import *
 @when('user uploads "{file_type}" file')
 def step_upload_file(context, file_type):
     context.file_id = upload(file_type)
+    assert context.file_id != None
 
 @then('file is uploaded')
 def step_validate_file_upload(context):
     context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
 
 @step('metadata "{metadata}" is validated')
 def step_validate_metadata(context, metadata):
-    validate_metadata(context.response, metadata)
+    exp = metadata.split(',')
+    print(context.response)
+    assert context.response['mimeType'] == exp[0]
+    assert str(context.response['fileSize']) == exp[1]
 
-@step('user updates "{file_type}" file')
-def step_update_file(context, file_type):
+@step('user updates "{mime_type}" file')
+def step_update_file(context, mime_type):
+    context.file_id = get_mediaitem_by_file_type(context.db, mime_type)
+    context.response = update_mediaitem_description(context.file_id, 'test-description')
+    assert context.response == True
+
+@step('file description is updated')
+def step_file_updated(context):
+    context.response = get_mediaitem(context.file_id)
+    assert context.response['id'] == context.file_id
+    assert context.response['description'] == 'test-description'
+
+@step('user favourites "{mime_type}" file')
+def step_favourite_file(context, mime_type):
     pass
 
-@step('"{file_type}" file is updated')
-def step_file_updated(context, file_type):
+@step('file is marked as favourite')
+def step_validate_file_is_marked_favourite(context):
     pass
 
-@step('user favourites "{file_type}" file')
-def step_favourite_file(context, file_type):
+@step('file is listed in favourites')
+def step_validate_file_in_favourites(context):
     pass
 
-@step('"{file_type}" file is marked as favourite')
-def step_validate_file_is_marked_favourite(context, file_type):
+@step('user deletes "{mime_type}" file')
+def step_delete_file(context, mime_type):
     pass
 
-@step('"{file_type}" is listed in favourites')
-def step_validate_file_in_favourites(context, file_type):
+@step('file is marked as deleted')
+def step_validate_file_is_marked_deleted(context):
     pass
 
-@step('user deletes "{file_type}" file')
-def step_delete_file(context, file_type):
+@step('file is listed in trash')
+def step_validate_file_in_trash(context):
     pass
 
-@step('"{file_type}" file is marked as deleted')
-def step_validate_file_is_marked_deleted(context, file_type):
+@step('user permanently deletes "{mime_type}" file')
+def step_permanently_delete_file(context, mime_type):
     pass
 
-@step('"{file_type}" is listed in trash')
-def step_validate_file_in_trash(context, file_type):
+@step('file is deleted')
+def step_validate_file_is_deleted(context):
     pass
 
-@step('user permanently deletes "{file_type}" file')
-def step_permanently_delete_file(context, file_type):
-    pass
-
-@step('"{file_type}" file is deleted')
-def step_validate_file_is_deleted(context, file_type):
-    pass
-
-@step('"{file_type}" is not listed in trash')
-def step_validate_file_not_in_trash(context, file_type):
+@step('file is not listed in trash')
+def step_validate_file_not_in_trash(context):
     pass

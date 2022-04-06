@@ -7,4 +7,4 @@ stop:
 test-dependencies:
 	cd tests/ && pip install -r requirements.txt
 test:
-	cd tests/ && behave --no-capture
+	cd tests/ && behave

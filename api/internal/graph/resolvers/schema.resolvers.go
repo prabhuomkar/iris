@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"iris/api/internal/models"
+	"iris/api/internal/utils"
 	"log"
 	"strings"
 	"time"
@@ -20,6 +21,12 @@ import (
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
+	mimeType, err := utils.GetMimeType(file)
+	if err != nil {
+		log.Printf("some error extracting mime type: %v", err)
+	}
+	log.Printf("got file of mimeType: %s", mimeType)
+
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
 		return "", err
@@ -30,7 +37,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
 		{Key: "sourceUrl", Value: imageURL},
 		{Key: "description", Value: nil},
-		{Key: "mimeType", Value: result.MimeType},
+		{Key: "mimeType", Value: mimeType},
 		{Key: "fileName", Value: result.FileName},
 		{Key: "fileSize", Value: result.FileSize},
 		{Key: "mediaMetadata", Value: nil},
@@ -50,7 +57,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			} else {
 				log.Printf("published event to rabbitmq for image: %s mimeType: %s", imageURL, mimeType)
 			}
-		}(insertedID.Hex(), imageURL, result.MimeType)
+		}(insertedID.Hex(), imageURL, mimeType)
 	} else {
 		return "", nil
 	}

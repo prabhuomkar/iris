@@ -25,28 +25,34 @@ def get_mediaitem(id):
             query MediaItem($id: String!) {
                 mediaItem(id: $id) {
                     id
+                    description
                     fileName
                     mimeType
                     fileSize
                 }
             }
         """,
-        variables={"id": id},
-        upload_files=False
+        variables={"id": id}
     )
-    assert res['mediaItem']['id'] == id
     return res['mediaItem']
 
 def get_mediaitems():
     pass
 
-def update_mediaitem(id, description):
-    pass
-
-def validate_metadata(res, exp):
-    exp = exp.split(',')
-    assert res['mimeType'] == exp[0]
-    assert str(res['fileSize']) == exp[1]
+def update_mediaitem_description(id, description):
+    res = get_response(
+        query="""
+            mutation UpdateMediaItemDescription($id: String!, $description: String!) {
+                updateDescription(id: $id, description: $description)
+            }
+        """,
+        variables={"id": id, "description": description}
+    )
+    return res['updateDescription']
 
 def validate_uploaded():
     pass
+
+def get_mediaitem_by_file_type(db, mime_type):
+    res = db['mediaitems'].find_one({'mimeType': mime_type})
+    return str(res['_id'])
