@@ -38,7 +38,19 @@ def get_mediaitem(id):
     return res['mediaItem'] if res is not None else None
 
 def get_mediaitems():
-    pass
+    res = get_response(
+        query="""
+            query MediaItems {
+                mediaItems {
+                    nodes {
+                        id
+                    }
+                }
+            }
+        """,
+        variables={}
+    )
+    return res['mediaItems']['nodes'] if res is not None else None
 
 def update_mediaitem_description(id, description):
     res = get_response(

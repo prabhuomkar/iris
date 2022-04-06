@@ -1,4 +1,3 @@
-from turtle import update
 from behave import *
 from helpers.mediaitem import *
 

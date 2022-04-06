@@ -1,48 +1,43 @@
 Feature: Albums
   Select photos or videos and create albums
 
-  Scenario: List Albums
+  Scenario Outline: Upload MediaItems for Albums
     Given api service is running
-    When user requests for albums
-    Then no albums are found
+    When user uploads "<file_type>" file
+    Then file is uploaded
+
+    Examples: Photos
+      | file_type | 
+      | GIF       | 
+      | HEIC      | 
+      | ICO       | 
+      | JPEG      | 
+      | PNG       | 
+      | WEBP      | 
 
   Scenario: Create Album
     Given api service is running
     When user creates an album
     Then album is created
-    And mediaitems are listed in album
+    And album is listed in albums
   
-  Scenario: List Albums
-    Given api service is running
-    When user requests for albums
-    Then albums are found
-
-  Scenario: Single Album
-    Given api service is running
-    When user requests for album
-    Then album is viewed
-    And mediaitems are listed in album
-  
-  Scenario: Updates Album
+  Scenario: Update Album
     Given api service is running
     When user updates an album
     Then album is updated
-    And mediaitems are listed in album
   
-  Scenario: Updates Album MediaItems
+  Scenario: Update Album MediaItems
     Given api service is running
     When user updates an album mediaitems
-    Then album is updated
-    And mediaitems are listed in album
+    Then album mediaitems are updated
 
-  Scenario: Updates Album Thumbnail
+  Scenario: Update Album Thumbnail
     Given api service is running
     When user updates an album thumbnail
     Then album thumbnail is updated
-    And mediaitems are listed in album
   
   Scenario: Delete Album
     Given api service is running
     When user deletes an album
     Then album is deleted
-    And mediaitems are listed in album
+    And album is not listed in albums
