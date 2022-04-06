@@ -16,7 +16,7 @@ const GET_DELETED = gql`
       totalCount
       nodes {
         id
-        imageUrl
+        thumbnailUrl
       }
     }
   }
@@ -68,7 +68,7 @@ const Trash = () => {
                       <ImageListItem key={src.id} style={styleFav}>
                         <ImageListImageAspectContainer>
                           <ImageListImage
-                            src={`${src.imageUrl}?width=200&height=200`}
+                            src={`${src.thumbnailUrl}?width=200&height=200`}
                             style={{ cursor: 'pointer', borderRadius: '4px' }}
                             onClick={() => history.push(`/photo/${src.id}`)}
                           />

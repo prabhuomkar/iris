@@ -8,4 +8,4 @@ client = Client(transport=transport, fetch_schema_from_transport=True)
 
 def get_response(query: str, variables: Dict, upload_files: bool = False):
     query = gql(query)
-    return client.execute(query)
+    return client.execute(query, variable_values=variables, upload_files=upload_files)

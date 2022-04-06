@@ -11,9 +11,7 @@ const GET_PEOPLE = gql`
       nodes {
         id
         name
-        displayMediaItem {
-          imageUrl
-        }
+        thumbnailUrl
       }
     }
   }

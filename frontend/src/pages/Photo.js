@@ -31,7 +31,8 @@ const GET_MEDIA_ITEM = gql`
     mediaItem(id: $id) {
       id
       description
-      imageUrl
+      thumbnailUrl
+      sourceUrl
       mimeType
       fileName
       fileSize
@@ -42,10 +43,7 @@ const GET_MEDIA_ITEM = gql`
         id
         name
         entityType
-        displayMediaItem {
-          imageUrl
-          id
-        }
+        thumbnailUrl
       }
       mediaMetadata {
         creationTime
@@ -143,7 +141,7 @@ const Photo = () => {
             className="photo-grid-cell"
           >
             <div>
-              <img src={data.mediaItem.imageUrl} width="100%" />
+              <img src={data.mediaItem.sourceUrl} width="100%" />
             </div>
             <div className="fav-icon">
               <FavouriteAction

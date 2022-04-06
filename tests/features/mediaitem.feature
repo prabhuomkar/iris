@@ -9,17 +9,8 @@ Feature: MediaItems
 
     Examples: Photos
       | file_type |
-      | BMP       |
       | GIF       |
       | HEIC      |
-      | ICO       |
-      | JPG       |
-      | PNG       |
-      | TIFF      |
-
-    Examples: Videos
-      | file_type |
-      | MOV       |
   
   Scenario Outline: Update MediaItem Description
     Given api service is running

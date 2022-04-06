@@ -14,13 +14,13 @@ const reducePhotos = (data) => {
     }, -1);
 
     if (occurs >= 0) {
-      ob[occurs].imageUrl = ob[occurs].imageUrl.concat(cur.imageUrl);
+      ob[occurs].thumbnailUrl = ob[occurs].thumbnailUrl.concat(cur.thumbnailUrl);
       ob[occurs].id = ob[occurs].id.concat(cur.id);
     } else {
       let obj = {
         createdAt: cur.mediaMetadata?.creationTime || cur.createdAt,
         id: [cur.id],
-        imageUrl: [cur.imageUrl],
+        thumbnailUrl: [cur.thumbnailUrl],
       };
       ob = ob.concat([obj]);
     }

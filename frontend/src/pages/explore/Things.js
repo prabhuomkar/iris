@@ -11,9 +11,7 @@ const GET_THINGS = gql`
       nodes {
         id
         name
-        displayMediaItem {
-          imageUrl
-        }
+        thumbnailUrl
       }
     }
   }
