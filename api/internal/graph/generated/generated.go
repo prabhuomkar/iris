@@ -191,7 +191,7 @@ type MutationResolver interface {
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
 	UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
-	Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error)
+	Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error)
 	UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error)
 	Delete(ctx context.Context, id string, typeArg string) (bool, error)
 }
@@ -1117,7 +1117,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  upload(file: Upload!, albumId: String): Boolean!
+  upload(file: Upload!, albumId: String): String!
   updateFavourite(id: String!, type: String!): Boolean!
   delete(id: String!, type: String!): Boolean!
 }
@@ -3615,9 +3615,9 @@ func (ec *executionContext) _Mutation_upload(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateFavourite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {

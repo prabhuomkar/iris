@@ -4,6 +4,7 @@ from helpers.mediaitem import *
 
 @step('user uploads "{file_type}" file')
 def step_upload_file(context, file_type):
+    upload
     pass
 
 @step('"{file_type}" file is uploaded')

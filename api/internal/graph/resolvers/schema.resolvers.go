@@ -19,10 +19,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error) {
+func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	imageURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
@@ -38,7 +38,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 		{Key: "updatedAt", Value: time.Now()},
 	})
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
@@ -52,13 +52,13 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			}
 		}(insertedID.Hex(), imageURL, result.MimeType)
 	} else {
-		return false, nil
+		return "", nil
 	}
 
 	if albumID != nil {
 		albumOID, err := primitive.ObjectIDFromHex(*albumID)
 		if err != nil {
-			return false, err
+			return "", err
 		}
 
 		_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, albumOID, bson.D{
@@ -67,11 +67,11 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			}},
 		})
 		if err != nil {
-			return false, err
+			return "", err
 		}
 	}
 
-	return true, nil
+	return insertedID.Hex(), nil
 }
 
 func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error) {
