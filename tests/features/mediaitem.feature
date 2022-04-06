@@ -3,7 +3,7 @@ Feature: MediaItems
 
   Scenario Outline: Upload and Validate Metadata
     Given api service is running
-    When user uploads a "<file_type>" file
+    When user uploads "<file_type>" file
     Then "<file_type>" file is uploaded
     And metadata for "<file_type>" file is validated
 
@@ -20,3 +20,30 @@ Feature: MediaItems
     Examples: Videos
       | file_type |
       | MOV       |
+  
+  Scenario Outline: Favourite MediaItems
+    Given api service is running
+    When user favourites "<file_type>" file
+    Then "<file_type>" file is marked as favourite
+    And "<file_type>" is listed in favourites
+
+    Examples: Photos
+      | file_type |
+      | HEIC      |
+      | JPG       |
+      | PNG       |
+  
+  Scenario Outline: Delete MediaItems
+    Given api service is running
+    When user deletes "<file_type>" file
+    Then "<file_type>" file is marked as deleted
+    And "<file_type>" is listed in trash
+    When user permanently deletes "<file_type>" file
+    Then "<file_type>" file is deleted
+    And "<file_type>" is not listed in trash
+
+    Examples: Photos
+      | file_type |
+      | HEIC      |
+      | JPG       |
+      | PNG       |

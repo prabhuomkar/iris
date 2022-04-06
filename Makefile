@@ -6,3 +6,5 @@ start: start-infra
 	docker-compose up -d --build api worker frontend
 stop:
 	docker-compose down
+test:
+	cd tests/ && behave
