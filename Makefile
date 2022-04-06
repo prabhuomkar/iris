@@ -1,5 +1,3 @@
-start-with-ml:
-	docker-compose up -d --build
 start-infra:
 	docker-compose up -d --build database queue cdn-master cdn-volume
 start: start-infra
