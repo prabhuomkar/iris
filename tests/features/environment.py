@@ -8,8 +8,12 @@ def before_all(context):
     client = MongoClient('mongodb://root:root@localhost:5010/skim?authSource=admin')
     db = client['iris']
     context.db = db
+    clear_data(context)
 
 def after_feature(context, feature):
+    clear_data(context)
+
+def clear_data(context):
     # get mediaitems to clear from cdn
     mediaitems_to_clear = []
     cursor = context.db['mediaitems'].find({})
