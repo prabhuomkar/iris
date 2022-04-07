@@ -10,8 +10,8 @@ from .component import Component
 
 class Things(Component):
   """Things Component"""
-  def __init__(self, db, oid, image_url, mime_type):
-    super().__init__('things', db, oid, image_url, mime_type)
+  def __init__(self, db, oid, mediaitem_url, mime_type):
+    super().__init__('things', db, oid, mediaitem_url, mime_type)
     self.INFERENCE_TYPES = [
       'object_detection', 'image_classification'
     ]
@@ -74,6 +74,4 @@ class Things(Component):
       entity_oids = self.upsert_entity(classes)
       self.update({ '$set': { 'contentCategories': content_categories }, '$addToSet': { 'entities': { '$each': entity_oids } } })
     except Exception as e:
-      print(f'some exception while processing things: {str(e)}')
-    finally:
-      self.clear_files()
+      print(f'some exception while processing things for mediaitem {self.oid}: {str(e)}')

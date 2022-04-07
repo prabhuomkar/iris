@@ -9,8 +9,8 @@ from .component import Component
 
 class People(Component):
   """People Component"""
-  def __init__(self, db, oid, image_url, mime_type):
-    super().__init__('people', db, oid, image_url, mime_type)
+  def __init__(self, db, oid, mediaitem_url, mime_type):
+    super().__init__('people', db, oid, mediaitem_url, mime_type)
 
   def get_inference_results(self):
     """Calls torchserve inference api and returns response"""
@@ -56,7 +56,7 @@ class People(Component):
     for val in result:
       people = list(self.db['entities'].find({'entityType': 'people'}))
       insert_people = None
-      image_url = upload_image(val['data'])
+      mediaitem_url = upload_image(val['data'])
       if len(people) == 0:
         insert_people = {'name': 'Face #1', 'embedding': val['embedding']}
       else:
@@ -66,7 +66,7 @@ class People(Component):
           insert_people = {'name': f'Face #{len(people)+1}', 'embedding': val['embedding']}
       entity_id = self.upsert_entity(insert_people)
       entity_oids.append(entity_id)
-      entity_images.append({'entityId': entity_id, 'imageUrl': image_url})
+      entity_images.append({'entityId': entity_id, 'imageUrl': mediaitem_url})
     return entity_oids, entity_images
 
   def process(self):
@@ -78,6 +78,4 @@ class People(Component):
         'faces': { '$each': entity_images },
       }})
     except Exception as e:
-      print(f'some exception while processing people: {str(e)}')
-    finally:
-      self.clear_files()
+      print(f'some exception while processing people for mediaitem {self.oid}: {str(e)}')

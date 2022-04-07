@@ -65,7 +65,7 @@ def step_validate_album_mediaitems_updated(context, type):
     type = type[:-3]
     context.response = get_album(context.album_id)
     assert context.response['id'] == context.album_id
-    assert context.response['mediaItems']['totalCount'] == 6 if type == 'add' else 2
+    assert context.response['mediaItems']['totalCount'] == 5 if type == 'add' else 2
 
 @step('album is deleted')
 def step_validate_album_deleted(context):

@@ -1,5 +1,6 @@
 from behave import *
 from helpers.mediaitem import *
+from helpers.common import json_validate_mediaitem
 
 
 @when('user uploads "{file_type}" file')
@@ -12,12 +13,13 @@ def step_validate_file_upload(context):
     context.response = get_mediaitem(context.file_id)
     assert context.response['id'] == context.file_id
 
-@step('metadata "{metadata}" is validated')
-def step_validate_metadata(context, metadata):
-    exp = metadata.split(',')
+@step('metadata for "{file_type}" file is validated')
+def step_validate_metadata(context, file_type):
+    exp = get_expected_metadata(file_type)
+    context.response = get_mediaitem(context.file_id)
+    print(exp)
     print(context.response)
-    assert context.response['mimeType'] == exp[0]
-    assert str(context.response['fileSize']) == exp[1]
+    json_validate_mediaitem(exp, context.response)
 
 @step('user updates "{mime_type}" file')
 def step_update_file(context, mime_type):

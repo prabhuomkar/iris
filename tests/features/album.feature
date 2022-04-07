@@ -10,7 +10,6 @@ Feature: Albums
       | file_type | 
       | GIF       | 
       | HEIC      | 
-      | ICO       | 
       | JPEG      | 
       | PNG       | 
       | WEBP      | 

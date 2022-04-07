@@ -5,16 +5,16 @@ Feature: MediaItems
     Given api service is running
     When user uploads "<file_type>" file
     Then file is uploaded
-    And metadata "<metadata>" is validated
+    And waits for "5" seconds
+    And metadata for "<file_type>" file is validated
 
     Examples: Photos
-      | file_type | metadata            |
-      | GIF       | image/gif,2080761   |
-      | HEIC      | image/heic,107760   |
-      | ICO       | image/x-icon,432254 |
-      | JPEG      | image/jpeg,239829   |
-      | PNG       | image/png,446687    |
-      | WEBP      | image/webp,280032   |
+      | file_type |
+      | GIF       |
+      | HEIC      |
+      | JPEG      |
+      | PNG       |
+      | WEBP      |
   
   Scenario Outline: Update MediaItem Description
     Given api service is running

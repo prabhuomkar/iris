@@ -9,8 +9,8 @@ from .component import Component
 
 class Places(Component):
   """Places Component"""
-  def __init__(self, db, oid, image_url, mime_type):
-    super().__init__('places', db, oid, image_url, mime_type)
+  def __init__(self, db, oid, mediaitem_url, mime_type):
+    super().__init__('places', db, oid, mediaitem_url, mime_type)
 
   def upsert_entity(self, data):
     """Upserts places entity"""
@@ -58,6 +58,4 @@ class Places(Component):
           # update database with
           self.update({ '$addToSet': { 'entities': entity_oid } })
     except Exception as e:
-      print(f'some exception while processing places: {str(e)}')
-    finally:
-      self.clear_files()
+      print(f'some exception while processing places for mediaitem {self.oid}: {str(e)}')

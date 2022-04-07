@@ -6,21 +6,21 @@ from .utils import get_creation_time
 
 class Metadata(Component):
   """Metadata Component"""
-  def __init__(self, db, oid, image_url, mime_type):
-    super().__init__('metadata', db, oid, image_url, mime_type)
+  def __init__(self, db, oid, mediaitem_url, mime_type):
+    super().__init__('metadata', db, oid, mediaitem_url, mime_type)
 
   def process(self):
     try:
       with exiftool.ExifTool() as et:
         metadata = et.get_metadata(self.file_name)
+        print(metadata)
         if len(metadata.keys()) > 0:
+          wh_splits = metadata['Composite:ImageSize'].split()
           media_metadata = {
             'creationTime': get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata \
               else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata else None,
-            'width': metadata['EXIF:ExifImageHeight'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageHeight'] \
-              if 'File:ImageHeight' in metadata else None,
-            'height': metadata['EXIF:ExifImageWidth'] if 'EXIF:ExifImageHeight' in metadata else metadata['File:ImageWidth'] \
-              if 'File:ImageWidth' in metadata else None,
+            'width': int(wh_splits[0]) if len(wh_splits) == 2 else None,
+            'height': int(wh_splits[1]) if len(wh_splits) == 2 else None,
             'location': {
               'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata \
                 else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
@@ -40,7 +40,8 @@ class Metadata(Component):
           self.update({'$set': {
             'mediaMetadata': media_metadata
           }})
+          print('\n\n')
+        else:
+          print(f'no metadata extracted for mediaitem: {self.oid}')
     except Exception as e:
-      print(f'some exception while processing metadata: {str(e)}')
-    finally:
-      self.clear_files()
+      print(f'some exception while processing metadata for mediaitem {self.oid}: {str(e)}')

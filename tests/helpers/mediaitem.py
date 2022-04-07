@@ -1,3 +1,4 @@
+import json
 from .common import get_response
 
 
@@ -30,6 +31,18 @@ def get_mediaitem(id):
                     fileSize
                     favourite
                     deleted
+                    mediaMetadata {
+                        width
+                        height
+                        photo {
+                            cameraMake
+                            cameraModel
+                            focalLength
+                            apertureFNumber
+                            isoEquivalent
+                            exposureTime
+                        }
+                    }
                 }
             }
         """,
@@ -120,3 +133,8 @@ def get_mediaitem_by_file_type(db, mime_type):
     if res is not None:
         return str(res['_id'])
     return None
+
+def get_expected_metadata(file_type):
+    file_name = get_file_name(file_type)
+    with open(f'data/mediaitem/metadata/{file_name}.json', 'rb') as f:
+        return json.load(f)
