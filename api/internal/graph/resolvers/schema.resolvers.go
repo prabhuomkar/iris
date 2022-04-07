@@ -20,14 +20,14 @@ import (
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
-	mimeType, err := utils.GetMimeType(file)
+	mimeType, fileReader, err := utils.GetMimeType(file.File)
 	if err != nil {
 		log.Printf("some error extracting mime type: %v", err)
 	}
 
 	log.Printf("got file of mimeType: %s", mimeType)
 
-	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
+	result, err := r.CDN.Upload(fileReader, file.Filename, file.Size, "", "")
 	if err != nil {
 		return "", err
 	}

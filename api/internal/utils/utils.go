@@ -1,21 +1,25 @@
 package utils
 
 import (
+	"bytes"
+	"io"
 	"log"
 	"strings"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/linxGnu/goseaweedfs"
 )
 
-func GetMimeType(file graphql.Upload) (string, error) {
-	mtype, err := mimetype.DetectReader(file.File)
+func GetMimeType(input io.Reader) (string, io.Reader, error) {
+	header := bytes.NewBuffer(nil)
+	mimeType, err := mimetype.DetectReader(io.TeeReader(input, header))
+	recycled := io.MultiReader(header, input)
+
 	if err != nil {
-		return "", err
+		return "", recycled, err
 	}
 
-	return mtype.String(), nil
+	return mimeType.String(), recycled, err
 }
 
 func DeleteImagesFromCDN(cdn *goseaweedfs.Seaweed, imageURLs []string) {
