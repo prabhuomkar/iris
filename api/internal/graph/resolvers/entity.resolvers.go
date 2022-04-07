@@ -111,12 +111,17 @@ func (r *mutationResolver) UpdateEntityThumbnailURL(ctx context.Context, id stri
 	}
 
 	var entity models.Entity
+
 	err = r.DB.Collection(models.ColEntity).FindOne(ctx, bson.D{{Key: "_id", Value: entityOID}}).Decode(&entity)
 	if err != nil {
 		return false, err
 	}
 
-	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "thumbnailUrl", Value: entity.ThumbnailURL}}}})
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "thumbnailUrl", Value: entity.ThumbnailURL},
+		}},
+	})
 	if err != nil {
 		return false, err
 	}

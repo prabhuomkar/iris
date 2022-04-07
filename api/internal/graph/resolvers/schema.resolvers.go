@@ -10,7 +10,6 @@ import (
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -25,6 +24,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	if err != nil {
 		log.Printf("some error extracting mime type: %v", err)
 	}
+
 	log.Printf("got file of mimeType: %s", mimeType)
 
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
@@ -166,27 +166,7 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			return false, err
 		}
 
-		// delete the source image from CDN
-		if len(deleteMediaItem.SourceURL) > 0 {
-			splits := strings.Split(deleteMediaItem.SourceURL, "/")
-			fileID := splits[len(splits)-1]
-
-			err = r.CDN.DeleteFile(fileID, nil)
-			if err != nil {
-				return false, err
-			}
-		}
-
-		// delete the thumbnail image from CDN
-		if len(deleteMediaItem.ThumbnailURL) > 0 {
-			splits := strings.Split(deleteMediaItem.ThumbnailURL, "/")
-			fileID := splits[len(splits)-1]
-
-			err = r.CDN.DeleteFile(fileID, nil)
-			if err != nil {
-				return false, err
-			}
-		}
+		utils.DeleteImagesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.ThumbnailURL})
 	}
 
 	return true, nil

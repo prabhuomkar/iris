@@ -98,6 +98,7 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 	}
 
 	var thumbnailMediaItem models.MediaItem
+
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&thumbnailMediaItem)
 	if err != nil {
 		return nil, err
@@ -115,7 +116,12 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		return nil, err
 	}
 
-	albumID := result.InsertedID.(primitive.ObjectID).Hex()
+	var albumID string
+
+	albumOID, ok := result.InsertedID.(primitive.ObjectID)
+	if ok {
+		albumID = albumOID.Hex()
+	}
 
 	return &albumID, nil
 }
@@ -151,12 +157,17 @@ func (r *mutationResolver) UpdateAlbumThumbnailURL(ctx context.Context, id strin
 	}
 
 	var mediaItem models.MediaItem
+
 	err = r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
 	if err != nil {
 		return false, err
 	}
 
-	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{{Key: "$set", Value: bson.D{{Key: "thumbnailUrl", Value: mediaItem.ThumbnailURL}}}})
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "thumbnailUrl", Value: mediaItem.ThumbnailURL},
+		}},
+	})
 	if err != nil {
 		return false, err
 	}
