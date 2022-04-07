@@ -16,12 +16,13 @@ def step_album_update(context):
     context.response = update_album(context.album_id, 'album-new-name', 'album-new-description')
     assert context.response == True
 
-@step('user updates an album mediaitems')
-def step_album_update_mediaitems(context):
+@step('user "{type}" album mediaitems')
+def step_album_update_mediaitems(context, type):
+    type = type[:-1]
     context.album_id = get_album_by_name(context.db, 'album-new-name')
     context.response = get_mediaitems()
     context.file_ids = [node['id'] for node in context.response]
-    context.response = update_album_mediaitems(context.album_id, 'add', context.file_ids[2:])
+    context.response = update_album_mediaitems(context.album_id, type, context.file_ids[2:])
     assert context.response == True
 
 @step('user updates an album thumbnail')
@@ -59,11 +60,12 @@ def step_validate_album_thumbnail_updated(context):
     context.response = get_album(context.album_id)
     assert context.response['id'] == context.album_id
 
-@step('album mediaitems are updated')
-def step_validate_album_mediaitems_updated(context):
+@step('album mediaitems are updated after "{type}"')
+def step_validate_album_mediaitems_updated(context, type):
+    type = type[:-3]
     context.response = get_album(context.album_id)
     assert context.response['id'] == context.album_id
-    assert context.response['mediaItems']['totalCount'] == 6
+    assert context.response['mediaItems']['totalCount'] == 6 if type == 'add' else 2
 
 @step('album is deleted')
 def step_validate_album_deleted(context):

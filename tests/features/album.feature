@@ -28,8 +28,10 @@ Feature: Albums
   
   Scenario: Update Album MediaItems
     Given api service is running
-    When user updates an album mediaitems
-    Then album mediaitems are updated
+    When user "adds" album mediaitems
+    Then album mediaitems are updated after "adding"
+    When user "removes" album mediaitems
+    Then album mediaitems are updated after "removing"
 
   Scenario: Update Album Thumbnail
     Given api service is running
