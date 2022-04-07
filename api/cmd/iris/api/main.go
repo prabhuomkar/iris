@@ -34,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	queue, err := rabbitmq.Init(cfg.Queue.URI, cfg.Queue.Exchange)
+	queue, err := rabbitmq.Init(cfg.Queue.URI, cfg.Queue.Name)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +72,7 @@ func main() {
 	router.Handle("/", playground.Handler("graphql playground", "/graphql"))
 	router.Handle("/graphql", srv)
 
-	log.Printf("starting graphql server on port:%d", cfg.Port)
+	log.Printf("starting api on port :%d", cfg.Port)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
 	if err != nil && errors.Is(err, http.ErrServerClosed) {

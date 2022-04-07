@@ -17,8 +17,8 @@ type (
 	}
 
 	Queue struct {
-		URI      string `envconfig:"QUEUE_URI" default:"amqp://root:root@127.0.0.1:5030"`
-		Exchange string `envconfig:"QUEUE_EXCHANGE" default:"iris"`
+		URI  string `envconfig:"QUEUE_URI" default:"amqp://root:root@127.0.0.1:5030"`
+		Name string `envconfig:"QUEUE_NAME" default:"iris"`
 	}
 
 	Config struct {

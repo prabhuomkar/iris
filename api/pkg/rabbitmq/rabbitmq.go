@@ -8,11 +8,11 @@ import (
 type Connection struct {
 	Connection *amqp.Connection
 	Channel    *amqp.Channel
-	Exchange   string
+	Queue      string
 }
 
 // Init will initialize rabbitmq connection
-func Init(amqpURI, exchange string) (*Connection, error) {
+func Init(amqpURI, queue string) (*Connection, error) {
 	connection, err := amqp.Dial(amqpURI)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func Init(amqpURI, exchange string) (*Connection, error) {
 	return &Connection{
 		Connection: connection,
 		Channel:    channel,
-		Exchange:   exchange,
+		Queue:      queue,
 	}, nil
 }
 
@@ -39,7 +39,7 @@ func (c *Connection) Disconnect() error {
 // Publish will send a message to rabbitmq exchange
 func (c *Connection) Publish(message []byte) error {
 	return c.Channel.Publish(
-		c.Exchange, "", false, false,
+		"", c.Queue, false, false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        message,
