@@ -12,7 +12,7 @@ const GET_PEOPLE = gql`
       nodes {
         id
         name
-        thumbnailUrl
+        previewURL
       }
     }
   }
@@ -25,7 +25,7 @@ const GET_PLACES = gql`
       nodes {
         id
         name
-        thumbnailUrl
+        previewURL
       }
     }
   }
@@ -38,7 +38,7 @@ const GET_THINGS = gql`
       nodes {
         id
         name
-        thumbnailUrl
+        previewURL
       }
     }
   }

@@ -27,7 +27,7 @@ const GET_MEDIA_ITEM = gql`
       mediaItems {
         nodes {
           id
-          thumbnailUrl
+          previewURL
           entities {
             name
           }
@@ -148,7 +148,7 @@ const Entity = () => {
                   <ImageListItem key={src.id} style={stylePlacesThigsList}>
                     <ImageListImageAspectContainer>
                       <ImageListImage
-                        src={`${src.thumbnailUrl}?width=200&height=200`}
+                        src={`${src.previewUrl}?width=200&height=200`}
                         style={{ cursor: 'pointer', borderRadius: '4px' }}
                         onClick={() => history.push(`/photo/${src.id}`)}
                       />

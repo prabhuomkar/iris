@@ -32,10 +32,10 @@ Feature: Albums
     When user "removes" album mediaitems
     Then album mediaitems are updated after "removing"
 
-  Scenario: Update Album Thumbnail
+  Scenario: Update Album Preview MediaItem
     Given api service is running
-    When user updates an album thumbnail
-    Then album thumbnail is updated
+    When user updates an album preview mediaitem
+    Then album preview mediaitem is updated
   
   Scenario: Delete Album
     Given api service is running

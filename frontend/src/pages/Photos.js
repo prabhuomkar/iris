@@ -16,7 +16,7 @@ const GET_MEDIA_ITEMS = gql`
     mediaItems(page: 1, limit: 100) {
       nodes {
         id
-        thumbnailUrl
+        previewURL
         sourceUrl
         mimeType
         fileName
@@ -30,7 +30,7 @@ const GET_MEDIA_ITEMS = gql`
   }
 `;
 
-const Photo = ({ imageId, thumbnailUrl, imageList, setImageList, match }) => {
+const Photo = ({ imageId, previewURL, imageList, setImageList, match }) => {
   const [isSelected, setIsSelected] = useState(false);
 
   const onSelect = () => {
@@ -61,7 +61,7 @@ const Photo = ({ imageId, thumbnailUrl, imageList, setImageList, match }) => {
       <Link to={match ? '#' : `photo/${imageId}`}>
         <img
           key={imageId}
-          src={`${thumbnailUrl}?width=200&height=200`}
+          src={`${previewURL}?width=200&height=200`}
           width="100%"
           style={{
             cursor: 'pointer',
@@ -136,7 +136,7 @@ const Photos = () => {
                       </GridCell>
                     </Grid>
                     <Grid>
-                      {image.thumbnailUrl.map((img, index) => {
+                      {image.previewUrl.map((img, index) => {
                         return (
                           <GridCell
                             key={image.id[index]}
@@ -146,7 +146,7 @@ const Photos = () => {
                           >
                             <Photo
                               imageId={image.id[index]}
-                              thumbnailUrl={img}
+                              previewURL={img}
                               imageList={
                                 match?.isExact ? addImageList : imageList
                               }
@@ -172,7 +172,7 @@ const Photos = () => {
 
 Photo.propTypes = {
   imageId: PropTypes.string,
-  thumbnailUrl: PropTypes.string,
+  previewURL: PropTypes.string,
   imageList: PropTypes.array,
   setImageList: PropTypes.func,
   match: PropTypes.bool,

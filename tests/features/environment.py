@@ -18,18 +18,18 @@ def clear_data(context):
     mediaitems_to_clear = []
     cursor = context.db['mediaitems'].find({})
     for document in cursor:
-        if 'thumbnailUrl' in document and len(document['thumbnailUrl']) > 0:
-            mediaitems_to_clear.append(document['thumbnailUrl'])
+        if 'previewURL' in document and len(document['previewURL']) > 0:
+            mediaitems_to_clear.append(document['previewURL'])
         if 'sourceUrl' in document and len(document['sourceUrl']) > 0:
             mediaitems_to_clear.append(document['sourceUrl'])
     cursor = context.db['albums'].find({})
     for document in cursor:
-        if 'thumbnailUrl' in document and len(document['thumbnailUrl']) > 0:
-            mediaitems_to_clear.append(document['thumbnailUrl'])
+        if 'previewURL' in document and len(document['previewURL']) > 0:
+            mediaitems_to_clear.append(document['previewURL'])
     cursor = context.db['entities'].find({})
     for document in cursor:
-        if 'thumbnailUrl' in document and len(document['thumbnailUrl']) > 0:
-            mediaitems_to_clear.append(document['thumbnailUrl'])
+        if 'previewURL' in document and len(document['previewURL']) > 0:
+            mediaitems_to_clear.append(document['previewURL'])
 
     # clear all collections
     context.db['mediaitems'].drop()

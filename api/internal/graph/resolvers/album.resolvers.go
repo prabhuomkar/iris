@@ -97,9 +97,9 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		return nil, errInvalidMediaItemsForAlbum
 	}
 
-	var thumbnailMediaItem models.MediaItem
+	var previewMediaItem models.MediaItem
 
-	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&thumbnailMediaItem)
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&previewMediaItem)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
-		{Key: "thumbnailUrl", Value: thumbnailMediaItem.ThumbnailURL},
+		{Key: "previewUrl", Value: previewMediaItem.PreviewURL},
 		{Key: "mediaItems", Value: mediaItems},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
@@ -145,7 +145,7 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 	return true, nil
 }
 
-func (r *mutationResolver) UpdateAlbumThumbnailURL(ctx context.Context, id string, mediaItemID string) (bool, error) {
+func (r *mutationResolver) UpdateAlbumPreviewURL(ctx context.Context, id string, mediaItemID string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -165,7 +165,7 @@ func (r *mutationResolver) UpdateAlbumThumbnailURL(ctx context.Context, id strin
 
 	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
 		{Key: "$set", Value: bson.D{
-			{Key: "thumbnailUrl", Value: mediaItem.ThumbnailURL},
+			{Key: "previewUrl", Value: mediaItem.PreviewURL},
 		}},
 	})
 	if err != nil {

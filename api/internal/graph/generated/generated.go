@@ -48,13 +48,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Album struct {
-		CreatedAt    func(childComplexity int) int
-		Description  func(childComplexity int) int
-		ID           func(childComplexity int) int
-		MediaItems   func(childComplexity int, page *int, limit *int) int
-		Name         func(childComplexity int) int
-		ThumbnailURL func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		MediaItems  func(childComplexity int, page *int, limit *int) int
+		Name        func(childComplexity int) int
+		PreviewURL  func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
 	}
 
 	AlbumConnection struct {
@@ -68,11 +68,11 @@ type ComplexityRoot struct {
 	}
 
 	Entity struct {
-		EntityType   func(childComplexity int) int
-		ID           func(childComplexity int) int
-		MediaItems   func(childComplexity int, page *int, limit *int) int
-		Name         func(childComplexity int) int
-		ThumbnailURL func(childComplexity int) int
+		EntityType func(childComplexity int) int
+		ID         func(childComplexity int) int
+		MediaItems func(childComplexity int, page *int, limit *int) int
+		Name       func(childComplexity int) int
+		PreviewURL func(childComplexity int) int
 	}
 
 	EntityItemConnection struct {
@@ -103,8 +103,8 @@ type ComplexityRoot struct {
 		ID                func(childComplexity int) int
 		MediaMetadata     func(childComplexity int) int
 		MimeType          func(childComplexity int) int
+		PreviewURL        func(childComplexity int) int
 		SourceURL         func(childComplexity int) int
-		ThumbnailURL      func(childComplexity int) int
 		UpdatedAt         func(childComplexity int) int
 	}
 
@@ -123,17 +123,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAlbum              func(childComplexity int, input models.CreateAlbumInput) int
-		Delete                   func(childComplexity int, id string, typeArg string) int
-		DeleteAlbum              func(childComplexity int, id string) int
-		Favourite                func(childComplexity int, id string, typeArg string) int
-		UpdateAlbum              func(childComplexity int, id string, input models.UpdateAlbumInput) int
-		UpdateAlbumMediaItems    func(childComplexity int, id string, typeArg string, mediaItems []string) int
-		UpdateAlbumThumbnailURL  func(childComplexity int, id string, mediaItemID string) int
-		UpdateDescription        func(childComplexity int, id string, description string) int
-		UpdateEntity             func(childComplexity int, id string, name string) int
-		UpdateEntityThumbnailURL func(childComplexity int, id string, entityID string) int
-		Upload                   func(childComplexity int, file graphql.Upload, albumID *string) int
+		CreateAlbum            func(childComplexity int, input models.CreateAlbumInput) int
+		Delete                 func(childComplexity int, id string, typeArg string) int
+		DeleteAlbum            func(childComplexity int, id string) int
+		Favourite              func(childComplexity int, id string, typeArg string) int
+		UpdateAlbum            func(childComplexity int, id string, input models.UpdateAlbumInput) int
+		UpdateAlbumMediaItems  func(childComplexity int, id string, typeArg string, mediaItems []string) int
+		UpdateAlbumPreviewURL  func(childComplexity int, id string, mediaItemID string) int
+		UpdateDescription      func(childComplexity int, id string, description string) int
+		UpdateEntity           func(childComplexity int, id string, name string) int
+		UpdateEntityPreviewURL func(childComplexity int, id string, entityID string) int
+		Upload                 func(childComplexity int, file graphql.Upload, albumID *string) int
 	}
 
 	OnThisDayResponse struct {
@@ -185,11 +185,11 @@ type MediaItemResolver interface {
 type MutationResolver interface {
 	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (*string, error)
 	UpdateAlbum(ctx context.Context, id string, input models.UpdateAlbumInput) (bool, error)
-	UpdateAlbumThumbnailURL(ctx context.Context, id string, mediaItemID string) (bool, error)
+	UpdateAlbumPreviewURL(ctx context.Context, id string, mediaItemID string) (bool, error)
 	DeleteAlbum(ctx context.Context, id string) (bool, error)
 	UpdateAlbumMediaItems(ctx context.Context, id string, typeArg string, mediaItems []string) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
-	UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error)
+	UpdateEntityPreviewURL(ctx context.Context, id string, entityID string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 	Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error)
 	Favourite(ctx context.Context, id string, typeArg string) (bool, error)
@@ -265,12 +265,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Album.Name(childComplexity), true
 
-	case "Album.thumbnailUrl":
-		if e.complexity.Album.ThumbnailURL == nil {
+	case "Album.previewUrl":
+		if e.complexity.Album.PreviewURL == nil {
 			break
 		}
 
-		return e.complexity.Album.ThumbnailURL(childComplexity), true
+		return e.complexity.Album.PreviewURL(childComplexity), true
 
 	case "Album.updatedAt":
 		if e.complexity.Album.UpdatedAt == nil {
@@ -340,12 +340,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Entity.Name(childComplexity), true
 
-	case "Entity.thumbnailUrl":
-		if e.complexity.Entity.ThumbnailURL == nil {
+	case "Entity.previewUrl":
+		if e.complexity.Entity.PreviewURL == nil {
 			break
 		}
 
-		return e.complexity.Entity.ThumbnailURL(childComplexity), true
+		return e.complexity.Entity.PreviewURL(childComplexity), true
 
 	case "EntityItemConnection.nodes":
 		if e.complexity.EntityItemConnection.Nodes == nil {
@@ -473,19 +473,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MediaItem.MimeType(childComplexity), true
 
+	case "MediaItem.previewUrl":
+		if e.complexity.MediaItem.PreviewURL == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.PreviewURL(childComplexity), true
+
 	case "MediaItem.sourceUrl":
 		if e.complexity.MediaItem.SourceURL == nil {
 			break
 		}
 
 		return e.complexity.MediaItem.SourceURL(childComplexity), true
-
-	case "MediaItem.thumbnailUrl":
-		if e.complexity.MediaItem.ThumbnailURL == nil {
-			break
-		}
-
-		return e.complexity.MediaItem.ThumbnailURL(childComplexity), true
 
 	case "MediaItem.updatedAt":
 		if e.complexity.MediaItem.UpdatedAt == nil {
@@ -622,17 +622,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAlbumMediaItems(childComplexity, args["id"].(string), args["type"].(string), args["mediaItems"].([]string)), true
 
-	case "Mutation.updateAlbumThumbnailUrl":
-		if e.complexity.Mutation.UpdateAlbumThumbnailURL == nil {
+	case "Mutation.updateAlbumPreviewUrl":
+		if e.complexity.Mutation.UpdateAlbumPreviewURL == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateAlbumThumbnailUrl_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateAlbumPreviewUrl_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateAlbumThumbnailURL(childComplexity, args["id"].(string), args["mediaItemId"].(string)), true
+		return e.complexity.Mutation.UpdateAlbumPreviewURL(childComplexity, args["id"].(string), args["mediaItemId"].(string)), true
 
 	case "Mutation.updateDescription":
 		if e.complexity.Mutation.UpdateDescription == nil {
@@ -658,17 +658,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateEntity(childComplexity, args["id"].(string), args["name"].(string)), true
 
-	case "Mutation.updateEntityThumbnailUrl":
-		if e.complexity.Mutation.UpdateEntityThumbnailURL == nil {
+	case "Mutation.updateEntityPreviewUrl":
+		if e.complexity.Mutation.UpdateEntityPreviewURL == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateEntityThumbnailUrl_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateEntityPreviewUrl_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateEntityThumbnailURL(childComplexity, args["id"].(string), args["entityId"].(string)), true
+		return e.complexity.Mutation.UpdateEntityPreviewURL(childComplexity, args["id"].(string), args["entityId"].(string)), true
 
 	case "Mutation.upload":
 		if e.complexity.Mutation.Upload == nil {
@@ -968,7 +968,7 @@ var sources = []*ast.Source{
   id: String!
   name: String!
   description: String
-  thumbnailUrl: String!
+  previewUrl: String!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
   createdAt: Time!
   updatedAt: Time!
@@ -998,7 +998,7 @@ extend type Query {
 extend type Mutation {
   createAlbum(input: CreateAlbumInput!): String
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
-  updateAlbumThumbnailUrl(id: String!, mediaItemId: String!): Boolean!
+  updateAlbumPreviewUrl(id: String!, mediaItemId: String!): Boolean!
   deleteAlbum(id: String!): Boolean!
   updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }
@@ -1006,7 +1006,7 @@ extend type Mutation {
 	{Name: "schema/entity.graphql", Input: `type Entity {
   id: String!
   name: String!
-  thumbnailUrl: String!
+  previewUrl: String!
   entityType: String!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
 }
@@ -1030,7 +1030,7 @@ extend type Query {
 
 extend type Mutation {
   updateEntity(id: String!, name: String!): Boolean!
-  updateEntityThumbnailUrl(id: String!, entityId: String!): Boolean!
+  updateEntityPreviewUrl(id: String!, entityId: String!): Boolean!
 }
 `, BuiltIn: false},
 	{Name: "schema/mediaitem.graphql", Input: `scalar Upload
@@ -1038,7 +1038,7 @@ extend type Mutation {
 type MediaItem {
   id: String!
   description: String!
-  thumbnailUrl: String!
+  previewUrl: String!
   sourceUrl: String!
   mimeType: String!
   fileName: String!
@@ -1288,7 +1288,7 @@ func (ec *executionContext) field_Mutation_updateAlbumMediaItems_args(ctx contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateAlbumThumbnailUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateAlbumPreviewUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1360,7 +1360,7 @@ func (ec *executionContext) field_Mutation_updateDescription_args(ctx context.Co
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateEntityThumbnailUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateEntityPreviewUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1818,7 +1818,7 @@ func (ec *executionContext) _Album_description(ctx context.Context, field graphq
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Album_thumbnailUrl(ctx context.Context, field graphql.CollectedField, obj *models.Album) (ret graphql.Marshaler) {
+func (ec *executionContext) _Album_previewUrl(ctx context.Context, field graphql.CollectedField, obj *models.Album) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1836,7 +1836,7 @@ func (ec *executionContext) _Album_thumbnailUrl(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ThumbnailURL, nil
+		return obj.PreviewURL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2172,7 +2172,7 @@ func (ec *executionContext) _Entity_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Entity_thumbnailUrl(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
+func (ec *executionContext) _Entity_previewUrl(ctx context.Context, field graphql.CollectedField, obj *models.Entity) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2190,7 +2190,7 @@ func (ec *executionContext) _Entity_thumbnailUrl(ctx context.Context, field grap
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ThumbnailURL, nil
+		return obj.PreviewURL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2581,7 +2581,7 @@ func (ec *executionContext) _MediaItem_description(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _MediaItem_thumbnailUrl(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+func (ec *executionContext) _MediaItem_previewUrl(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2599,7 +2599,7 @@ func (ec *executionContext) _MediaItem_thumbnailUrl(ctx context.Context, field g
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ThumbnailURL, nil
+		return obj.PreviewURL, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3326,7 +3326,7 @@ func (ec *executionContext) _Mutation_updateAlbum(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateAlbumThumbnailUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateAlbumPreviewUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3343,7 +3343,7 @@ func (ec *executionContext) _Mutation_updateAlbumThumbnailUrl(ctx context.Contex
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateAlbumThumbnailUrl_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateAlbumPreviewUrl_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3351,7 +3351,7 @@ func (ec *executionContext) _Mutation_updateAlbumThumbnailUrl(ctx context.Contex
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateAlbumThumbnailURL(rctx, args["id"].(string), args["mediaItemId"].(string))
+		return ec.resolvers.Mutation().UpdateAlbumPreviewURL(rctx, args["id"].(string), args["mediaItemId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3494,7 +3494,7 @@ func (ec *executionContext) _Mutation_updateEntity(ctx context.Context, field gr
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateEntityThumbnailUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateEntityPreviewUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3511,7 +3511,7 @@ func (ec *executionContext) _Mutation_updateEntityThumbnailUrl(ctx context.Conte
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateEntityThumbnailUrl_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateEntityPreviewUrl_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3519,7 +3519,7 @@ func (ec *executionContext) _Mutation_updateEntityThumbnailUrl(ctx context.Conte
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateEntityThumbnailURL(rctx, args["id"].(string), args["entityId"].(string))
+		return ec.resolvers.Mutation().UpdateEntityPreviewURL(rctx, args["id"].(string), args["entityId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5828,8 +5828,8 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "description":
 			out.Values[i] = ec._Album_description(ctx, field, obj)
-		case "thumbnailUrl":
-			out.Values[i] = ec._Album_thumbnailUrl(ctx, field, obj)
+		case "previewUrl":
+			out.Values[i] = ec._Album_previewUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -5950,8 +5950,8 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "thumbnailUrl":
-			out.Values[i] = ec._Entity_thumbnailUrl(ctx, field, obj)
+		case "previewUrl":
+			out.Values[i] = ec._Entity_previewUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -6089,8 +6089,8 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "thumbnailUrl":
-			out.Values[i] = ec._MediaItem_thumbnailUrl(ctx, field, obj)
+		case "previewUrl":
+			out.Values[i] = ec._MediaItem_previewUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -6239,8 +6239,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateAlbumThumbnailUrl":
-			out.Values[i] = ec._Mutation_updateAlbumThumbnailUrl(ctx, field)
+		case "updateAlbumPreviewUrl":
+			out.Values[i] = ec._Mutation_updateAlbumPreviewUrl(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6259,8 +6259,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateEntityThumbnailUrl":
-			out.Values[i] = ec._Mutation_updateEntityThumbnailUrl(ctx, field)
+		case "updateEntityPreviewUrl":
+			out.Values[i] = ec._Mutation_updateEntityPreviewUrl(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

@@ -3,7 +3,7 @@ scalar Upload
 type MediaItem {
   id: String!
   description: String!
-  thumbnailUrl: String!
+  previewUrl: String!
   sourceUrl: String!
   mimeType: String!
   fileName: String!

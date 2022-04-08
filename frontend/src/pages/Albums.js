@@ -19,7 +19,7 @@ const GET_ALBUMS = gql`
       nodes {
         id
         name
-        thumbnailUrl
+        previewURL
         mediaItems {
           totalCount
         }
@@ -75,7 +75,7 @@ const Albums = () => {
                         <ImageListImageAspectContainer>
                           {album.mediaItems?.totalCount !== 0 ? (
                             <ImageListImage
-                              src={`${album.mediaItems?.thumbnailUrl}?width=200&height=200`}
+                              src={`${album.mediaItems?.previewUrl}?width=200&height=200`}
                               style={{
                                 cursor: 'pointer',
                                 borderRadius: '4px',

@@ -28,7 +28,7 @@ const GET_ALBUM = gql`
         totalCount
         nodes {
           id
-          thumbnailUrl
+          previewURL
         }
       }
     }
@@ -36,7 +36,7 @@ const GET_ALBUM = gql`
 `;
 
 const AlbumPhoto = ({
-  thumbnailUrl,
+  previewURL,
   imageId,
   removeImageList,
   setRemoveImageList,
@@ -73,7 +73,7 @@ const AlbumPhoto = ({
       />
       <ImageListImageAspectContainer>
         <ImageListImage
-          src={`${thumbnailUrl}?width=200&height=200`}
+          src={`${previewURL}?width=200&height=200`}
           style={{ cursor: 'pointer', borderRadius: '4px' }}
           onClick={() => history.push(`/photo/${imageId}`)}
         />
@@ -155,7 +155,7 @@ const Album = () => {
                     {data.album.mediaItems.nodes.map((img) => (
                       <ImageListItem key={img.id} style={styleFav}>
                         <AlbumPhoto
-                          thumbnailUrl={img.thumbnailUrl}
+                          previewURL={img.previewUrl}
                           imageId={img.id}
                           removeImageList={removeImageList}
                           setRemoveImageList={setRemoveImageList}
@@ -212,7 +212,7 @@ const Album = () => {
 };
 
 AlbumPhoto.propTypes = {
-  thumbnailUrl: PropTypes.string,
+  previewURL: PropTypes.string,
   imageId: PropTypes.string,
   removeImageList: PropTypes.array,
   setRemoveImageList: PropTypes.func,

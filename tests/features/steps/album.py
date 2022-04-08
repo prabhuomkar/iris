@@ -25,12 +25,12 @@ def step_album_update_mediaitems(context, type):
     context.response = update_album_mediaitems(context.album_id, type, context.file_ids[2:])
     assert context.response == True
 
-@step('user updates an album thumbnail')
-def step_album_update_thumbnail(context):
+@step('user updates an album preview mediaitem')
+def step_album_update_preview_mediaitem(context):
     context.album_id = get_album_by_name(context.db, 'album-new-name')
     context.response = get_mediaitems()
     context.file_ids = [node['id'] for node in context.response]
-    context.response = update_album_thumbnail(context.album_id, context.file_ids[2])
+    context.response = update_album_preview_url(context.album_id, context.file_ids[2])
     assert context.response == True
 
 @step('user deletes an album')
@@ -55,8 +55,8 @@ def step_validate_album_updated(context):
     assert context.response['description'] == 'album-new-description'
     assert context.response['mediaItems']['totalCount'] == 2
 
-@step('album thumbnail is updated')
-def step_validate_album_thumbnail_updated(context):
+@step('album preview mediaitem is updated')
+def step_validate_album_preview_mediaitem_updated(context):
     context.response = get_album(context.album_id)
     assert context.response['id'] == context.album_id
 

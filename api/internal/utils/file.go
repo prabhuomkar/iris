@@ -6,7 +6,6 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
-	"math"
 	"strings"
 
 	"github.com/disintegration/imaging"
@@ -14,8 +13,6 @@ import (
 	"github.com/linxGnu/goseaweedfs"
 	_ "golang.org/x/image/webp" // for image processing
 )
-
-const thumbnailSize = 400
 
 func GetMimeType(input []byte) string {
 	mimeType := mimetype.Detect(input)
@@ -31,12 +28,12 @@ func UploadImagesToCDN(cdn *goseaweedfs.Seaweed, mimeType, fileName string, file
 
 	sourceURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
 
-	// upload thumbnail mediaitem
-	var thumbnailURL string
-	if canCreateThumbnail(mimeType) {
+	// upload previewMediaItem mediaitem
+	var previewURL string
+	if canCreatepreviewMediaItem(mimeType) {
 		src, err := imaging.Decode(bytes.NewReader(fileBytes))
 		if err != nil {
-			log.Printf("error opening the image for thumbnail generation: %v", err)
+			log.Printf("error opening the image for previewMediaItem generation: %v", err)
 			return "", "", err
 		}
 
@@ -45,30 +42,28 @@ func UploadImagesToCDN(cdn *goseaweedfs.Seaweed, mimeType, fileName string, file
 		width, height := src.Bounds().Max.X, src.Bounds().Max.Y
 
 		if height > width {
-			minHeight := int(math.Min(float64(height), thumbnailSize))
-			dst = imaging.Resize(src, 0, minHeight, imaging.NearestNeighbor)
+			dst = imaging.Resize(src, 0, height, imaging.NearestNeighbor)
 		} else {
-			minWidth := int(math.Min(float64(width), thumbnailSize))
-			dst = imaging.Resize(src, minWidth, 0, imaging.NearestNeighbor)
+			dst = imaging.Resize(src, width, 0, imaging.NearestNeighbor)
 		}
 
-		thumbnailBuf := new(bytes.Buffer)
+		previewMediaItemBuf := new(bytes.Buffer)
 
-		err = jpeg.Encode(thumbnailBuf, dst, nil)
+		err = jpeg.Encode(previewMediaItemBuf, dst, nil)
 		if err != nil {
-			log.Printf("error encoding created thumbnail: %v", err)
+			log.Printf("error encoding created previewMediaItem: %v", err)
 			return "", "", err
 		}
 
-		result, err = cdn.Upload(bytes.NewReader(thumbnailBuf.Bytes()), fileName, int64(len(thumbnailBuf.Bytes())), "", "")
+		result, err = cdn.Upload(bytes.NewReader(previewMediaItemBuf.Bytes()), fileName, int64(len(previewMediaItemBuf.Bytes())), "", "")
 		if err != nil {
 			return "", "", err
 		}
 
-		thumbnailURL = fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
+		previewURL = fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
 	}
 
-	return sourceURL, thumbnailURL, err
+	return sourceURL, previewURL, err
 }
 
 func DeleteImagesFromCDN(cdn *goseaweedfs.Seaweed, imageURLs []string) {
@@ -85,7 +80,7 @@ func DeleteImagesFromCDN(cdn *goseaweedfs.Seaweed, imageURLs []string) {
 	}
 }
 
-func canCreateThumbnail(mimeType string) bool {
+func canCreatepreviewMediaItem(mimeType string) bool {
 	canConvertMimeTypes := []string{
 		"image/jpeg", "image/png", "image/webp", "image/bmp", "image/gif", "image/tiff",
 	}

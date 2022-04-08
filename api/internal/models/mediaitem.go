@@ -8,7 +8,7 @@ type (
 	MediaItem struct {
 		ID                string         `json:"id" bson:"_id"`
 		Description       string         `json:"description"`
-		ThumbnailURL      string         `json:"thumbnailUrl"`
+		PreviewURL        string         `json:"previewUrl"`
 		SourceURL         string         `json:"sourceUrl"`
 		MimeType          string         `json:"mimeType"`
 		FileName          string         `json:"fileName"`

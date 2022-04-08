@@ -28,7 +28,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	}
 
 	mimeType := utils.GetMimeType(fileBytes)
-	sourceURL, thumbnailURL, err := utils.UploadImagesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
+	sourceURL, previewURL, err := utils.UploadImagesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
 	if err != nil {
 		log.Printf("some error uploading mediaitems to cdn: %v", err)
 		return "", err
@@ -36,7 +36,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
 		{Key: "sourceUrl", Value: sourceURL},
-		{Key: "thumbnailUrl", Value: thumbnailURL},
+		{Key: "previewUrl", Value: previewURL},
 		{Key: "description", Value: nil},
 		{Key: "mimeType", Value: mimeType},
 		{Key: "fileName", Value: file.Filename},
@@ -169,7 +169,7 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			return false, err
 		}
 
-		utils.DeleteImagesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.ThumbnailURL})
+		utils.DeleteImagesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.PreviewURL})
 	}
 
 	return true, nil
@@ -422,7 +422,6 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-
 var (
 	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
 	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")

@@ -99,7 +99,7 @@ func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name str
 	return true, nil
 }
 
-func (r *mutationResolver) UpdateEntityThumbnailURL(ctx context.Context, id string, entityID string) (bool, error) {
+func (r *mutationResolver) UpdateEntityPreviewURL(ctx context.Context, id string, entityID string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -119,7 +119,7 @@ func (r *mutationResolver) UpdateEntityThumbnailURL(ctx context.Context, id stri
 
 	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
 		{Key: "$set", Value: bson.D{
-			{Key: "thumbnailUrl", Value: entity.ThumbnailURL},
+			{Key: "previewUrl", Value: entity.PreviewURL},
 		}},
 	})
 	if err != nil {

@@ -11,7 +11,7 @@ const GET_THINGS = gql`
       nodes {
         id
         name
-        thumbnailUrl
+        previewURL
       }
     }
   }

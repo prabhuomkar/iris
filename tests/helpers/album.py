@@ -57,16 +57,16 @@ def update_album(id, name, description):
     )
     return res['updateAlbum'] if res is not None else None
 
-def update_album_thumbnail(id, media_item):
+def update_album_preview_url(id, media_item):
     res = get_response(
         query="""
-            mutation UpdateAlbumThumbnailUrl($id: String!, $mediaItemId: String!) {
-                updateAlbumThumbnailUrl(id: $id, mediaItemId: $mediaItemId)
+            mutation UpdateAlbumPreviewUrl($id: String!, $mediaItemId: String!) {
+                updateAlbumPreviewUrl(id: $id, mediaItemId: $mediaItemId)
             }
         """,
         variables={"id": id, "mediaItemId": media_item}
     )
-    return res['updateAlbumThumbnailUrl'] if res is not None else None
+    return res['updateAlbumPreviewUrl'] if res is not None else None
 
 def update_album_mediaitems(id, type, media_items):
     res = get_response(
