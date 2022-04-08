@@ -75,7 +75,7 @@ const Albums = () => {
                         <ImageListImageAspectContainer>
                           {album.mediaItems?.totalCount !== 0 ? (
                             <ImageListImage
-                              src={`${album.mediaItems?.previewUrl}?width=200&height=200`}
+                              src={`${album.previewUrl}?width=200&height=200`}
                               style={{
                                 cursor: 'pointer',
                                 borderRadius: '4px',
