@@ -28,9 +28,9 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 		return "", err
 	}
 
-	mimeType := utils.GetMimeType(fileBytes)
+	mimeType := utils.GetFileMimeType(fileBytes)
 
-	sourceURL, previewURL, err := utils.UploadImagesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
+	sourceURL, previewURL, err := utils.UploadFilesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
 	if err != nil {
 		log.Printf("some error uploading mediaitems to cdn: %v", err)
 
@@ -172,7 +172,7 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			return false, err
 		}
 
-		utils.DeleteImagesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.PreviewURL})
+		utils.DeleteFilesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.PreviewURL})
 	}
 
 	return true, nil
