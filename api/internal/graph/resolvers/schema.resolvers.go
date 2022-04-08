@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
 	"log"
@@ -20,26 +21,26 @@ import (
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
-	mimeType, fileReader, err := utils.GetMimeType(file.File)
+	fileBytes, err := ioutil.ReadAll(file.File)
 	if err != nil {
-		log.Printf("some error extracting mime type: %v", err)
-	}
-
-	log.Printf("got file of mimeType: %s", mimeType)
-
-	result, err := r.CDN.Upload(fileReader, file.Filename, file.Size, "", "")
-	if err != nil {
+		log.Printf("some error reading uploaded file: %v", err)
 		return "", err
 	}
 
-	imageURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
+	mimeType := utils.GetMimeType(fileBytes)
+	sourceURL, thumbnailURL, err := utils.UploadImagesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
+	if err != nil {
+		log.Printf("some error uploading mediaitems to cdn: %v", err)
+		return "", err
+	}
 
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
-		{Key: "sourceUrl", Value: imageURL},
+		{Key: "sourceUrl", Value: sourceURL},
+		{Key: "thumbnailUrl", Value: thumbnailURL},
 		{Key: "description", Value: nil},
 		{Key: "mimeType", Value: mimeType},
-		{Key: "fileName", Value: result.FileName},
-		{Key: "fileSize", Value: result.FileSize},
+		{Key: "fileName", Value: file.Filename},
+		{Key: "fileSize", Value: file.Size},
 		{Key: "mediaMetadata", Value: nil},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
@@ -50,15 +51,16 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if ok {
-		go func(insertedID, imageURL, mimeType string) {
-			message := fmt.Sprintf(`{"id":"%s","imageUrl":"%s","mimeType":"%s"}`, insertedID, imageURL, mimeType)
+		go func(insertedID, mediaItemURL, mimeType string) {
+			message := fmt.Sprintf(`{"id":"%s","imageUrl":"%s","mimeType":"%s"}`, insertedID, mediaItemURL, mimeType)
 			err := r.Queue.Publish([]byte(message))
+
 			if err != nil {
 				log.Printf("error while publishing event to rabbitmq: %v", err)
 			} else {
 				log.Printf("published event to queue: %s", message)
 			}
-		}(insertedID.Hex(), imageURL, mimeType)
+		}(insertedID.Hex(), sourceURL, mimeType)
 	} else {
 		return "", nil
 	}

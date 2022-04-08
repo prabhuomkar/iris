@@ -3,7 +3,7 @@ from .common import get_response
 
 
 def get_file_name(ext: str):
-    return 'pizza.{}'.format(ext.lower())
+    return 'sample.{}'.format(ext.lower())
 
 def upload(file_type):
     file_name = get_file_name(file_type)
