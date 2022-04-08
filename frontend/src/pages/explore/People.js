@@ -11,7 +11,7 @@ const GET_PEOPLE = gql`
       nodes {
         id
         name
-        previewURL
+        previewUrl
       }
     }
   }

@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/disintegration/imaging"
@@ -16,6 +17,7 @@ import (
 
 func GetMimeType(input []byte) string {
 	mimeType := mimetype.Detect(input)
+
 	return mimeType.String()
 }
 
@@ -30,6 +32,7 @@ func UploadImagesToCDN(cdn *goseaweedfs.Seaweed, mimeType, fileName string, file
 
 	// upload previewMediaItem mediaitem
 	var previewURL string
+	// nolint
 	if canCreatepreviewMediaItem(mimeType) {
 		src, err := imaging.Decode(bytes.NewReader(fileBytes))
 		if err != nil {
@@ -55,7 +58,8 @@ func UploadImagesToCDN(cdn *goseaweedfs.Seaweed, mimeType, fileName string, file
 			return "", "", err
 		}
 
-		result, err = cdn.Upload(bytes.NewReader(previewMediaItemBuf.Bytes()), fileName, int64(len(previewMediaItemBuf.Bytes())), "", "")
+		result, err = cdn.Upload(bytes.NewReader(previewMediaItemBuf.Bytes()),
+			getFormattedFileName(fileName), int64(len(previewMediaItemBuf.Bytes())), "", "")
 		if err != nil {
 			return "", "", err
 		}
@@ -92,4 +96,14 @@ func canCreatepreviewMediaItem(mimeType string) bool {
 	}
 
 	return false
+}
+
+func getFormattedFileName(fileName string) string {
+	extension := filepath.Ext(fileName)
+
+	if len(extension) > 1 {
+		return fmt.Sprintf("%s.jpg", fileName[:(len(fileName)-len(extension))])
+	}
+
+	return fmt.Sprintf("%s.jpg", fileName)
 }

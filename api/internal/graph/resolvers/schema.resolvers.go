@@ -24,13 +24,16 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	fileBytes, err := ioutil.ReadAll(file.File)
 	if err != nil {
 		log.Printf("some error reading uploaded file: %v", err)
+
 		return "", err
 	}
 
 	mimeType := utils.GetMimeType(fileBytes)
+
 	sourceURL, previewURL, err := utils.UploadImagesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
 	if err != nil {
 		log.Printf("some error uploading mediaitems to cdn: %v", err)
+
 		return "", err
 	}
 

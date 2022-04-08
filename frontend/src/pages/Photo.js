@@ -31,7 +31,7 @@ const GET_MEDIA_ITEM = gql`
     mediaItem(id: $id) {
       id
       description
-      previewURL
+      previewUrl
       sourceUrl
       mimeType
       fileName
@@ -43,7 +43,7 @@ const GET_MEDIA_ITEM = gql`
         id
         name
         entityType
-        previewURL
+        previewUrl
       }
       mediaMetadata {
         creationTime

@@ -19,7 +19,7 @@ const GET_ALBUMS = gql`
       nodes {
         id
         name
-        previewURL
+        previewUrl
         mediaItems {
           totalCount
         }

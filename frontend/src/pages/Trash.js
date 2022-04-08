@@ -16,7 +16,7 @@ const GET_DELETED = gql`
       totalCount
       nodes {
         id
-        previewURL
+        previewUrl
       }
     }
   }

@@ -27,7 +27,7 @@ const GET_MEDIA_ITEM = gql`
       mediaItems {
         nodes {
           id
-          previewURL
+          previewUrl
           entities {
             name
           }

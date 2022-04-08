@@ -20,7 +20,7 @@ const reducePhotos = (data) => {
       let obj = {
         createdAt: cur.mediaMetadata?.creationTime || cur.createdAt,
         id: [cur.id],
-        previewURL: [cur.previewUrl],
+        previewUrl: [cur.previewUrl],
       };
       ob = ob.concat([obj]);
     }

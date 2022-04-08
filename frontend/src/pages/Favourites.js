@@ -16,7 +16,7 @@ const GET_FAVOURITES = gql`
       totalCount
       nodes {
         id
-        previewURL
+        previewUrl
       }
     }
   }
