@@ -25,8 +25,10 @@ class Callback:
       urllib.request.urlretrieve(mediaitem_url, file_id)
       # start the pipeline processing
       threads = [Thread(target=component(self.db, oid, filename, mediaitem_url).process, args=()) for component in self.components]
-      [thread.start() for thread in threads]
-      [thread.join() for thread in threads]
+      for thread in threads:
+        thread.start()
+      for thread in threads:
+        thread.join()
     except Exception as e:
       print(f'some exception while downloading and running pipeline component for mediaitem: {str(e)}')
     finally:

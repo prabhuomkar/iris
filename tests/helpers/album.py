@@ -1,5 +1,4 @@
 from .common import get_response
-from .mediaitem import get_mediaitem_by_file_type
 
 
 def get_albums():

@@ -20,6 +20,7 @@ func (r *entityResolver) PreviewURL(ctx context.Context, obj *models.Entity) (st
 	var mediaItem models.MediaItem
 
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+
 	return mediaItem.PreviewURL, err
 }
 

@@ -21,6 +21,7 @@ func (r *albumResolver) PreviewURL(ctx context.Context, obj *models.Album) (stri
 	var mediaItem models.MediaItem
 
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+
 	return mediaItem.PreviewURL, err
 }
 
