@@ -20,6 +20,7 @@ type (
 		Deleted           bool           `json:"deleted"`
 		CreatedAt         time.Time      `json:"createdAt"`
 		UpdatedAt         time.Time      `json:"updatedAt"`
+		Status            string         `json:"status"`
 	}
 
 	MediaMetaData struct {

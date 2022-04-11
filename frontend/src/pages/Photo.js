@@ -32,7 +32,6 @@ const GET_MEDIA_ITEM = gql`
       id
       description
       previewUrl
-      sourceUrl
       mimeType
       fileName
       fileSize
@@ -141,7 +140,7 @@ const Photo = () => {
             className="photo-grid-cell"
           >
             <div>
-              <img src={data.mediaItem.sourceUrl} width="100%" />
+              <img src={data.mediaItem.previewUrl} width="100%" />
             </div>
             <div className="fav-icon">
               <FavouriteAction

@@ -10,8 +10,8 @@ from .component import Component
 
 class Things(Component):
   """Things Component"""
-  def __init__(self, db, oid, mediaitem_url, mime_type):
-    super().__init__('things', db, oid, mediaitem_url, mime_type)
+  def __init__(self, db, oid, filename, mediaitem_url):
+    super().__init__('things', db, oid, filename, mediaitem_url)
     self.INFERENCE_TYPES = [
       'object_detection', 'image_classification'
     ]
@@ -29,9 +29,9 @@ class Things(Component):
     width_size = int((float(image.size[0]) * float(height_percent)))
     image = image.resize((width_size, fixed_height), Image.NEAREST)
     data = io.BytesIO()
-    image.save(data, format=list(Image.MIME.keys())[list(Image.MIME.values()).index(self.mime_type)])
+    image.save(data, format=list(Image.MIME.keys())[list(Image.MIME.values()).index('image/jpeg')])
     data = data.getvalue()
-    headers = {'Content-Type': self.mime_type}
+    headers = {'Content-Type': 'image/jpeg'}
     res = requests.post(f'{os.getenv("ML_URL")}/predictions/{model_name}', data=data, headers=headers)
     if res.status_code == 200:
       data = res.json()

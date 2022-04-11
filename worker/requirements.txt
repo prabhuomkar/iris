@@ -6,3 +6,6 @@ annoy==1.17.0
 Pillow==9.0.0
 pyseaweed==2.0.0
 dnspython==2.1.0
+rawpy==0.17.1
+imageio==2.16.1
+pillow-heif==0.2.0

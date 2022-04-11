@@ -9,8 +9,8 @@ from .component import Component
 
 class Places(Component):
   """Places Component"""
-  def __init__(self, db, oid, mediaitem_url, mime_type):
-    super().__init__('places', db, oid, mediaitem_url, mime_type)
+  def __init__(self, db, oid, filename, mediaitem_url):
+    super().__init__('places', db, oid, filename, mediaitem_url)
 
   def upsert_entity(self, data):
     """Upserts places entity"""

@@ -15,6 +15,7 @@ type MediaItem {
   deleted: Boolean
   createdAt: Time!
   updatedAt: Time!
+  status: String!
 }
 
 type MediaMetaData {

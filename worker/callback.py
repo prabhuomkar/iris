@@ -2,14 +2,14 @@ import json
 import os
 from threading import Thread
 import urllib.request
-from pipeline import Metadata, People, Places, Things
+from pipeline import Preview, Metadata, Places
 
 
 class Callback:
   """RabbitMQ Callback"""
   def __init__(self, db):
     self.db = db
-    self.components = [Metadata, Places]
+    self.components = [Preview, Metadata, Places]
 
   def process(self, ch, method, ___, body):
     """Callback processing"""
@@ -17,13 +17,14 @@ class Callback:
 
     data = json.loads(body)
     # extract details from message
-    oid, mediaitem_url, mime_type = data['id'], data['imageUrl'], data['mimeType']
-    file_id = f'mediaitem-{oid}'
+    oid, filename, mediaitem = data['id'], data['fileName'], data['mediaItem']
+    mediaitem_url = mediaitem['sourceUrl']
+    file_id = f'mediaitem-{oid}-{filename}'
     try:
       # download the mediaitem
       urllib.request.urlretrieve(mediaitem_url, file_id)
       # start the pipeline processing
-      threads = [Thread(target=component(self.db, oid, mediaitem_url, mime_type).process, args=()) for component in self.components]
+      threads = [Thread(target=component(self.db, oid, filename, mediaitem_url).process, args=()) for component in self.components]
       [thread.start() for thread in threads]
       [thread.join() for thread in threads]
     except Exception as e:

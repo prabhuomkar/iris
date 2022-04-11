@@ -4,10 +4,11 @@ from .component import Component
 from .utils import get_creation_time
 
 
+
 class Metadata(Component):
   """Metadata Component"""
-  def __init__(self, db, oid, mediaitem_url, mime_type):
-    super().__init__('metadata', db, oid, mediaitem_url, mime_type)
+  def __init__(self, db, oid, filename, mediaitem_url):
+    super().__init__('metadata', db, oid, filename, mediaitem_url)
 
   def process(self):
     try:
@@ -38,9 +39,9 @@ class Metadata(Component):
           }
           print(f'[metadata]: {media_metadata}')
           self.update({'$set': {
+            'mimeType': metadata['File:MIMEType'],
             'mediaMetadata': media_metadata
           }})
-          print('\n\n')
         else:
           print(f'no metadata extracted for mediaitem: {self.oid}')
     except Exception as e:

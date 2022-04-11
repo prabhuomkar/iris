@@ -9,8 +9,8 @@ from .component import Component
 
 class People(Component):
   """People Component"""
-  def __init__(self, db, oid, mediaitem_url, mime_type):
-    super().__init__('people', db, oid, mediaitem_url, mime_type)
+  def __init__(self, db, oid, filename, mediaitem_url):
+    super().__init__('people', db, oid, filename, mediaitem_url)
 
   def get_inference_results(self):
     """Calls torchserve inference api and returns response"""
@@ -18,7 +18,7 @@ class People(Component):
     data = None
     with open(self.file_name, 'rb') as f:
       data = f.read()
-    headers = {'Content-Type': self.mime_type}
+    headers = {'Content-Type': 'image/jpeg'}
     res = requests.post(f'{os.getenv("ML_URL")}/predictions/facenet', data=data, headers=headers)
     if res.status_code == 200:
       data = res.json()

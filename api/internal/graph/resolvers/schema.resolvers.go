@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
 	"log"
@@ -21,32 +20,23 @@ import (
 )
 
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
-	fileBytes, err := ioutil.ReadAll(file.File)
-	if err != nil {
-		log.Printf("some error reading uploaded file: %v", err)
-
-		return "", err
-	}
-
-	mimeType := utils.GetFileMimeType(fileBytes)
-
-	sourceURL, previewURL, err := utils.UploadFilesToCDN(r.CDN, mimeType, file.Filename, file.Size, fileBytes)
+	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
 		log.Printf("some error uploading mediaitems to cdn: %v", err)
 
 		return "", err
 	}
 
+	sourceURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
+
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
 		{Key: "sourceUrl", Value: sourceURL},
-		{Key: "previewUrl", Value: previewURL},
-		{Key: "description", Value: nil},
-		{Key: "mimeType", Value: mimeType},
 		{Key: "fileName", Value: file.Filename},
 		{Key: "fileSize", Value: file.Size},
 		{Key: "mediaMetadata", Value: nil},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
+		{Key: "status", Value: StatusUnspecified},
 	})
 	if err != nil {
 		return "", err
@@ -54,16 +44,16 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if ok {
-		go func(insertedID, mediaItemURL, mimeType string) {
-			message := fmt.Sprintf(`{"id":"%s","imageUrl":"%s","mimeType":"%s"}`, insertedID, mediaItemURL, mimeType)
+		go func(insertedID, sourceURL string) {
+			message := fmt.Sprintf(`{"id":"%s","fileName":"%s","mediaItem":{"sourceUrl":"%s"}}`, insertedID, file.Filename, sourceURL)
 			err := r.Queue.Publish([]byte(message))
 
 			if err != nil {
-				log.Printf("error while publishing event to rabbitmq: %v", err)
+				log.Printf("error while publishing event to queue: %v", err)
 			} else {
 				log.Printf("published event to queue: %s", message)
 			}
-		}(insertedID.Hex(), sourceURL, mimeType)
+		}(insertedID.Hex(), sourceURL)
 	} else {
 		return "", nil
 	}
@@ -425,6 +415,13 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+const (
+	StatusUnspecified = "UNSPECIFIED"
+	StatusProcessing  = "PROCESSING"
+	StatusReady       = "READY"
+	StatusFailed      = "FAILED"
+)
+
 var (
 	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
 	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")
