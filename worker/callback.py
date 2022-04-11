@@ -2,14 +2,16 @@ import json
 import os
 from threading import Thread
 import urllib.request
-from pipeline import Preview, Metadata, Places
+from pipeline import Preview, Metadata, Places, People, Things
 
 
 class Callback:
   """RabbitMQ Callback"""
-  def __init__(self, db):
+  def __init__(self, db, queue):
     self.db = db
-    self.components = [Preview, Metadata, Places]
+    self.queue = queue
+    self.components = [Preview, Metadata, Places] if queue == os.getenv('COMMON_QUEUE_NAME') \
+      else [People, Things]
 
   def process(self, ch, method, ___, body):
     """Callback processing"""
@@ -18,7 +20,7 @@ class Callback:
     data = json.loads(body)
     # extract details from message
     oid, filename, mediaitem = data['id'], data['fileName'], data['mediaItem']
-    mediaitem_url = mediaitem['sourceUrl']
+    mediaitem_url = mediaitem['downloadUrl']
     file_id = f'mediaitem-{oid}-{filename}'
     try:
       # download the mediaitem
@@ -30,7 +32,7 @@ class Callback:
       for thread in threads:
         thread.join()
     except Exception as e:
-      print(f'some exception while downloading and running pipeline component for mediaitem: {str(e)}')
+      print(f'some exception while downloading and running pipeline component for queue: {self.queue} and mediaitem: {str(e)}')
     finally:
       if os.path.exists(file_id):
         print(f'clearing the downloaded mediaitem: {file_id}')

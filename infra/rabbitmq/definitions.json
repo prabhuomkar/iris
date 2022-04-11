@@ -17,7 +17,13 @@
 	"policies": [],
 	"queues": [
 		{
-			"name": "iris",
+			"name": "iris.process",
+			"vhost": "/",
+			"durable": true,
+			"auto_delete": false
+		},
+		{
+			"name": "iris.inference",
 			"vhost": "/",
 			"durable": true,
 			"auto_delete": false

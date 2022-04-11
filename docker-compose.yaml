@@ -29,7 +29,7 @@ services:
       DB_URI: 'mongodb://root:root@database:5010/iris?authSource=admin'
       DB_NAME: iris
       QUEUE_URI: 'amqp://root:root@queue:5030'
-      QUEUE_NAME: iris
+      QUEUE_NAME: iris.process
   worker:
     build: worker
     restart: always
@@ -41,7 +41,8 @@ services:
       DB_NAME: iris
       ML_URL: http://ml:5002
       QUEUE_URI: amqp://root:root@queue:5030/
-      QUEUE_NAME: iris
+      COMMON_QUEUE_NAME: iris.process
+      INTERNAL_QUEUE_NAME: iris.inference
     depends_on:
       - queue
   ml:

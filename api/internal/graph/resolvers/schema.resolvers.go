@@ -45,7 +45,7 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if ok {
 		go func(insertedID, sourceURL string) {
-			message := fmt.Sprintf(`{"id":"%s","fileName":"%s","mediaItem":{"sourceUrl":"%s"}}`, insertedID, file.Filename, sourceURL)
+			message := fmt.Sprintf(`{"id":"%s","fileName":"%s","mediaItem":{"downloadUrl":"%s"}}`, insertedID, file.Filename, sourceURL)
 			err := r.Queue.Publish([]byte(message))
 
 			if err != nil {
