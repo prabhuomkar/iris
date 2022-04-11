@@ -24,13 +24,13 @@ class Preview(Component):
       with exiftool.ExifTool() as et:
         metadata = et.get_metadata(self.file_name)
         data = None
-        if len(metadata.keys()) > 0:
-          if 'File:MIMEType' in metadata and metadata['File:MIMEType'] in self.std_images:
-            image = Image.open(self.file_name)
-            image_bytes = io.BytesIO()
-            image = image.convert('RGB')
-            image.save(image_bytes, format='JPEG')
-            data = image_bytes.getvalue()
+        if len(metadata.keys()) > 0 and 'File:MIMEType' in metadata and \
+          metadata['File:MIMEType'] in self.std_images:
+          image = Image.open(self.file_name)
+          image_bytes = io.BytesIO()
+          image = image.convert('RGB')
+          image.save(image_bytes, format='JPEG')
+          data = image_bytes.getvalue()
         else:
           with rawpy.imread(self.file_name) as raw:
             rgb = raw.postprocess()
