@@ -124,17 +124,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAlbum            func(childComplexity int, input models.CreateAlbumInput) int
-		Delete                 func(childComplexity int, id string, typeArg string) int
-		DeleteAlbum            func(childComplexity int, id string) int
-		Favourite              func(childComplexity int, id string, typeArg string) int
-		UpdateAlbum            func(childComplexity int, id string, input models.UpdateAlbumInput) int
-		UpdateAlbumMediaItems  func(childComplexity int, id string, typeArg string, mediaItems []string) int
-		UpdateAlbumPreviewURL  func(childComplexity int, id string, mediaItemID string) int
-		UpdateDescription      func(childComplexity int, id string, description string) int
-		UpdateEntity           func(childComplexity int, id string, name string) int
-		UpdateEntityPreviewURL func(childComplexity int, id string, entityID string) int
-		Upload                 func(childComplexity int, file graphql.Upload, albumID *string) int
+		CreateAlbum                  func(childComplexity int, input models.CreateAlbumInput) int
+		Delete                       func(childComplexity int, id string, typeArg string) int
+		DeleteAlbum                  func(childComplexity int, id string) int
+		Favourite                    func(childComplexity int, id string, typeArg string) int
+		UpdateAlbum                  func(childComplexity int, id string, input models.UpdateAlbumInput) int
+		UpdateAlbumMediaItems        func(childComplexity int, id string, typeArg string, mediaItems []string) int
+		UpdateAlbumPreviewMediaItem  func(childComplexity int, id string, mediaItemID string) int
+		UpdateDescription            func(childComplexity int, id string, description string) int
+		UpdateEntity                 func(childComplexity int, id string, name string) int
+		UpdateEntityPreviewMediaItem func(childComplexity int, id string, entityID string) int
+		Upload                       func(childComplexity int, file graphql.Upload, albumID *string) int
 	}
 
 	OnThisDayResponse struct {
@@ -175,9 +175,12 @@ type ComplexityRoot struct {
 }
 
 type AlbumResolver interface {
+	PreviewURL(ctx context.Context, obj *models.Album) (string, error)
 	MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 type EntityResolver interface {
+	PreviewURL(ctx context.Context, obj *models.Entity) (string, error)
+
 	MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error)
 }
 type MediaItemResolver interface {
@@ -186,11 +189,11 @@ type MediaItemResolver interface {
 type MutationResolver interface {
 	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (*string, error)
 	UpdateAlbum(ctx context.Context, id string, input models.UpdateAlbumInput) (bool, error)
-	UpdateAlbumPreviewURL(ctx context.Context, id string, mediaItemID string) (bool, error)
+	UpdateAlbumPreviewMediaItem(ctx context.Context, id string, mediaItemID string) (bool, error)
 	DeleteAlbum(ctx context.Context, id string) (bool, error)
 	UpdateAlbumMediaItems(ctx context.Context, id string, typeArg string, mediaItems []string) (bool, error)
 	UpdateEntity(ctx context.Context, id string, name string) (bool, error)
-	UpdateEntityPreviewURL(ctx context.Context, id string, entityID string) (bool, error)
+	UpdateEntityPreviewMediaItem(ctx context.Context, id string, entityID string) (bool, error)
 	UpdateDescription(ctx context.Context, id string, description string) (bool, error)
 	Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error)
 	Favourite(ctx context.Context, id string, typeArg string) (bool, error)
@@ -630,17 +633,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateAlbumMediaItems(childComplexity, args["id"].(string), args["type"].(string), args["mediaItems"].([]string)), true
 
-	case "Mutation.updateAlbumPreviewUrl":
-		if e.complexity.Mutation.UpdateAlbumPreviewURL == nil {
+	case "Mutation.updateAlbumPreviewMediaItem":
+		if e.complexity.Mutation.UpdateAlbumPreviewMediaItem == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateAlbumPreviewUrl_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateAlbumPreviewMediaItem_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateAlbumPreviewURL(childComplexity, args["id"].(string), args["mediaItemId"].(string)), true
+		return e.complexity.Mutation.UpdateAlbumPreviewMediaItem(childComplexity, args["id"].(string), args["mediaItemId"].(string)), true
 
 	case "Mutation.updateDescription":
 		if e.complexity.Mutation.UpdateDescription == nil {
@@ -666,17 +669,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateEntity(childComplexity, args["id"].(string), args["name"].(string)), true
 
-	case "Mutation.updateEntityPreviewUrl":
-		if e.complexity.Mutation.UpdateEntityPreviewURL == nil {
+	case "Mutation.updateEntityPreviewMediaItem":
+		if e.complexity.Mutation.UpdateEntityPreviewMediaItem == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateEntityPreviewUrl_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateEntityPreviewMediaItem_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateEntityPreviewURL(childComplexity, args["id"].(string), args["entityId"].(string)), true
+		return e.complexity.Mutation.UpdateEntityPreviewMediaItem(childComplexity, args["id"].(string), args["entityId"].(string)), true
 
 	case "Mutation.upload":
 		if e.complexity.Mutation.Upload == nil {
@@ -1006,7 +1009,7 @@ extend type Query {
 extend type Mutation {
   createAlbum(input: CreateAlbumInput!): String
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
-  updateAlbumPreviewUrl(id: String!, mediaItemId: String!): Boolean!
+  updateAlbumPreviewMediaItem(id: String!, mediaItemId: String!): Boolean!
   deleteAlbum(id: String!): Boolean!
   updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }
@@ -1038,7 +1041,7 @@ extend type Query {
 
 extend type Mutation {
   updateEntity(id: String!, name: String!): Boolean!
-  updateEntityPreviewUrl(id: String!, entityId: String!): Boolean!
+  updateEntityPreviewMediaItem(id: String!, entityId: String!): Boolean!
 }
 `, BuiltIn: false},
 	{Name: "schema/mediaitem.graphql", Input: `scalar Upload
@@ -1297,7 +1300,7 @@ func (ec *executionContext) field_Mutation_updateAlbumMediaItems_args(ctx contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateAlbumPreviewUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateAlbumPreviewMediaItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1369,7 +1372,7 @@ func (ec *executionContext) field_Mutation_updateDescription_args(ctx context.Co
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateEntityPreviewUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateEntityPreviewMediaItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1838,14 +1841,14 @@ func (ec *executionContext) _Album_previewUrl(ctx context.Context, field graphql
 		Object:     "Album",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PreviewURL, nil
+		return ec.resolvers.Album().PreviewURL(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2192,14 +2195,14 @@ func (ec *executionContext) _Entity_previewUrl(ctx context.Context, field graphq
 		Object:     "Entity",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.PreviewURL, nil
+		return ec.resolvers.Entity().PreviewURL(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3370,7 +3373,7 @@ func (ec *executionContext) _Mutation_updateAlbum(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateAlbumPreviewUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateAlbumPreviewMediaItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3387,7 +3390,7 @@ func (ec *executionContext) _Mutation_updateAlbumPreviewUrl(ctx context.Context,
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateAlbumPreviewUrl_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateAlbumPreviewMediaItem_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3395,7 +3398,7 @@ func (ec *executionContext) _Mutation_updateAlbumPreviewUrl(ctx context.Context,
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateAlbumPreviewURL(rctx, args["id"].(string), args["mediaItemId"].(string))
+		return ec.resolvers.Mutation().UpdateAlbumPreviewMediaItem(rctx, args["id"].(string), args["mediaItemId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3538,7 +3541,7 @@ func (ec *executionContext) _Mutation_updateEntity(ctx context.Context, field gr
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_updateEntityPreviewUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateEntityPreviewMediaItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3555,7 +3558,7 @@ func (ec *executionContext) _Mutation_updateEntityPreviewUrl(ctx context.Context
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateEntityPreviewUrl_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_updateEntityPreviewMediaItem_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3563,7 +3566,7 @@ func (ec *executionContext) _Mutation_updateEntityPreviewUrl(ctx context.Context
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateEntityPreviewURL(rctx, args["id"].(string), args["entityId"].(string))
+		return ec.resolvers.Mutation().UpdateEntityPreviewMediaItem(rctx, args["id"].(string), args["entityId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5873,10 +5876,19 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 		case "description":
 			out.Values[i] = ec._Album_description(ctx, field, obj)
 		case "previewUrl":
-			out.Values[i] = ec._Album_previewUrl(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Album_previewUrl(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "mediaItems":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5995,10 +6007,19 @@ func (ec *executionContext) _Entity(ctx context.Context, sel ast.SelectionSet, o
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "previewUrl":
-			out.Values[i] = ec._Entity_previewUrl(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Entity_previewUrl(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "entityType":
 			out.Values[i] = ec._Entity_entityType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6288,8 +6309,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateAlbumPreviewUrl":
-			out.Values[i] = ec._Mutation_updateAlbumPreviewUrl(ctx, field)
+		case "updateAlbumPreviewMediaItem":
+			out.Values[i] = ec._Mutation_updateAlbumPreviewMediaItem(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6308,8 +6329,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "updateEntityPreviewUrl":
-			out.Values[i] = ec._Mutation_updateEntityPreviewUrl(ctx, field)
+		case "updateEntityPreviewMediaItem":
+			out.Values[i] = ec._Mutation_updateEntityPreviewMediaItem(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

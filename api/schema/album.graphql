@@ -32,7 +32,7 @@ extend type Query {
 extend type Mutation {
   createAlbum(input: CreateAlbumInput!): String
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
-  updateAlbumPreviewUrl(id: String!, mediaItemId: String!): Boolean!
+  updateAlbumPreviewMediaItem(id: String!, mediaItemId: String!): Boolean!
   deleteAlbum(id: String!): Boolean!
   updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }

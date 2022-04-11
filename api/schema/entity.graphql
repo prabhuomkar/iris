@@ -25,5 +25,5 @@ extend type Query {
 
 extend type Mutation {
   updateEntity(id: String!, name: String!): Boolean!
-  updateEntityPreviewUrl(id: String!, entityId: String!): Boolean!
+  updateEntityPreviewMediaItem(id: String!, entityId: String!): Boolean!
 }

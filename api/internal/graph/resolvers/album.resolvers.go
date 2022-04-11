@@ -15,6 +15,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (r *albumResolver) PreviewURL(ctx context.Context, obj *models.Album) (string, error) {
+	mediaItemOID, _ := primitive.ObjectIDFromHex(obj.PreviewMediaItem)
+
+	var mediaItem models.MediaItem
+
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+	return mediaItem.PreviewURL, err
+}
+
 func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultAlbumMediaItemsLimit := 20
 	defaultAlbumMediaItemsPage := 1
@@ -145,7 +154,7 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 	return true, nil
 }
 
-func (r *mutationResolver) UpdateAlbumPreviewURL(ctx context.Context, id string, mediaItemID string) (bool, error) {
+func (r *mutationResolver) UpdateAlbumPreviewMediaItem(ctx context.Context, id string, mediaItemID string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -156,16 +165,9 @@ func (r *mutationResolver) UpdateAlbumPreviewURL(ctx context.Context, id string,
 		return false, err
 	}
 
-	var mediaItem models.MediaItem
-
-	err = r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
-	if err != nil {
-		return false, err
-	}
-
 	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
 		{Key: "$set", Value: bson.D{
-			{Key: "previewUrl", Value: mediaItem.PreviewURL},
+			{Key: "previewMediaItem", Value: mediaItemOID},
 		}},
 	})
 	if err != nil {

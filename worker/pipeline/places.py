@@ -53,7 +53,11 @@ class Places(Component):
 
         # update database with new place and new entity if necessary
         if len(name) > 0:
-          entity_oid = self.upsert_entity({'name': name, 'data': address})
+          entity_oid = self.upsert_entity({
+            'name': name,
+            'previewMediaItem': self.oid,
+            'data': address,
+          })
 
           # update database with
           self.update({ '$addToSet': { 'entities': entity_oid } })
