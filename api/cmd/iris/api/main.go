@@ -72,7 +72,7 @@ func main() {
 	router.Handle("/", playground.Handler("graphql playground", "/graphql"))
 	router.Handle("/graphql", srv)
 
-	log.Printf("starting api on port :%d", cfg.Port)
+	log.Printf("starting api")
 
 	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
 	if err != nil && errors.Is(err, http.ErrServerClosed) {

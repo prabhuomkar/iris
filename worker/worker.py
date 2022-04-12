@@ -15,7 +15,7 @@ def start_consumers():
   connection = pika.BlockingConnection(pika.URLParameters(os.getenv('QUEUE_URI')))
   channel = connection.channel()
   for queue in queues:
-    callback = Callback(db=db, queue=queue)
+    callback = Callback(db=db, channel=channel, queue=queue)
     message_callback = callback.process
     channel.basic_consume(queue=queue, auto_ack=False,
                           on_message_callback=message_callback)
