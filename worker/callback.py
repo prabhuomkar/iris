@@ -27,17 +27,18 @@ class Callback:
     mediaitem_url = mediaitem['downloadUrl']
     # extract what components need to be initialized
     actions = data['actions'] if 'actions' in data else []
-    if 'places' in actions and Places not in self.components and self.queue == os.getenv('COMMON_QUEUE_NAME'):
+    if 'places' in actions and Places not in self.components[self.queue] and self.queue == os.getenv('COMMON_QUEUE_NAME'):
       self.components[self.queue].append(Places)
-    if 'people' in actions and People not in self.components and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
+    if 'people' in actions and People not in self.components[self.queue] and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
       self.components[self.queue].append(People)
-    if 'things' in actions and Things not in self.components and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
+    if 'things' in actions and Things not in self.components[self.queue] and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
       self.components[self.queue].append(Things)
     file_id = f'mediaitem-{oid}-{filename}'
     try:
       # download the mediaitem
       urllib.request.urlretrieve(mediaitem_url, file_id)
       # start the pipeline processing
+      print(self.components)
       threads = [Thread(target=component(self.db, oid, filename, mediaitem_url).process, args=()) \
         for component in self.components[self.queue]]
       [thread.start() for thread in threads] # pylint: disable=expression-not-assigned

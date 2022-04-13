@@ -14,6 +14,7 @@ class Metadata(Component):
     try:
       with exiftool.ExifTool() as et:
         metadata = et.get_metadata(self.file_name)
+        print(metadata)
         if len(metadata.keys()) > 0:
           wh_splits = metadata['Composite:ImageSize'].split()
           media_metadata = {
@@ -29,12 +30,18 @@ class Metadata(Component):
                 else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
             },
             'photo': {
-              'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else None,
-              'cameraModel': metadata['EXIF:Model'] if 'EXIF:Model' in metadata else None,
-              'focalLength': metadata['EXIF:FocalLength'] if 'EXIF:FocalLength' in metadata else None,
-              'apertureFNumber': metadata['EXIF:FNumber'] if 'EXIF:FNumber' in metadata else None,
-              'isoEquivalent': metadata['EXIF:ISO'] if 'EXIF:ISO' in metadata else None,
-              'exposureTime': metadata['EXIF:ExposureTime'] if 'EXIF:ExposureTime' in metadata else None,
+              'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else \
+              metadata['MakerNotes:Make'] if 'MakerNotes:Make' in metadata else None,
+              'cameraModel': metadata['EXIF:Model'] if 'EXIF:Model' in metadata else \
+              metadata['MakerNotes:Model'] if 'MakerNotes:Model' in metadata else None,
+              'focalLength': metadata['EXIF:FocalLength'] if 'EXIF:FocalLength' in metadata else \
+              metadata['MakerNotes:FocalLength'] if 'MakerNotes:FocalLength' in metadata else None,
+              'apertureFNumber': metadata['EXIF:FNumber'] if 'EXIF:FNumber' in metadata else \
+              metadata['MakerNotes:FNumber'] if 'MakerNotes:FNumber' in metadata else None,
+              'isoEquivalent': metadata['EXIF:ISO'] if 'EXIF:ISO' in metadata else \
+              metadata['Composite:ISO'] if 'Composite:ISO' in metadata else None,
+              'exposureTime': metadata['EXIF:ExposureTime'] if 'EXIF:ExposureTime' in metadata else \
+              float(metadata['MakerNotes:ExposureTime']) if 'MakerNotes:ExposureTime' in metadata else None,
             },
           }
           print(f'[metadata]: {media_metadata}')
