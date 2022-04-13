@@ -14,12 +14,12 @@ class Metadata(Component):
     try:
       with exiftool.ExifTool() as et:
         metadata = et.get_metadata(self.file_name)
-        print(metadata)
         if len(metadata.keys()) > 0:
           wh_splits = metadata['Composite:ImageSize'].split()
           media_metadata = {
             'creationTime': get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata \
-              else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata else None,
+              else get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata \
+              else get_creation_time(str(metadata['MakerNotes:DateTimeOriginal'])) if 'MakerNotes:DateTimeOriginal' in metadata else None,
             'width': int(wh_splits[0]) if len(wh_splits) == 2 else None,
             'height': int(wh_splits[1]) if len(wh_splits) == 2 else None,
             'location': {

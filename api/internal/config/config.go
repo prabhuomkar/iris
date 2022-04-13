@@ -57,9 +57,11 @@ func (c Config) GetMediaItemFeatures() string {
 	if !c.FeatureConfig.DisablePlaces {
 		result = append(result, fmt.Sprintf("%q", FeaturePlaces))
 	}
+
 	if !c.FeatureConfig.DisablePeople {
 		result = append(result, fmt.Sprintf("%q", FeaturePeople))
 	}
+
 	if !c.FeatureConfig.DisableThings {
 		result = append(result, fmt.Sprintf("%q", FeatureThings))
 	}
