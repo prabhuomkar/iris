@@ -10,22 +10,22 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import SearchIcon from '@mui/icons-material/Search';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+// import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import StarIcon from '@mui/icons-material/Star';
 import CollectionsBookmarkIcon from '@mui/icons-material/CollectionsBookmark';
-import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
+// import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const sideNavItems1 = [
   { id: 'Photos', to: '/', icon: <InsertPhotoIcon /> },
   { id: 'Explore', to: '/explore', icon: <SearchIcon /> },
-  { id: 'Sharing', to: '/sharing', icon: <PeopleAltIcon /> },
+  // { id: 'Sharing', to: '/sharing', icon: <PeopleAltIcon /> },
 ];
 
 const sideNavItems2 = [
   { id: 'Favourites', to: '/favourites', icon: <StarIcon /> },
   { id: 'Albums', to: '/albums', icon: <CollectionsBookmarkIcon /> },
-  { id: 'Utilities', to: '/utilities', icon: <LibraryAddCheckIcon /> },
+  // { id: 'Utilities', to: '/utilities', icon: <LibraryAddCheckIcon /> },
   { id: 'Trash', to: '/trash', icon: <DeleteIcon /> },
 ];
 
@@ -49,6 +49,10 @@ const SideNav = ({ mobileOpen, handleDrawerToggle }) => {
               button
               key={sn1.id}
               selected={sn1.to === location.pathname}
+              sx={{
+                margin: '4px 0px',
+                borderRadius: '8px',
+              }}
             >
               <ListItemIcon>{sn1.icon}</ListItemIcon>
               <ListItemText primary={sn1.id} />
@@ -69,6 +73,10 @@ const SideNav = ({ mobileOpen, handleDrawerToggle }) => {
               button
               key={sn2.id}
               selected={sn2.to === location.pathname}
+              sx={{
+                margin: '4px 0px',
+                borderRadius: '8px',
+              }}
             >
               <ListItemIcon>{sn2.icon}</ListItemIcon>
               <ListItemText primary={sn2.id} />
@@ -93,6 +101,7 @@ const SideNav = ({ mobileOpen, handleDrawerToggle }) => {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
+            padding: '0px 10px',
           },
         }}
       >
@@ -105,6 +114,7 @@ const SideNav = ({ mobileOpen, handleDrawerToggle }) => {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width: drawerWidth,
+            padding: '0px 10px',
           },
         }}
         open

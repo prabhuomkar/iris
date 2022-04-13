@@ -4,6 +4,7 @@ import ImageListItem, {
   imageListItemClasses,
 } from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
+import Divider from '@mui/material/Divider';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -21,6 +22,7 @@ const Albums = () => {
   return (
     <>
       Albums
+      <Divider />
       <ThemeProvider theme={theme}>
         <Box
           sx={{
@@ -42,13 +44,17 @@ const Albums = () => {
           {itemData.map((item) => (
             <ImageListItem key={item.img}>
               <img
-                src={`${item.img}?w=248&fit=crop&auto=format`}
-                srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                 alt={item.title}
                 loading="lazy"
                 style={{ borderRadius: '4px' }}
               />
-              <ImageListItemBar title={item.title} position="below" />
+              <ImageListItemBar
+                title={item.title}
+                subtitle={<span>6 items</span>}
+                position="below"
+              />
             </ImageListItem>
           ))}
         </Box>

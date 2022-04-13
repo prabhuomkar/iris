@@ -4,6 +4,13 @@ import ImageListItem, {
   imageListItemClasses,
 } from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
+import Divider from '@mui/material/Divider';
+import {
+  AlbumAction,
+  AlbumFormDialog,
+  CreateAlbum,
+} from '../components/albums';
+import AlbumsStyled from '../components/albums/styles';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -15,44 +22,72 @@ const theme = createTheme({
       desktop: 900,
     },
   },
+  typography: {
+    fontFamily: `"Poppins", sans-serif`,
+  },
 });
 
 const Albums = () => {
   return (
     <>
-      Albums
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            marginTop: '10px',
-            display: 'grid',
-            gridTemplateColumns: {
-              mobile: 'repeat(1, 1fr)',
-              bigMobile: 'repeat(2, 1fr)',
-              tablet: 'repeat(3, 1fr)',
-              desktop: 'repeat(5, 1fr)',
-            },
-            [`& .${imageListItemClasses.root}`]: {
-              display: 'flex',
-              flexDirection: 'column',
-              margin: '6px',
-            },
-          }}
-        >
-          {itemData.map((item) => (
-            <ImageListItem key={item.img}>
-              <img
-                src={`${item.img}?w=248&fit=crop&auto=format`}
-                srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                alt={item.title}
-                loading="lazy"
-                style={{ borderRadius: '4px' }}
-              />
-              <ImageListItemBar title={item.title} position="below" />
-            </ImageListItem>
-          ))}
-        </Box>
-      </ThemeProvider>
+      <AlbumsStyled>
+        <div className="albums-heading">
+          <div className="albums-title">Albums</div>
+          <div>
+            <CreateAlbum />
+          </div>
+        </div>
+        <Divider />
+        <ThemeProvider theme={theme}>
+          <Box
+            sx={{
+              marginTop: '10px',
+              display: 'grid',
+              gridTemplateColumns: {
+                mobile: 'repeat(1, 1fr)',
+                bigMobile: 'repeat(2, 1fr)',
+                tablet: 'repeat(3, 1fr)',
+                desktop: 'repeat(5, 1fr)',
+              },
+              [`& .${imageListItemClasses.root}`]: {
+                display: 'flex',
+                flexDirection: 'column',
+                margin: '6px',
+              },
+            }}
+          >
+            {itemData.map((item) => (
+              <ImageListItem key={item.img} className="albums-image-list">
+                <img
+                  src={`${item.img}?w=164&h=164&fit=crop&auto=format`}
+                  srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                  alt={item.title}
+                  loading="lazy"
+                  style={{ borderRadius: '6px' }}
+                />
+                <div className="albums-more">
+                  <AlbumAction />
+                  <AlbumFormDialog />
+                </div>
+                <ImageListItemBar
+                  title={item.title}
+                  subtitle={
+                    <div
+                      style={{
+                        fontSize: '13px',
+                        color: '#5f6368',
+                      }}
+                    >
+                      6 items
+                    </div>
+                  }
+                  position="below"
+                />
+              </ImageListItem>
+            ))}
+          </Box>
+        </ThemeProvider>
+      </AlbumsStyled>
     </>
   );
 };

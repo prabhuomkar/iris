@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import ImageListItem, {
   imageListItemClasses,
 } from '@mui/material/ImageListItem';
+import Divider from '@mui/material/Divider';
+import { styled } from '@mui/system';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -16,10 +18,20 @@ const theme = createTheme({
   },
 });
 
+const HeadingStyled = styled('div')({
+  marginBottom: '10px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
+
 const Favourites = () => {
   return (
     <>
-      Favourites
+      <HeadingStyled>
+        <div>Favourites</div>
+      </HeadingStyled>
+      <Divider />
       <ThemeProvider theme={theme}>
         <Box
           sx={{
