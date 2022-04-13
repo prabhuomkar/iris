@@ -31,6 +31,8 @@ def get_mediaitem(id):
                     fileSize
                     favourite
                     deleted
+                    sourceUrl
+                    previewUrl
                     mediaMetadata {
                         width
                         height

@@ -18,6 +18,8 @@ def json_validate_mediaitem(exp: Dict, got: Dict):
     assert exp['mimeType'] == got['mimeType']
     assert exp['mediaMetadata']['width'] == got['mediaMetadata']['width']
     assert exp['mediaMetadata']['height'] == got['mediaMetadata']['height']
+    assert len(got['sourceUrl']) > 0
+    assert len(got['previewUrl']) > 0
     if 'photo' in exp['mediaMetadata']:
         for meta_type in ['cameraMake', 'cameraModel', 'focalLength', 'apertureFNumber', 'isoEquivalent', 'exposureTime']:
             if meta_type in exp['mediaMetadata']['photo']:

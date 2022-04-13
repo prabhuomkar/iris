@@ -17,8 +17,6 @@ def step_validate_file_upload(context):
 def step_validate_metadata(context, file_type):
     exp = get_expected_metadata(file_type)
     context.response = get_mediaitem(context.file_id)
-    print(exp)
-    print(context.response)
     json_validate_mediaitem(exp, context.response)
 
 @step('user updates "{mime_type}" file')
