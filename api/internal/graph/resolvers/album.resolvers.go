@@ -169,6 +169,7 @@ func (r *mutationResolver) UpdateAlbumPreviewMediaItem(ctx context.Context, id s
 	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
 		{Key: "$set", Value: bson.D{
 			{Key: "previewMediaItem", Value: mediaItemOID},
+			{Key: "updatedAt", Value: time.Now()},
 		}},
 	})
 	if err != nil {
@@ -214,14 +215,19 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 	}
 
 	// update album to add or remove mediaitems
-	update := bson.D{{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}}
+	update := primitive.E{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}
 	if typeArg == actionTypeAdd {
-		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}}
+		update = primitive.E{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}
 	}
 
 	filter := bson.D{{Key: "_id", Value: albumID}}
 
-	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, update)
+	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "updatedAt", Value: time.Now()},
+		}},
+		update,
+	})
 	if err != nil {
 		return false, err
 	}
@@ -269,9 +275,11 @@ func (r *queryResolver) Album(ctx context.Context, id string) (*models.Album, er
 	return result, err
 }
 
-func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*models.AlbumConnection, error) {
+func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int, sortBy *string) (*models.AlbumConnection, error) {
 	defaultAlbumsLimit := 20
 	defaultAlbumsPage := 1
+	defaultAlbumsSortBy := "updatedAt"
+	sortDirection := -1
 
 	if limit == nil {
 		limit = &defaultAlbumsLimit
@@ -281,11 +289,19 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*mod
 		page = &defaultAlbumsPage
 	}
 
+	if sortBy == nil {
+		sortBy = &defaultAlbumsSortBy
+	}
+
+	if *sortBy == "name" {
+		sortDirection = 1
+	}
+
 	skip := int64(*limit * (*page - 1))
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: *sortBy, Value: sortDirection}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}

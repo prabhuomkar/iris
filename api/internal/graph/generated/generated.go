@@ -154,7 +154,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Album        func(childComplexity int, id string) int
-		Albums       func(childComplexity int, page *int, limit *int) int
+		Albums       func(childComplexity int, page *int, limit *int, sortBy *string) int
 		Autocomplete func(childComplexity int, q string) int
 		Deleted      func(childComplexity int, page *int, limit *int) int
 		Entities     func(childComplexity int, entityType string, page *int, limit *int) int
@@ -203,7 +203,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Album(ctx context.Context, id string) (*models.Album, error)
-	Albums(ctx context.Context, page *int, limit *int) (*models.AlbumConnection, error)
+	Albums(ctx context.Context, page *int, limit *int, sortBy *string) (*models.AlbumConnection, error)
 	Explore(ctx context.Context) (*models.ExploreResponse, error)
 	Entities(ctx context.Context, entityType string, page *int, limit *int) (*models.EntityItemConnection, error)
 	Entity(ctx context.Context, id string) (*models.Entity, error)
@@ -780,7 +780,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Albums(childComplexity, args["page"].(*int), args["limit"].(*int)), true
+		return e.complexity.Query.Albums(childComplexity, args["page"].(*int), args["limit"].(*int), args["sortBy"].(*string)), true
 
 	case "Query.autocomplete":
 		if e.complexity.Query.Autocomplete == nil {
@@ -1012,7 +1012,7 @@ input UpdateAlbumInput {
 
 extend type Query {
   album(id: String!): Album!
-  albums(page: Int, limit: Int): AlbumConnection!
+  albums(page: Int, limit: Int, sortBy: String): AlbumConnection!
 }
 
 extend type Mutation {
@@ -1505,6 +1505,15 @@ func (ec *executionContext) field_Query_albums_args(ctx context.Context, rawArgs
 		}
 	}
 	args["limit"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["sortBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortBy"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sortBy"] = arg2
 	return args, nil
 }
 
@@ -4119,7 +4128,7 @@ func (ec *executionContext) _Query_albums(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Albums(rctx, args["page"].(*int), args["limit"].(*int))
+		return ec.resolvers.Query().Albums(rctx, args["page"].(*int), args["limit"].(*int), args["sortBy"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

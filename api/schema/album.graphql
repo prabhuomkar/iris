@@ -26,7 +26,7 @@ input UpdateAlbumInput {
 
 extend type Query {
   album(id: String!): Album!
-  albums(page: Int, limit: Int): AlbumConnection!
+  albums(page: Int, limit: Int, sortBy: String): AlbumConnection!
 }
 
 extend type Mutation {

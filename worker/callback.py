@@ -38,7 +38,6 @@ class Callback:
       # download the mediaitem
       urllib.request.urlretrieve(mediaitem_url, file_id)
       # start the pipeline processing
-      print(self.components)
       threads = [Thread(target=component(self.db, oid, filename, mediaitem_url).process, args=()) \
         for component in self.components[self.queue]]
       [thread.start() for thread in threads] # pylint: disable=expression-not-assigned
