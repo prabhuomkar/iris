@@ -36,6 +36,27 @@ func (r *mediaItemResolver) Entities(ctx context.Context, obj *models.MediaItem)
 	return result, nil
 }
 
+func (r *mediaItemResolver) Albums(ctx context.Context, obj *models.MediaItem) ([]*models.Album, error) {
+	albumIDs := make([]primitive.ObjectID, len(obj.Albums))
+
+	for idx, strID := range obj.Albums {
+		oid, _ := primitive.ObjectIDFromHex(strID)
+		albumIDs[idx] = oid
+	}
+
+	cur, err := r.DB.Collection(models.ColAlbums).Find(ctx, bson.M{"_id": bson.M{"$in": albumIDs}})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*models.Album
+	if err = cur.All(ctx, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *mutationResolver) UpdateDescription(ctx context.Context, id string, description string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

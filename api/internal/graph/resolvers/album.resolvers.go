@@ -213,6 +213,7 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 		return false, errIncorrectUpdateAlbumMediaItemsActionType
 	}
 
+	// update album to add or remove mediaitems
 	update := bson.D{{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}}
 	if typeArg == actionTypeAdd {
 		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}}
@@ -221,6 +222,24 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 	filter := bson.D{{Key: "_id", Value: albumID}}
 
 	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, update)
+	if err != nil {
+		return false, err
+	}
+
+	// update mediaitems to add or remove album
+	operation := "$pull"
+	if typeArg == actionTypeAdd {
+		operation = "$addToSet"
+	}
+
+	_, err = r.DB.Collection(models.ColMediaItems).UpdateMany(ctx,
+		bson.D{{Key: "_id", Value: bson.D{
+			{Key: "$in", Value: mediaItemIDs},
+		}}},
+		bson.D{{Key: operation, Value: bson.D{
+			{Key: "albums", Value: albumID},
+		}}},
+	)
 	if err != nil {
 		return false, err
 	}

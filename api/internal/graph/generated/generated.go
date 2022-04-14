@@ -92,6 +92,7 @@ type ComplexityRoot struct {
 	}
 
 	MediaItem struct {
+		Albums            func(childComplexity int) int
 		ContentCategories func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
 		Deleted           func(childComplexity int) int
@@ -185,6 +186,7 @@ type EntityResolver interface {
 }
 type MediaItemResolver interface {
 	Entities(ctx context.Context, obj *models.MediaItem) ([]*models.Entity, error)
+	Albums(ctx context.Context, obj *models.MediaItem) ([]*models.Album, error)
 }
 type MutationResolver interface {
 	CreateAlbum(ctx context.Context, input models.CreateAlbumInput) (*string, error)
@@ -399,6 +401,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Location.Longitude(childComplexity), true
+
+	case "MediaItem.albums":
+		if e.complexity.MediaItem.Albums == nil {
+			break
+		}
+
+		return e.complexity.MediaItem.Albums(childComplexity), true
 
 	case "MediaItem.contentCategories":
 		if e.complexity.MediaItem.ContentCategories == nil {
@@ -1057,6 +1066,7 @@ type MediaItem {
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  albums: [Album!]
   favourite: Boolean
   deleted: Boolean
   createdAt: Time!
@@ -2862,6 +2872,38 @@ func (ec *executionContext) _MediaItem_entities(ctx context.Context, field graph
 	res := resTmp.([]*models.Entity)
 	fc.Result = res
 	return ec.marshalOEntity2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐEntityᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MediaItem_albums(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MediaItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MediaItem().Albums(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Album)
+	fc.Result = res
+	return ec.marshalOAlbum2ᚕᚖirisᚋapiᚋinternalᚋmodelsᚐAlbumᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _MediaItem_favourite(ctx context.Context, field graphql.CollectedField, obj *models.MediaItem) (ret graphql.Marshaler) {
@@ -6192,6 +6234,17 @@ func (ec *executionContext) _MediaItem(ctx context.Context, sel ast.SelectionSet
 					}
 				}()
 				res = ec._MediaItem_entities(ctx, field, obj)
+				return res
+			})
+		case "albums":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MediaItem_albums(ctx, field, obj)
 				return res
 			})
 		case "favourite":

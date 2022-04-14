@@ -16,6 +16,7 @@ type (
 		MediaMetadata     *MediaMetaData `json:"mediaMetadata"`
 		ContentCategories []string       `json:"contentCategories"`
 		Entities          []string       `json:"entities"`
+		Albums            []string       `json:"albums"`
 		Favourite         bool           `json:"favourite"`
 		Deleted           bool           `json:"deleted"`
 		CreatedAt         time.Time      `json:"createdAt"`

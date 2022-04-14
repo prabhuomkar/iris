@@ -11,6 +11,7 @@ type MediaItem {
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  albums: [Album!]
   favourite: Boolean
   deleted: Boolean
   createdAt: Time!
