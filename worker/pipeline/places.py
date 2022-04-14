@@ -25,8 +25,9 @@ class Places(Component):
 
   def process(self):
     try:
-      with exiftool.ExifTool() as et:
+      with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(self.file_name)
+        metadata = metadata[0] if len(metadata) > 0 else {}
         coords = []
         if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
           coords.append(metadata['EXIF:GPSLatitude'])

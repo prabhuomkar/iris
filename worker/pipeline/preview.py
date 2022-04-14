@@ -21,9 +21,10 @@ class Preview(Component):
   def process(self):
     try:
       self.update({'$set': {'status': 'PROCESSING'}})
-      with exiftool.ExifTool() as et:
+      with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(self.file_name)
         data = None
+        metadata = metadata[0] if len(metadata) > 0 else {}
         if len(metadata.keys()) > 0 and 'File:MIMEType' in metadata and \
           metadata['File:MIMEType'] in self.std_images:
           image = Image.open(self.file_name)

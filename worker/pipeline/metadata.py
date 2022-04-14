@@ -12,9 +12,9 @@ class Metadata(Component):
 
   def process(self):
     try:
-      with exiftool.ExifTool() as et:
+      with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(self.file_name)
-        print(metadata)
+        metadata = metadata[0] if len(metadata) > 0 else {}
         if len(metadata.keys()) > 0:
           wh_splits = metadata['Composite:ImageSize'].split()
           media_metadata = {
