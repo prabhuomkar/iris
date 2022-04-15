@@ -8,50 +8,34 @@ import (
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
 	"iris/api/internal/utils"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (r *entityResolver) DisplayMediaItem(ctx context.Context, obj *models.Entity) (*models.MediaItem, error) {
-	entityID, _ := primitive.ObjectIDFromHex(obj.ID)
+func (r *entityResolver) PreviewURL(ctx context.Context, obj *models.Entity) (string, error) {
+	mediaItemOID, _ := primitive.ObjectIDFromHex(obj.PreviewMediaItem)
 
-	matchStage := bson.D{{Key: "$match", Value: bson.D{
-		{Key: "$and", Value: bson.A{
-			bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-			bson.D{{Key: "entities", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-		}},
-	}}}
-	if obj.EntityType == "people" {
-		matchStage = bson.D{{Key: "$match", Value: bson.D{
-			{Key: "$and", Value: bson.A{
-				bson.D{{Key: "deleted", Value: bson.D{{Key: "$not", Value: bson.D{{Key: "$eq", Value: true}}}}}},
-				bson.D{{Key: "faces.entityId", Value: bson.D{{Key: "$in", Value: bson.A{entityID}}}}},
-			}},
-		}}}
-	}
+	var mediaItem models.MediaItem
 
-	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{
-		matchStage,
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "mediaMetadata.creationTime", Value: -1}}}},
-		bson.D{{Key: "$limit", Value: 1}},
-	})
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
 	if err != nil {
-		return nil, err
+		log.Printf("error getting entity preview url: %+v", err)
+
+		return "", err
 	}
 
-	var result []*models.MediaItem
-
-	if err = cur.All(ctx, &result); err != nil {
-		return nil, err
+	if obj.EntityType == "people" {
+		for _, face := range mediaItem.Faces {
+			if face.EntityID == obj.ID {
+				return face.PreviewURL, nil
+			}
+		}
 	}
 
-	if len(result) == 0 {
-		return nil, nil
-	}
-
-	return result[0], nil
+	return mediaItem.PreviewURL, nil
 }
 
 func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, page *int, limit *int) (*models.MediaItemConnection, error) {
@@ -98,6 +82,8 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting entity mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -109,6 +95,8 @@ func (r *entityResolver) MediaItems(ctx context.Context, obj *models.Entity, pag
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding entity mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -133,7 +121,34 @@ func (r *mutationResolver) UpdateEntity(ctx context.Context, id string, name str
 		{Key: "_id", Value: oid}, {Key: "entityType", Value: "people"},
 	}, bson.D{{Key: "$set", Value: bson.D{{Key: "name", Value: name}}}})
 	if res.Err() != nil {
+		log.Printf("error updating entity: %+v", err)
+
 		return false, res.Err()
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateEntityPreviewMediaItem(ctx context.Context, id string, entityID string) (bool, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	entityOID, err := primitive.ObjectIDFromHex(entityID)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "previewMediaItem", Value: entityOID},
+		}},
+	})
+	if err != nil {
+		log.Printf("error updating entity preview mediaitem: %+v", err)
+
+		return false, err
 	}
 
 	return true, nil
@@ -143,16 +158,22 @@ func (r *queryResolver) Explore(ctx context.Context) (*models.ExploreResponse, e
 	// later(omkar): move entityType to enums
 	people, err := utils.GetEntitiesByType(ctx, r.DB, "people")
 	if err != nil {
+		log.Printf("error getting people entity mediaitems: %+v", err)
+
 		return nil, err
 	}
 
 	places, err := utils.GetEntitiesByType(ctx, r.DB, "places")
 	if err != nil {
+		log.Printf("error getting places entity mediaitems: %+v", err)
+
 		return nil, err
 	}
 
 	things, err := utils.GetEntitiesByType(ctx, r.DB, "things")
 	if err != nil {
+		log.Printf("error getting things entity mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -219,6 +240,8 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 
 	cur, err := r.DB.Collection(models.ColEntity).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting entities: %+v", err)
+
 		return nil, err
 	}
 
@@ -230,6 +253,8 @@ func (r *queryResolver) Entities(ctx context.Context, entityType string, page *i
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding entities: %+v", err)
+
 		return nil, err
 	}
 
@@ -254,6 +279,8 @@ func (r *queryResolver) Entity(ctx context.Context, id string) (*models.Entity, 
 
 	err = r.DB.Collection(models.ColEntity).FindOne(ctx, bson.D{{Key: "_id", Value: entityID}}).Decode(&entity)
 	if err != nil {
+		log.Printf("error getting entity: %+v", err)
+
 		return nil, err
 	}
 

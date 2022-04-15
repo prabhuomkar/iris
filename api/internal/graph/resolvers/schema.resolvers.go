@@ -8,8 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"iris/api/internal/models"
+	"iris/api/internal/utils"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -19,46 +19,51 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (bool, error) {
+func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
-		return false, err
+		log.Printf("some error uploading mediaitems to cdn: %+v", err)
+
+		return "", err
 	}
 
-	imageURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
+	sourceURL := fmt.Sprintf("http://%s/%s", result.Server, result.FileID)
 
 	insertResult, err := r.DB.Collection(models.ColMediaItems).InsertOne(ctx, bson.D{
-		{Key: "imageUrl", Value: imageURL},
-		{Key: "description", Value: nil},
-		{Key: "mimeType", Value: result.MimeType},
-		{Key: "fileName", Value: result.FileName},
-		{Key: "fileSize", Value: result.FileSize},
+		{Key: "sourceUrl", Value: sourceURL},
+		{Key: "fileName", Value: file.Filename},
+		{Key: "fileSize", Value: file.Size},
 		{Key: "mediaMetadata", Value: nil},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
+		{Key: "status", Value: StatusUnspecified},
 	})
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	insertedID, ok := insertResult.InsertedID.(primitive.ObjectID)
 	if ok {
-		go func(insertedID, imageURL, mimeType string) {
-			err := r.Queue.Publish([]byte(fmt.Sprintf(`{"id":"%s","imageUrl":"%s","mimeType":"%s"}`, insertedID, imageURL, mimeType)))
+		go func(insertedID, sourceURL string) {
+			message := fmt.Sprintf(
+				`{"id":"%s","fileName":"%s","mediaItem":{"downloadUrl":"%s"},"actions":[%s]}`,
+				insertedID, file.Filename, sourceURL, r.Config.GetMediaItemFeatures())
+
+			err := r.Queue.Publish([]byte(message))
 			if err != nil {
-				log.Printf("error while publishing event to rabbitmq: %v", err)
-			} else {
-				log.Printf("published event to rabbitmq for image: %s mimeType: %s", imageURL, mimeType)
+				log.Printf("error publishing event to queue rabbitmq: %+v", err)
 			}
-		}(insertedID.Hex(), imageURL, result.MimeType)
+		}(insertedID.Hex(), sourceURL)
 	} else {
-		return false, nil
+		return "", nil
 	}
 
 	if albumID != nil {
+		log.Printf("uploaded mediaitem is for album: %s", *albumID)
+
 		albumOID, err := primitive.ObjectIDFromHex(*albumID)
 		if err != nil {
-			return false, err
+			return "", err
 		}
 
 		_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, albumOID, bson.D{
@@ -67,14 +72,16 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			}},
 		})
 		if err != nil {
-			return false, err
+			log.Printf("error linking uploaded mediaitem to album: %+v", err)
+
+			return "", err
 		}
 	}
 
-	return true, nil
+	return insertedID.Hex(), nil
 }
 
-func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeArg string) (bool, error) {
+func (r *mutationResolver) Favourite(ctx context.Context, id string, typeArg string) (bool, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -93,6 +100,8 @@ func (r *mutationResolver) UpdateFavourite(ctx context.Context, id string, typeA
 		{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}},
 	})
 	if err != nil {
+		log.Printf("error marking mediaitem as favourite: %+v", err)
+
 		return false, err
 	}
 
@@ -122,6 +131,8 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		&options.FindOneAndUpdateOptions{ReturnDocument: &after},
 	)
 	if result.Err() != nil {
+		log.Printf("error marking mediaitem as deleted: %+v", err)
+
 		return false, result.Err()
 	}
 
@@ -150,23 +161,20 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			}}},
 		)
 		if err != nil {
+			log.Printf("error deleting entities related to mediaitem: %+v", err)
+
 			return false, err
 		}
 
 		// delete from mediaitems collection
 		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
 		if err != nil {
+			log.Printf("error deleting mediaitem: %+v", err)
+
 			return false, err
 		}
 
-		// delete the image from CDN
-		splits := strings.Split(deleteMediaItem.ImageURL, "/")
-		fileID := splits[len(splits)-1]
-
-		err = r.CDN.DeleteFile(fileID, nil)
-		if err != nil {
-			return false, err
-		}
+		utils.DeleteFilesFromCDN(r.CDN, []string{deleteMediaItem.SourceURL, deleteMediaItem.PreviewURL})
 	}
 
 	return true, nil
@@ -196,6 +204,8 @@ func (r *queryResolver) Search(ctx context.Context, q *string, id *string, page 
 				{Key: "$caseSensitive", Value: false},
 			}}})
 		if err != nil {
+			log.Printf("error searching mediaitems: %+v", err)
+
 			return nil, err
 		}
 
@@ -331,6 +341,8 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting favourite mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -342,6 +354,8 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding favourite mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -388,6 +402,8 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 
 	if err != nil {
+		log.Printf("error getting deleted mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -399,6 +415,8 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding deleted mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -419,6 +437,13 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+const (
+	StatusUnspecified = "UNSPECIFIED"
+	StatusProcessing  = "PROCESSING"
+	StatusReady       = "READY"
+	StatusFailed      = "FAILED"
+)
+
 var (
 	errIncorrectFavouriteActionType = errors.New("incorrect action type for favourite")
 	errIncorrectDeleteActionType    = errors.New("incorrect action type for delete")

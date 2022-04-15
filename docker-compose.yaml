@@ -23,39 +23,27 @@ services:
       - database
       - queue
     environment:
-      DB_URI: 'mongodb://root:root@database:5010/iris?authSource=admin'
-      DB_NAME: iris
       CDN_URL: 'http://cdn-master:5020'
       CDN_CHUNK_SIZE: 1048576
       CDN_TIMEOUT: 5
+      DB_URI: 'mongodb://root:root@database:5010/iris?authSource=admin'
+      DB_NAME: iris
       QUEUE_URI: 'amqp://root:root@queue:5030'
-      QUEUE_EXCHANGE: iris
+      QUEUE_NAME: iris.process
   worker:
     build: worker
     restart: always
     container_name: worker
     environment:
+      CDN_URL: cdn-master
+      CDN_PORT: 5020
       DB_URI: mongodb://root:root@database:5010/iris?authSource=admin
       DB_NAME: iris
       QUEUE_URI: amqp://root:root@queue:5030/
-      CDN_URL: cdn-master
-      CDN_PORT: 5020
-      ML_URL: http://ml:5002
+      COMMON_QUEUE_NAME: iris.process
+      INTERNAL_QUEUE_NAME: iris.inference
     depends_on:
       - queue
-      - ml
-  ml:
-    build: ml
-    restart: always
-    container_name: ml
-    ports:
-      - '5002:5002'
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-        reservations:
-          cpus: '1.0'
   # infra services
   database:
     image: mongo

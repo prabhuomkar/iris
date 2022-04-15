@@ -9,8 +9,8 @@ from .component import Component
 
 class Places(Component):
   """Places Component"""
-  def __init__(self, db, oid, image_url, mime_type):
-    super().__init__('places', db, oid, image_url, mime_type)
+  def __init__(self, db, oid, filename, mediaitem_url):
+    super().__init__('places', db, oid, filename, mediaitem_url)
 
   def upsert_entity(self, data):
     """Upserts places entity"""
@@ -25,8 +25,9 @@ class Places(Component):
 
   def process(self):
     try:
-      with exiftool.ExifTool() as et:
+      with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(self.file_name)
+        metadata = metadata[0] if len(metadata) > 0 else {}
         coords = []
         if 'EXIF:GPSLatitude' in metadata and 'EXIF:GPSLongitude' in metadata:
           coords.append(metadata['EXIF:GPSLatitude'])
@@ -53,11 +54,13 @@ class Places(Component):
 
         # update database with new place and new entity if necessary
         if len(name) > 0:
-          entity_oid = self.upsert_entity({'name': name, 'data': address})
+          entity_oid = self.upsert_entity({
+            'name': name,
+            'previewMediaItem': self.oid,
+            'data': address,
+          })
 
           # update database with
           self.update({ '$addToSet': { 'entities': entity_oid } })
     except Exception as e:
-      print(f'some exception while processing places: {str(e)}')
-    finally:
-      self.clear_files()
+      print(f'some exception while processing places for mediaitem {self.oid}: {str(e)}')

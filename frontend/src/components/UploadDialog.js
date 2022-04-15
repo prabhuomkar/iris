@@ -49,7 +49,7 @@ const UploadDialog = ({ open, setOpen }) => {
       <DialogContent>
         <input
           type="file"
-          accept="image/jpeg, image/png, image/bmp"
+          accept="image/*"
           required
           onChange={onChange}
         />

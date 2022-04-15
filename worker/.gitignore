@@ -55,3 +55,4 @@ venv.bak/
 
 # Others
 .DS_Store
+*.pth

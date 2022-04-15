@@ -4,76 +4,29 @@
 	"vhosts": [{
 		"name": "/"
 	}],
-	"permissions": [{
-		"user": "root",
-		"vhost": "/",
-		"configure": ".*",
-		"write": ".*",
-		"read": ".*"
-	}],
-	"parameters": [],
-	"policies": [],
-	"queues": [{
-			"name": "pipeline.metadata",
-			"vhost": "/",
-			"durable": true,
-			"auto_delete": false
-		},
+	"permissions": [
 		{
-			"name": "pipeline.people",
+			"user": "root",
 			"vhost": "/",
-			"durable": true,
-			"auto_delete": false
-		},
-		{
-			"name": "pipeline.places",
-			"vhost": "/",
-			"durable": true,
-			"auto_delete": false
-		},
-		{
-			"name": "pipeline.things",
-			"vhost": "/",
-			"durable": true,
-			"auto_delete": false
+			"configure": ".*",
+			"write": ".*",
+			"read": ".*"
 		}
 	],
-	"exchanges": [{
-		"name": "iris",
-		"vhost": "/",
-		"type": "fanout",
-		"durable": true,
-		"auto_delete": false,
-		"internal": false
-	}],
-	"bindings": [
-    {
-			"source": "iris",
+	"parameters": [],
+	"policies": [],
+	"queues": [
+		{
+			"name": "iris.process",
 			"vhost": "/",
-			"destination": "pipeline.metadata",
-			"destination_type": "queue",
-			"routing_key": ""
+			"durable": true,
+			"auto_delete": false
 		},
 		{
-			"source": "iris",
+			"name": "iris.inference",
 			"vhost": "/",
-			"destination": "pipeline.people",
-			"destination_type": "queue",
-			"routing_key": ""
-		},
-    {
-			"source": "iris",
-			"vhost": "/",
-			"destination": "pipeline.places",
-			"destination_type": "queue",
-			"routing_key": ""
-		},
-		{
-			"source": "iris",
-			"vhost": "/",
-			"destination": "pipeline.things",
-			"destination_type": "queue",
-			"routing_key": ""
+			"durable": true,
+			"auto_delete": false
 		}
 	]
 }

@@ -4,4 +4,6 @@ RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y
 RUN apt-get install libimage-exiftool-perl exiftool -y
 COPY . /app
-CMD ["python", "-u", "app/worker.py"]
+WORKDIR /app
+RUN scripts/download_model_weights.sh
+CMD ["python", "-u", "worker.py"]

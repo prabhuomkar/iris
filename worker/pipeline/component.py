@@ -1,28 +1,20 @@
 """Component"""
-import os
-import urllib.request
 from bson.objectid import ObjectId
 
 
 class Component:
   """Component"""
-  def __init__(self, name, db, oid, image_url, mime_type):
+  def __init__(self, name, db, oid, filename, mediaitem_url):
     self.name = name
     self.db = db
     self.oid = oid
-    self.image_url = image_url
-    self.mime_type = mime_type
-    # download the image
-    urllib.request.urlretrieve(image_url, f'image-{oid}-{name}')
-
-  def clear_files(self):
-    """Clears downloaded or any processing files"""
-    os.remove(self.file_name)
+    self.filename = filename
+    self.mediaitem_url = mediaitem_url
 
   @property
   def file_name(self):
     """Returns the downloaded file name"""
-    return f'image-{self.oid}-{self.name}'
+    return f'mediaitem-{self.oid}-{self.filename}'
 
   def update(self, data):
     """Updates database with the pipeline result"""

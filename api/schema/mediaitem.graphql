@@ -3,17 +3,20 @@ scalar Upload
 type MediaItem {
   id: String!
   description: String!
-  imageUrl: String!
+  previewUrl: String!
+  sourceUrl: String!
   mimeType: String!
   fileName: String!
   fileSize: Int!
   mediaMetadata: MediaMetaData
   contentCategories: [String]
   entities: [Entity!]
+  albums: [Album!]
   favourite: Boolean
   deleted: Boolean
   createdAt: Time!
   updatedAt: Time!
+  status: String!
 }
 
 type MediaMetaData {
@@ -21,6 +24,7 @@ type MediaMetaData {
   width: Int
   height: Int
   photo: Photo
+  video: Video
   location: Location
 }
 
@@ -31,6 +35,13 @@ type Photo  {
   apertureFNumber: Float
   isoEquivalent: Int
   exposureTime: Float
+}
+
+type Video {
+  cameraMake: String
+  cameraModel: String
+  fps: Int
+  status: String
 }
 
 type Location {

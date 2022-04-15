@@ -1,8 +1,14 @@
 pika==1.2.0
-PyExifTool==0.4.11
+PyExifTool==0.5.3
 pymongo==3.11.3
 requests==2.25.1
 annoy==1.17.0
 Pillow==9.0.0
 pyseaweed==2.0.0
 dnspython==2.1.0
+rawpy==0.17.1
+imageio==2.16.1
+pillow-heif==0.2.0
+torch==1.9.0
+torchvision==0.10.0
+facenet-pytorch==2.5.2

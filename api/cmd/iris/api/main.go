@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"iris/api/internal/config"
@@ -22,8 +26,14 @@ import (
 	"github.com/rs/cors"
 )
 
+const shutdownTime = 10
+
 func main() {
-	// later(omkar): Handle graceful shutdowns
+	// handle graceful shutdown
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	// initialize config
 	cfg, err := config.Init()
 	if err != nil {
 		panic(err)
@@ -34,7 +44,7 @@ func main() {
 		panic(err)
 	}
 
-	queue, err := rabbitmq.Init(cfg.Queue.URI, cfg.Queue.Exchange)
+	queue, err := rabbitmq.Init(cfg.Queue.URI, cfg.Queue.Name)
 	if err != nil {
 		panic(err)
 	}
@@ -62,20 +72,44 @@ func main() {
 		},
 	}
 
-	srv := handler.New(generated.NewExecutableSchema(c))
-	srv.AddTransport(transport.Options{})
-	srv.AddTransport(transport.POST{})
-	srv.AddTransport(transport.GET{})
-	srv.AddTransport(transport.MultipartForm{})
-	srv.Use(extension.Introspection{})
+	gqlHandler := handler.New(generated.NewExecutableSchema(c))
+	gqlHandler.AddTransport(transport.Options{})
+	gqlHandler.AddTransport(transport.POST{})
+	gqlHandler.AddTransport(transport.GET{})
+	gqlHandler.AddTransport(transport.MultipartForm{})
+	gqlHandler.Use(extension.Introspection{})
 
 	router.Handle("/", playground.Handler("graphql playground", "/graphql"))
-	router.Handle("/graphql", srv)
+	router.Handle("/graphql", gqlHandler)
 
-	log.Printf("starting graphql server on port:%d", cfg.Port)
-
-	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
-	if err != nil && errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Port),
+		Handler: router,
 	}
+
+	go func() {
+		err = srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("error starting iris api: %+v", err)
+		}
+	}()
+	log.Printf("started iris api on port: %d", cfg.Port)
+
+	<-interrupt
+	log.Print("stopping iris api")
+
+	ctx, cancel := context.WithTimeout(context.Background(), shutdownTime*time.Second)
+	defer func() {
+		_ = db.Client.Disconnect(ctx)
+
+		_ = queue.Disconnect()
+
+		cancel()
+	}()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("error shutting down iris api: %+v", err)
+	}
+
+	log.Print("stopped iris api")
 }

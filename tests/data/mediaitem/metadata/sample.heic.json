@@ -1,0 +1,16 @@
+{
+    "mimeType": "image/heic",
+    "fileSize": 107760,
+    "mediaMetadata": {
+        "width": 1280,
+        "height": 960,
+        "photo": {
+            "cameraMake": "Apple",
+            "cameraModel": "iPhone 7",
+            "focalLength": 3.99,
+            "apertureFNumber": 1.8,
+            "isoEquivalent": 100,
+            "exposureTime": 0.25
+        }
+    }
+}

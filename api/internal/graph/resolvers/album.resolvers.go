@@ -8,12 +8,28 @@ import (
 	"errors"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+func (r *albumResolver) PreviewURL(ctx context.Context, obj *models.Album) (string, error) {
+	mediaItemOID, _ := primitive.ObjectIDFromHex(obj.PreviewMediaItem)
+
+	var mediaItem models.MediaItem
+
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+	if err != nil {
+		log.Printf("error getting album preview url: %+v", err)
+
+		return "", err
+	}
+
+	return mediaItem.PreviewURL, nil
+}
 
 func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error) {
 	defaultAlbumMediaItemsLimit := 20
@@ -60,6 +76,8 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	})
 	if err != nil {
+		log.Printf("error getting album mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -71,6 +89,8 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		}
 
 		if err := cur.Decode(&result); err != nil {
+			log.Printf("error decoding album mediaitems: %+v", err)
+
 			return nil, err
 		}
 
@@ -93,18 +113,39 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		mediaItems[idx] = oid
 	}
 
+	if len(mediaItems) == 0 {
+		return nil, errInvalidMediaItemsForAlbum
+	}
+
+	var previewMediaItem models.MediaItem
+
+	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&previewMediaItem)
+	if err != nil {
+		log.Printf("error getting album preview mediaitem: %+v", err)
+
+		return nil, err
+	}
+
 	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
+		{Key: "previewUrl", Value: previewMediaItem.PreviewURL},
 		{Key: "mediaItems", Value: mediaItems},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
 	})
 	if err != nil {
+		log.Printf("error creating album: %+v", err)
+
 		return nil, err
 	}
 
-	albumID := result.InsertedID.(primitive.ObjectID).Hex()
+	var albumID string
+
+	albumOID, ok := result.InsertedID.(primitive.ObjectID)
+	if ok {
+		albumID = albumOID.Hex()
+	}
 
 	return &albumID, nil
 }
@@ -122,6 +163,34 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 			{Key: "updatedAt", Value: time.Now()},
 		}}})
 	if err != nil {
+		log.Printf("error updating album: %+v", err)
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *mutationResolver) UpdateAlbumPreviewMediaItem(ctx context.Context, id string, mediaItemID string) (bool, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	mediaItemOID, err := primitive.ObjectIDFromHex(mediaItemID)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = r.DB.Collection(models.ColAlbums).UpdateByID(ctx, oid, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "previewMediaItem", Value: mediaItemOID},
+			{Key: "updatedAt", Value: time.Now()},
+		}},
+	})
+	if err != nil {
+		log.Printf("error updating album preview mediaitem: %+v", err)
+
 		return false, err
 	}
 
@@ -136,6 +205,8 @@ func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (bool, er
 
 	_, err = r.DB.Collection(models.ColAlbums).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}})
 	if err != nil {
+		log.Printf("error deleting album: %+v", err)
+
 		return false, err
 	}
 
@@ -163,15 +234,43 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 		return false, errIncorrectUpdateAlbumMediaItemsActionType
 	}
 
-	update := bson.D{{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}}
+	// update album to add or remove mediaitems
+	update := primitive.E{Key: "$pull", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$in", Value: mediaItemIDs}}}}}
 	if typeArg == actionTypeAdd {
-		update = bson.D{{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}}
+		update = primitive.E{Key: "$addToSet", Value: bson.D{{Key: "mediaItems", Value: bson.D{{Key: "$each", Value: mediaItemIDs}}}}}
 	}
 
 	filter := bson.D{{Key: "_id", Value: albumID}}
 
-	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, update)
+	_, err = r.DB.Collection(models.ColAlbums).UpdateOne(ctx, filter, bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "updatedAt", Value: time.Now()},
+		}},
+		update,
+	})
 	if err != nil {
+		log.Printf("error updating album mediaitems: %+v", err)
+
+		return false, err
+	}
+
+	// update mediaitems to add or remove album
+	operation := "$pull"
+	if typeArg == actionTypeAdd {
+		operation = "$addToSet"
+	}
+
+	_, err = r.DB.Collection(models.ColMediaItems).UpdateMany(ctx,
+		bson.D{{Key: "_id", Value: bson.D{
+			{Key: "$in", Value: mediaItemIDs},
+		}}},
+		bson.D{{Key: operation, Value: bson.D{
+			{Key: "albums", Value: albumID},
+		}}},
+	)
+	if err != nil {
+		log.Printf("error updating mediaitems while updating album mediaitems: %+v", err)
+
 		return false, err
 	}
 
@@ -194,15 +293,19 @@ func (r *queryResolver) Album(ctx context.Context, id string) (*models.Album, er
 			return nil, err
 		}
 
+		log.Printf("error getting album: %+v", err)
+
 		return nil, err
 	}
 
 	return result, err
 }
 
-func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*models.AlbumConnection, error) {
+func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int, sortBy *string) (*models.AlbumConnection, error) {
 	defaultAlbumsLimit := 20
 	defaultAlbumsPage := 1
+	defaultAlbumsSortBy := "updatedAt"
+	sortDirection := -1
 
 	if limit == nil {
 		limit = &defaultAlbumsLimit
@@ -212,11 +315,19 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*mod
 		page = &defaultAlbumsPage
 	}
 
+	if sortBy == nil {
+		sortBy = &defaultAlbumsSortBy
+	}
+
+	if *sortBy == "name" {
+		sortDirection = 1
+	}
+
 	skip := int64(*limit * (*page - 1))
 	itemsPerPage := int64(*limit)
 
 	colQuery := bson.A{
-		bson.D{{Key: "$sort", Value: bson.D{{Key: "updatedAt", Value: -1}}}},
+		bson.D{{Key: "$sort", Value: bson.D{{Key: *sortBy, Value: sortDirection}}}},
 		bson.D{{Key: "$skip", Value: skip}},
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	}
@@ -228,6 +339,8 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*mod
 
 	cur, err := r.DB.Collection(models.ColAlbums).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting albums: %+v", err)
+
 		return nil, err
 	}
 
@@ -239,6 +352,8 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int) (*mod
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding albums: %+v", err)
+
 		return nil, err
 	}
 
@@ -272,4 +387,5 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var errInvalidMediaItemsForAlbum = errors.New("invalid number of media items for album")
 var errIncorrectUpdateAlbumMediaItemsActionType = errors.New("incorrect action type for updating album mediaItems")

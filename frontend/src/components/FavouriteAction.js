@@ -3,9 +3,9 @@ import { gql, useMutation } from '@apollo/client';
 import PropTypes from 'prop-types';
 import { Icon } from '@rmwc/icon';
 
-const UPDATE_FAVOURITE = gql`
-  mutation updateFavourite($id: String!, $type: String!) {
-    updateFavourite(id: $id, type: $type)
+const FAVOURITE = gql`
+  mutation favourite($id: String!, $type: String!) {
+    favourite(id: $id, type: $type)
   }
 `;
 
@@ -16,11 +16,11 @@ const FavouriteAction = ({ liked, id }) => {
     setFav(liked);
   }, [liked]);
 
-  const [updateFavourite, { loading: favLoading }] =
-    useMutation(UPDATE_FAVOURITE);
+  const [favourite, { loading: favLoading }] =
+    useMutation(FAVOURITE);
 
   const handleFavButtonClick = (photoId, action) => {
-    updateFavourite({
+    favourite({
       variables: { id: photoId, type: action },
     });
     setFav(!fav);

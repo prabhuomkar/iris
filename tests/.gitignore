@@ -55,8 +55,3 @@ venv.bak/
 
 # Others
 .DS_Store
-
-# PyTorch Outputs
-*.mar
-*.pt
-*.pth

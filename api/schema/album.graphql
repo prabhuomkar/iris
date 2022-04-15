@@ -2,6 +2,7 @@ type Album {
   id: String!
   name: String!
   description: String
+  previewUrl: String!
   mediaItems(page: Int, limit: Int): MediaItemConnection!
   createdAt: Time!
   updatedAt: Time!
@@ -25,12 +26,13 @@ input UpdateAlbumInput {
 
 extend type Query {
   album(id: String!): Album!
-  albums(page: Int, limit: Int): AlbumConnection!
+  albums(page: Int, limit: Int, sortBy: String): AlbumConnection!
 }
 
 extend type Mutation {
   createAlbum(input: CreateAlbumInput!): String
   updateAlbum(id: String!, input: UpdateAlbumInput!): Boolean!
+  updateAlbumPreviewMediaItem(id: String!, mediaItemId: String!): Boolean!
   deleteAlbum(id: String!): Boolean!
   updateAlbumMediaItems(id: String!, type: String!, mediaItems: [String!]!): Boolean!
 }
