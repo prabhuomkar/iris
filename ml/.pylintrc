@@ -1,9 +1,0 @@
-[MASTER]
-ignore=CVS, .svn, .git
-
-[MESSAGES CONTROL]
-disable=missing-module-docstring,invalid-name,duplicate-code,too-many-locals,super-with-arguments
-
-indent-string='  '
-max-line-length=160
-max-args=6
