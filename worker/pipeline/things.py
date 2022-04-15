@@ -487,6 +487,7 @@ class Things(Component):
         'scabbard': 'UTILITY',
       }
 
+  # pylint: disable=too-many-locals
   def get_inference_results(self):
     """Calls torchserve inference api and returns response"""
     # prepare the input
@@ -507,7 +508,7 @@ class Things(Component):
       output = model(input_batch)
     # get top categories
     probabilities = torch.nn.functional.softmax(output[0], dim=0)
-    with open(self.MODEL_RESULT_FILE, 'r') as f:
+    with open(self.MODEL_RESULT_FILE, 'r') as f: # pylint: disable=unspecified-encoding
       categories = [s.strip() for s in f.readlines()]
     # show required categories
     top5_prob, top5_catid = torch.topk(probabilities, 5)
