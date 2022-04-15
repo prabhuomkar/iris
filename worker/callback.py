@@ -27,11 +27,11 @@ class Callback:
     mediaitem_url = mediaitem['downloadUrl']
     # extract what components need to be initialized
     actions = data['actions'] if 'actions' in data else []
-    if 'places' in actions and Places not in self.components[self.queue] and self.queue == os.getenv('COMMON_QUEUE_NAME'):
+    if 'places' in actions and Places not in self.components[self.queue]:
       self.components[self.queue].append(Places)
-    if 'people' in actions and People not in self.components[self.queue] and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
+    if 'people' in actions and People not in self.components[self.queue]:
       self.components[self.queue].append(People)
-    if 'things' in actions and Things not in self.components[self.queue] and self.queue == os.getenv('INTERNAL_QUEUE_NAME'):
+    if 'things' in actions and Things not in self.components[self.queue]:
       self.components[self.queue].append(Things)
     file_id = f'mediaitem-{oid}-{filename}'
     try:
@@ -53,6 +53,7 @@ class Callback:
       # send for inferencing
       if self.queue == os.getenv('COMMON_QUEUE_NAME') and len(self.components[os.getenv('INTERNAL_QUEUE_NAME')]) > 0:
         res = self.db['mediaitems'].find_one({'_id': ObjectId(data['id'])})
+        print(res)
         if res is not None:
           data['mediaItem']['downloadUrl'] = res['previewUrl']
           self.channel.basic_publish(exchange='', routing_key=os.getenv('INTERNAL_QUEUE_NAME'), body=json.dumps(data))
