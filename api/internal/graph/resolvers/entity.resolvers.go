@@ -21,6 +21,14 @@ func (r *entityResolver) PreviewURL(ctx context.Context, obj *models.Entity) (st
 
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
 
+	if obj.EntityType == "people" {
+		for _, face := range mediaItem.Faces {
+			if face.EntityID == obj.ID {
+				return face.PreviewURL, nil
+			}
+		}
+	}
+
 	return mediaItem.PreviewURL, err
 }
 

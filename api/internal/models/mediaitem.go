@@ -17,6 +17,7 @@ type (
 		ContentCategories []string       `json:"contentCategories"`
 		Entities          []string       `json:"entities"`
 		Albums            []string       `json:"albums"`
+		Faces             []Face         `json:"faces"`
 		Favourite         bool           `json:"favourite"`
 		Deleted           bool           `json:"deleted"`
 		CreatedAt         time.Time      `json:"createdAt"`
@@ -52,5 +53,10 @@ type (
 	Location struct {
 		Latitude  *float64 `json:"latitude"`
 		Longitude *float64 `json:"longitude"`
+	}
+
+	Face struct {
+		EntityID   string `json:"entityId"`
+		PreviewURL string `json:"previewUrl"`
 	}
 )

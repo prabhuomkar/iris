@@ -1,8 +1,10 @@
 """People"""
 import os
-import requests
+from PIL import Image
+import torch
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
+from facenet_pytorch import MTCNN, InceptionResnetV1
 from .utils import get_closest_people, upload_image
 from .component import Component
 
@@ -11,20 +13,32 @@ class People(Component):
   """People Component"""
   def __init__(self, db, oid, filename, mediaitem_url):
     super().__init__('people', db, oid, filename, mediaitem_url)
+    self.mtcnn_model = MTCNN(margin=48, image_size=240, keep_all=True)
+    self.resnet_model = InceptionResnetV1(pretrained='vggface2').eval()
 
   def get_inference_results(self):
     """Calls torchserve inference api and returns response"""
-    result_classes = []
-    data = None
-    with open(self.file_name, 'rb') as f:
-      data = f.read()
-    headers = {'Content-Type': 'image/jpeg'}
-    res = requests.post(f'{os.getenv("ML_URL")}/predictions/facenet', data=data, headers=headers)
-    if res.status_code == 200:
-      data = res.json()
-      return data
-    print(f'error while making inference request, status code: {res.status_code}')
-    return result_classes
+    # run pytorch inference
+    res_bytes = []
+    ten_imgs = []
+    data = Image.open(f'{self.file_name}')
+    imgs, probs = self.mtcnn_model(data, save_path=f'{self.file_name}-people-result.jpg', return_prob=True)
+    result = []
+    if imgs is not None:
+      for i in range(1, len(imgs)+1):
+        if probs[i-1] >= 0.99:
+          ten_imgs.append(imgs[i-1])
+          img_path = f'{self.file_name}-people-result.jpg' if i == 1 else f'{self.file_name}-people-result_{i}.jpg'
+          with open(img_path, 'rb') as f:
+            res_bytes.append(f.read())
+            os.remove(img_path)
+      if len(ten_imgs) > 0:
+        stacked_imgs = torch.stack(ten_imgs) # pylint: disable=no-member
+        embeddings = self.resnet_model(stacked_imgs)
+        result = [
+          { 'data': res.decode('latin1'), 'embedding': embed.tolist() } for res, embed in zip(res_bytes, embeddings)
+        ]
+    return result
 
   def upsert_entity(self, data):
     """Upserts people entity"""
@@ -58,7 +72,7 @@ class People(Component):
       insert_people = None
       mediaitem_url = upload_image(val['data'])
       if len(people) == 0:
-        insert_people = {'name': 'Face #1', 'embedding': val['embedding']}
+        insert_people = {'name': 'Face #1', 'embedding': val['embedding'], 'previewMediaItem': ObjectId(self.oid)}
       else:
         _id = get_closest_people(people, val['embedding'])
         insert_people = {'_id': _id, 'embedding': val['embedding']}
@@ -66,7 +80,7 @@ class People(Component):
           insert_people = {'name': f'Face #{len(people)+1}', 'embedding': val['embedding']}
       entity_id = self.upsert_entity(insert_people)
       entity_oids.append(entity_id)
-      entity_images.append({'entityId': entity_id, 'imageUrl': mediaitem_url})
+      entity_images.append({'entityId': entity_id, 'previewUrl': mediaitem_url})
     return entity_oids, entity_images
 
   def process(self):

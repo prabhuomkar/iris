@@ -1,6 +1,7 @@
 """Worker"""
 import os
 import pika
+from facenet_pytorch import InceptionResnetV1
 from pymongo import MongoClient
 from callback import Callback
 
@@ -24,4 +25,5 @@ def start_consumers():
 
 if __name__ == "__main__":
   print('starting worker')
+  InceptionResnetV1(pretrained='vggface2')
   start_consumers()
