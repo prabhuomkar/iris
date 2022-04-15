@@ -28,7 +28,7 @@ func Init(mongoURI, databaseName string) (*Connection, error) {
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 	if err != nil {
-		log.Printf("error while connecting to mongo: %v", err)
+		log.Printf("error connecting to database mongodb: %+v", err)
 
 		return nil, err
 	}
@@ -38,10 +38,12 @@ func Init(mongoURI, databaseName string) (*Connection, error) {
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		log.Printf("error while pinging mongo: %v", err)
+		log.Printf("error pinging database mongodb: %+v", err)
 
 		return nil, err
 	}
+
+	log.Printf("connected to database mongodb")
 
 	return &Connection{
 		Client:   client,

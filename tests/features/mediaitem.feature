@@ -5,7 +5,7 @@ Feature: MediaItems
     Given api service is running
     When user uploads "<file_type>" file
     Then file is uploaded
-    And waits for "5" seconds
+    And waits for "10" seconds
     And metadata for "<file_type>" file is validated
 
     Examples: Photos

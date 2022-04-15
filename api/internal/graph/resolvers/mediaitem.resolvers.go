@@ -8,6 +8,7 @@ import (
 	"errors"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,11 +26,15 @@ func (r *mediaItemResolver) Entities(ctx context.Context, obj *models.MediaItem)
 
 	cur, err := r.DB.Collection(models.ColEntity).Find(ctx, bson.M{"_id": bson.M{"$in": entityIDs}})
 	if err != nil {
+		log.Printf("error getting mediaitem related entities: %+v", err)
+
 		return nil, err
 	}
 
 	var result []*models.Entity
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding mediaitem related entities: %+v", err)
+
 		return nil, err
 	}
 
@@ -46,11 +51,15 @@ func (r *mediaItemResolver) Albums(ctx context.Context, obj *models.MediaItem) (
 
 	cur, err := r.DB.Collection(models.ColAlbums).Find(ctx, bson.M{"_id": bson.M{"$in": albumIDs}})
 	if err != nil {
+		log.Printf("error getting mediaitem related albums: %+v", err)
+
 		return nil, err
 	}
 
 	var result []*models.Album
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding mediaitem related albums: %+v", err)
+
 		return nil, err
 	}
 
@@ -67,6 +76,8 @@ func (r *mutationResolver) UpdateDescription(ctx context.Context, id string, des
 		{Key: "$set", Value: bson.D{{Key: "description", Value: description}}},
 	})
 	if err != nil {
+		log.Printf("error updating mediaitem description: %+v", err)
+
 		return false, err
 	}
 
@@ -88,6 +99,8 @@ func (r *queryResolver) MediaItem(ctx context.Context, id string) (*models.Media
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		}
+
+		log.Printf("error getting mediaitem: %+v", err)
 
 		return nil, err
 	}
@@ -131,6 +144,8 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -142,6 +157,8 @@ func (r *queryResolver) MediaItems(ctx context.Context, page *int, limit *int) (
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -196,6 +213,8 @@ func (r *queryResolver) OnThisDay(ctx context.Context) ([]*models.OnThisDayRespo
 	var result []*models.OnThisDayResponse
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error getting on this day mediaitems: %+v", err)
+
 		return nil, err
 	}
 

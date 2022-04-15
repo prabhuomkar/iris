@@ -15,7 +15,7 @@ func DeleteFilesFromCDN(cdn *goseaweedfs.Seaweed, imageURLs []string) {
 
 			err := cdn.DeleteFile(fileID, nil)
 			if err != nil {
-				log.Printf("error deleting images from cdn: %v", err)
+				log.Printf("error deleting images from cdn: %+v", err)
 			}
 		}
 	}

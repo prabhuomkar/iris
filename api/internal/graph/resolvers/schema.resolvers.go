@@ -22,7 +22,7 @@ import (
 func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albumID *string) (string, error) {
 	result, err := r.CDN.Upload(file.File, file.Filename, file.Size, "", "")
 	if err != nil {
-		log.Printf("some error uploading mediaitems to cdn: %v", err)
+		log.Printf("some error uploading mediaitems to cdn: %+v", err)
 
 		return "", err
 	}
@@ -48,12 +48,10 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			message := fmt.Sprintf(
 				`{"id":"%s","fileName":"%s","mediaItem":{"downloadUrl":"%s"},"actions":[%s]}`,
 				insertedID, file.Filename, sourceURL, r.Config.GetMediaItemFeatures())
-			err := r.Queue.Publish([]byte(message))
 
+			err := r.Queue.Publish([]byte(message))
 			if err != nil {
-				log.Printf("error while publishing event to queue: %v", err)
-			} else {
-				log.Printf("published event to queue: %s", message)
+				log.Printf("error publishing event to queue rabbitmq: %+v", err)
 			}
 		}(insertedID.Hex(), sourceURL)
 	} else {
@@ -61,6 +59,8 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 	}
 
 	if albumID != nil {
+		log.Printf("uploaded mediaitem is for album: %s", *albumID)
+
 		albumOID, err := primitive.ObjectIDFromHex(*albumID)
 		if err != nil {
 			return "", err
@@ -72,6 +72,8 @@ func (r *mutationResolver) Upload(ctx context.Context, file graphql.Upload, albu
 			}},
 		})
 		if err != nil {
+			log.Printf("error linking uploaded mediaitem to album: %+v", err)
+
 			return "", err
 		}
 	}
@@ -98,6 +100,8 @@ func (r *mutationResolver) Favourite(ctx context.Context, id string, typeArg str
 		{Key: "$set", Value: bson.D{{Key: "favourite", Value: action}}},
 	})
 	if err != nil {
+		log.Printf("error marking mediaitem as favourite: %+v", err)
+
 		return false, err
 	}
 
@@ -127,6 +131,8 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 		&options.FindOneAndUpdateOptions{ReturnDocument: &after},
 	)
 	if result.Err() != nil {
+		log.Printf("error marking mediaitem as deleted: %+v", err)
+
 		return false, result.Err()
 	}
 
@@ -155,12 +161,16 @@ func (r *mutationResolver) Delete(ctx context.Context, id string, typeArg string
 			}}},
 		)
 		if err != nil {
+			log.Printf("error deleting entities related to mediaitem: %+v", err)
+
 			return false, err
 		}
 
 		// delete from mediaitems collection
 		_, err = r.DB.Collection(models.ColMediaItems).DeleteOne(ctx, filter)
 		if err != nil {
+			log.Printf("error deleting mediaitem: %+v", err)
+
 			return false, err
 		}
 
@@ -194,6 +204,8 @@ func (r *queryResolver) Search(ctx context.Context, q *string, id *string, page 
 				{Key: "$caseSensitive", Value: false},
 			}}})
 		if err != nil {
+			log.Printf("error searching mediaitems: %+v", err)
+
 			return nil, err
 		}
 
@@ -329,6 +341,8 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting favourite mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -340,6 +354,8 @@ func (r *queryResolver) Favourites(ctx context.Context, page *int, limit *int) (
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding favourite mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -386,6 +402,8 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 	cur, err := r.DB.Collection(models.ColMediaItems).Aggregate(ctx, mongo.Pipeline{facetStage})
 
 	if err != nil {
+		log.Printf("error getting deleted mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -397,6 +415,8 @@ func (r *queryResolver) Deleted(ctx context.Context, page *int, limit *int) (*mo
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding deleted mediaitems: %+v", err)
+
 		return nil, err
 	}
 

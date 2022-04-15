@@ -8,6 +8,7 @@ import (
 	"errors"
 	"iris/api/internal/graph/generated"
 	"iris/api/internal/models"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,8 +22,13 @@ func (r *albumResolver) PreviewURL(ctx context.Context, obj *models.Album) (stri
 	var mediaItem models.MediaItem
 
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItemOID}}).Decode(&mediaItem)
+	if err != nil {
+		log.Printf("error getting album preview url: %+v", err)
 
-	return mediaItem.PreviewURL, err
+		return "", err
+	}
+
+	return mediaItem.PreviewURL, nil
 }
 
 func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page *int, limit *int) (*models.MediaItemConnection, error) {
@@ -70,6 +76,8 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		bson.D{{Key: "$limit", Value: itemsPerPage}},
 	})
 	if err != nil {
+		log.Printf("error getting album mediaitems: %+v", err)
+
 		return nil, err
 	}
 
@@ -81,6 +89,8 @@ func (r *albumResolver) MediaItems(ctx context.Context, obj *models.Album, page 
 		}
 
 		if err := cur.Decode(&result); err != nil {
+			log.Printf("error decoding album mediaitems: %+v", err)
+
 			return nil, err
 		}
 
@@ -111,6 +121,8 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 
 	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&previewMediaItem)
 	if err != nil {
+		log.Printf("error getting album preview mediaitem: %+v", err)
+
 		return nil, err
 	}
 
@@ -123,6 +135,8 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		{Key: "updatedAt", Value: time.Now()},
 	})
 	if err != nil {
+		log.Printf("error creating album: %+v", err)
+
 		return nil, err
 	}
 
@@ -149,6 +163,8 @@ func (r *mutationResolver) UpdateAlbum(ctx context.Context, id string, input mod
 			{Key: "updatedAt", Value: time.Now()},
 		}}})
 	if err != nil {
+		log.Printf("error updating album: %+v", err)
+
 		return false, err
 	}
 
@@ -173,6 +189,8 @@ func (r *mutationResolver) UpdateAlbumPreviewMediaItem(ctx context.Context, id s
 		}},
 	})
 	if err != nil {
+		log.Printf("error updating album preview mediaitem: %+v", err)
+
 		return false, err
 	}
 
@@ -187,6 +205,8 @@ func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (bool, er
 
 	_, err = r.DB.Collection(models.ColAlbums).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}})
 	if err != nil {
+		log.Printf("error deleting album: %+v", err)
+
 		return false, err
 	}
 
@@ -229,6 +249,8 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 		update,
 	})
 	if err != nil {
+		log.Printf("error updating album mediaitems: %+v", err)
+
 		return false, err
 	}
 
@@ -247,6 +269,8 @@ func (r *mutationResolver) UpdateAlbumMediaItems(ctx context.Context, id string,
 		}}},
 	)
 	if err != nil {
+		log.Printf("error updating mediaitems while updating album mediaitems: %+v", err)
+
 		return false, err
 	}
 
@@ -268,6 +292,8 @@ func (r *queryResolver) Album(ctx context.Context, id string) (*models.Album, er
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, err
 		}
+
+		log.Printf("error getting album: %+v", err)
 
 		return nil, err
 	}
@@ -313,6 +339,8 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int, sortB
 
 	cur, err := r.DB.Collection(models.ColAlbums).Aggregate(ctx, mongo.Pipeline{facetStage})
 	if err != nil {
+		log.Printf("error getting albums: %+v", err)
+
 		return nil, err
 	}
 
@@ -324,6 +352,8 @@ func (r *queryResolver) Albums(ctx context.Context, page *int, limit *int, sortB
 	}
 
 	if err = cur.All(ctx, &result); err != nil {
+		log.Printf("error decoding albums: %+v", err)
+
 		return nil, err
 	}
 
