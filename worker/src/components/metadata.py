@@ -4,6 +4,7 @@ import datetime
 import exiftool
 import rawpy
 import imageio
+from bson.objectid import ObjectId
 from PIL import Image
 from pillow_heif import register_heif_opener
 
@@ -29,30 +30,33 @@ class Metadata():
     """Extracts metadata which is required to persist in database"""
     wh_splits = metadata['Composite:ImageSize'].split()
     media_metadata = {
-      'creationTime': self._get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata \
-        else self._get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata \
-        else self._get_creation_time(str(metadata['MakerNotes:DateTimeOriginal'])) if 'MakerNotes:DateTimeOriginal' in metadata else None,
-      'width': int(wh_splits[0]) if len(wh_splits) == 2 else None,
-      'height': int(wh_splits[1]) if len(wh_splits) == 2 else None,
-      'location': {
-        'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata \
-          else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
-        'longitude': metadata['EXIF:GPSLongitude'] if 'EXIF:GPSLongitude' in metadata \
-          else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
-      },
-      'photo': {
-        'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else \
-        metadata['MakerNotes:Make'] if 'MakerNotes:Make' in metadata else None,
-        'cameraModel': metadata['EXIF:Model'] if 'EXIF:Model' in metadata else \
-        metadata['MakerNotes:Model'] if 'MakerNotes:Model' in metadata else None,
-        'focalLength': metadata['EXIF:FocalLength'] if 'EXIF:FocalLength' in metadata else \
-        metadata['MakerNotes:FocalLength'] if 'MakerNotes:FocalLength' in metadata else None,
-        'apertureFNumber': metadata['EXIF:FNumber'] if 'EXIF:FNumber' in metadata else \
-        metadata['MakerNotes:FNumber'] if 'MakerNotes:FNumber' in metadata else None,
-        'isoEquivalent': metadata['EXIF:ISO'] if 'EXIF:ISO' in metadata else \
-        metadata['Composite:ISO'] if 'Composite:ISO' in metadata else None,
-        'exposureTime': metadata['EXIF:ExposureTime'] if 'EXIF:ExposureTime' in metadata else \
-        float(metadata['MakerNotes:ExposureTime']) if 'MakerNotes:ExposureTime' in metadata else None,
+      'mimeType': metadata['File:MIMEType'] if 'File:MIMEType' in metadata else None,
+      'mediaMetadata': {
+        'creationTime': self._get_creation_time(str(metadata['EXIF:DateTimeOriginal'])) if 'EXIF:DateTimeOriginal' in metadata \
+          else self._get_creation_time(str(metadata['EXIF:CreateDate'])) if 'EXIF:CreateDate' in metadata \
+          else self._get_creation_time(str(metadata['MakerNotes:DateTimeOriginal'])) if 'MakerNotes:DateTimeOriginal' in metadata else None,
+        'width': int(wh_splits[0]) if len(wh_splits) == 2 else None,
+        'height': int(wh_splits[1]) if len(wh_splits) == 2 else None,
+        'location': {
+          'latitude': metadata['EXIF:GPSLatitude'] if 'EXIF:GPSLatitude' in metadata \
+            else metadata['Composite:GPSLatitude'] if 'Composite:GPSLatitude' in metadata else None,
+          'longitude': metadata['EXIF:GPSLongitude'] if 'EXIF:GPSLongitude' in metadata \
+            else metadata['Composite:GPSLongitude'] if 'Composite:GPSLongitude' in metadata else None,
+        },
+        'photo': {
+          'cameraMake': metadata['EXIF:Make'] if 'EXIF:Make' in metadata else \
+          metadata['MakerNotes:Make'] if 'MakerNotes:Make' in metadata else None,
+          'cameraModel': metadata['EXIF:Model'] if 'EXIF:Model' in metadata else \
+          metadata['MakerNotes:Model'] if 'MakerNotes:Model' in metadata else None,
+          'focalLength': metadata['EXIF:FocalLength'] if 'EXIF:FocalLength' in metadata else \
+          metadata['MakerNotes:FocalLength'] if 'MakerNotes:FocalLength' in metadata else None,
+          'apertureFNumber': metadata['EXIF:FNumber'] if 'EXIF:FNumber' in metadata else \
+          metadata['MakerNotes:FNumber'] if 'MakerNotes:FNumber' in metadata else None,
+          'isoEquivalent': metadata['EXIF:ISO'] if 'EXIF:ISO' in metadata else \
+          metadata['Composite:ISO'] if 'Composite:ISO' in metadata else None,
+          'exposureTime': metadata['EXIF:ExposureTime'] if 'EXIF:ExposureTime' in metadata else \
+          float(metadata['MakerNotes:ExposureTime']) if 'MakerNotes:ExposureTime' in metadata else None,
+        },
       },
     }
     return media_metadata
@@ -79,7 +83,10 @@ class Metadata():
   def run(self, event):
     """Run metadata component"""
     try:
-      # later(omkar): update 'status': 'PROCESSING'
+      self.db['mediaitems'].update_one(
+        {'_id': ObjectId(event['id'])}, 
+        {'$set': {'status': 'PROCESSING'}}
+      )
       with exiftool.ExifToolHelper() as et:
         metadata = et.get_metadata(get_source_file_name(event))
         metadata = metadata[0] if len(metadata) > 0 else {}
@@ -87,18 +94,29 @@ class Metadata():
           # extract raw image and upload to cdn
           mediaitem_preview_bytes = self._extract_preview_bytes(metadata, get_source_file_name(event))
           if mediaitem_preview_bytes is not None:
+            # upload preview image to cdn
             Image.open(io.BytesIO(mediaitem_preview_bytes)).save(get_preview_file_name(event))
             preview_url = upload_mediaitem(get_preview_file_name(event))
+            # extract metdata
+            mediaitem_metadata = self._extract_metadata(metadata)
+            print('[metadata]', mediaitem_metadata, preview_url)
+            self.db['mediaitems'].update_one(
+              {'_id': ObjectId(event['id'])}, 
+              {'$set': {'status': 'READY', **mediaitem_metadata, 'previewUrl': preview_url}}
+            )
             # later(omkar): update 'status': 'READY', 'previewUrl': preview_url
           else:
-            # later(omkar): update 'status': 'FAILED'
+            self.db['mediaitems'].update_one(
+              {'_id': ObjectId(event['id'])}, 
+              {'$set': {'status': 'FAILED'}}
+            )
             print(f'cannot get preview bytes for mediaitem {id}')
-          # extract metdata
-          mediaitem_metadata = self._extract_metadata(metadata)
-          print('[metadata]', mediaitem_metadata, preview_url)
         else:
           print('no metadata available via exiftool')
-          # later(omkar): mark as upload failed and delete from CDN
+          self.db['mediaitems'].update_one(
+            {'_id': ObjectId(event['id'])}, 
+            {'$set': {'status': 'FAILED'}}
+          )
     except Exception as e:
       print(f'error executing metadata component: {str(e)}')
     finally:

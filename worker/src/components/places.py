@@ -2,6 +2,8 @@
 import json
 import urllib.request
 import exiftool
+from bson.objectid import ObjectId
+from pymongo import ReturnDocument
 
 from utils import get_source_file_name
 
@@ -43,7 +45,16 @@ class Places():
               name = address['town']
 
           print('[places]', name)
-          # later(omkar): update entity with name and mediaitem
+          result = self.db['entities'].find_one_and_update(
+            {'name': name, 'entityType': 'places'},
+            {'$addToSet': {'mediaItems': ObjectId(event['id'])}, '$set': {'name': name, 'entityType': 'places'}},
+            upsert=True,
+            return_document=ReturnDocument.AFTER
+          )
+          self.db['mediaitems'].find_one_and_update(
+            {'name': name, 'entityType': 'places'},
+            {'$addToSet': {'entities': ObjectId(result['_id'])}},
+          )
         else:
           print('no metadata available via exiftool')
     except Exception as e:
