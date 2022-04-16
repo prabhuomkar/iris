@@ -1,5 +1,6 @@
 """RabbitMQ Consumer"""
 import time
+from threading import Thread
 import pika
 
 
@@ -17,6 +18,7 @@ class RabbitMQConsumer():
     self._closing = False
     self._consumer_tag = None
     self._consuming = False
+    self._prefetch_count = 4
 
   def connect(self):
     """Open rabbitmq connection"""
@@ -74,6 +76,7 @@ class RabbitMQConsumer():
     """On rabbitmq connection channel opened callback"""
     self._channel = channel
     self._channel.add_on_close_callback(self.on_channel_close)
+    self._channel.basic_qos(prefetch_count=self._prefetch_count)
     self.start_consuming()
 
   def on_channel_close(self, _, reason):
@@ -97,9 +100,9 @@ class RabbitMQConsumer():
 
   def on_message(self, _, basic_deliver, __, body):
     """Acknowledge the message on receiving"""
-    self._channel.basic_ack(basic_deliver.delivery_tag)
     if self._callable:
-      self._callable(body)
+      Thread(target=self._callable, args=(body,)).start()
+      self._channel.basic_ack(basic_deliver.delivery_tag)
 
   def start(self):
     """Start rabbitmq consumer"""

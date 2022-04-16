@@ -40,8 +40,8 @@ services:
       DB_URI: mongodb://root:root@database:5010/iris?authSource=admin
       DB_NAME: iris
       QUEUE_URI: amqp://root:root@queue:5030/
-      COMMON_QUEUE_NAME: iris.process
-      INTERNAL_QUEUE_NAME: iris.inference
+      INPUT_QUEUE_NAME: iris.process
+      OUTPUT_QUEUE_NAME: iris.results
     depends_on:
       - queue
   # infra services

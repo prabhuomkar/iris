@@ -1,8 +1,11 @@
+import os
 from services import Consumer
+from components import Pipeline
 
-def print_msg(msg):
-  print(msg)
 
 if __name__ == '__main__':
-  consumer = Consumer(uri='amqp://root:root@localhost:5030/', queue='iris.process', execute=print_msg)
+  # initialize pipeline
+  pipeline = Pipeline(db=None)
+  # initialize services
+  consumer = Consumer(uri=os.getenv('QUEUE_URI'), queue=os.getenv('INPUT_QUEUE_NAME'), execute=pipeline.process)
   consumer.run()
