@@ -1,0 +1,43 @@
+site_name: iris
+site_description: IRIS Documentation
+site_author: Omkar Prabhu
+site_url: https://iris-docs.readthedocs.io
+
+repo_name: prabhuomkar/iris
+repo_url: https://github.com/prabhuomkar/iris
+edit_uri: https://github.com/prabhuomkar/iris/tree/master/docs
+
+theme:
+  name: 'material'
+  static_templates:
+    - 404.html
+  include_search_page: false
+  search_index_only: true
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+  palette:
+    scheme: default
+    primary: white
+    accent: purple
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+nav:
+  - Features:
+    - Introduction: index.md
+  - Setup:
+    - Introduction: setup/introduction.md
+  - Contribution:
+    - Introduction: contribution/introduction.md
+    - Development: contribution/development.md
+    - Architecture: contribution/architecture.md
+    - User Interface: contribution/user_interface.md
+    - API: contribution/api.md
+    - Worker: contribution/worker.md
+  - About:
+    - Team: about/team.md
+    - Contact: about/contact.md
+    - License: about/license.md
