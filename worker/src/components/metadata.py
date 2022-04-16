@@ -84,7 +84,7 @@ class Metadata():
     """Run metadata component"""
     try:
       self.db['mediaitems'].update_one(
-        {'_id': ObjectId(event['id'])}, 
+        {'_id': ObjectId(event['id'])},
         {'$set': {'status': 'PROCESSING'}}
       )
       with exiftool.ExifToolHelper() as et:
@@ -101,20 +101,20 @@ class Metadata():
             mediaitem_metadata = self._extract_metadata(metadata)
             print('[metadata]', mediaitem_metadata, preview_url)
             self.db['mediaitems'].update_one(
-              {'_id': ObjectId(event['id'])}, 
+              {'_id': ObjectId(event['id'])},
               {'$set': {'status': 'READY', **mediaitem_metadata, 'previewUrl': preview_url}}
             )
             # later(omkar): update 'status': 'READY', 'previewUrl': preview_url
           else:
             self.db['mediaitems'].update_one(
-              {'_id': ObjectId(event['id'])}, 
+              {'_id': ObjectId(event['id'])},
               {'$set': {'status': 'FAILED'}}
             )
             print(f'cannot get preview bytes for mediaitem {id}')
         else:
           print('no metadata available via exiftool')
           self.db['mediaitems'].update_one(
-            {'_id': ObjectId(event['id'])}, 
+            {'_id': ObjectId(event['id'])},
             {'$set': {'status': 'FAILED'}}
           )
     except Exception as e:

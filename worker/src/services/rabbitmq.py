@@ -4,7 +4,7 @@ from threading import Thread
 import pika
 
 
-class RabbitMQConsumer():
+class RabbitMQConsumer(): # pylint: disable=too-many-instance-attributes
   """RabbitMQ Consumer"""
   def __init__(self, uri, queue, execute):
     """Initialize RabbitMQ Consumer"""

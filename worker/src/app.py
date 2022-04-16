@@ -1,7 +1,7 @@
 import os
-from services import Consumer
 from pymongo import MongoClient
 
+from services import Consumer
 from components import Pipeline
 
 
