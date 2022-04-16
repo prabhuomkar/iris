@@ -22,9 +22,9 @@ class Metadata():
       'image/tiff', 'image/webp', 'image/x-icon', 'image/jpeg'
     ]
 
-  def _get_creation_time(self, metdata_datetime):
+  def _get_creation_time(self, metadata_datetime):
     """Returns valid datetime from metadata creation time"""
-    return datetime.datetime.strptime(metdata_datetime, self.metadata_datetime_format).replace(tzinfo=datetime.timezone.utc).isoformat()
+    return datetime.datetime.strptime(metadata_datetime, self.metadata_datetime_format).replace(tzinfo=datetime.timezone.utc).isoformat()
 
   def _extract_metadata(self, metadata):
     """Extracts metadata which is required to persist in database"""
@@ -97,7 +97,7 @@ class Metadata():
             # upload preview image to cdn
             Image.open(io.BytesIO(mediaitem_preview_bytes)).save(get_preview_file_name(event))
             preview_url = upload_mediaitem(get_preview_file_name(event))
-            # extract metdata
+            # extract metadata
             mediaitem_metadata = self._extract_metadata(metadata)
             print('[metadata]', mediaitem_metadata, preview_url)
             self.db['mediaitems'].update_one(
@@ -120,4 +120,4 @@ class Metadata():
     except Exception as e:
       print(f'error executing metadata component: {str(e)}')
     finally:
-      print(f'finished executing metdata component for mediaitem: {event["id"]}')
+      print(f'finished executing metadata component for mediaitem: {event["id"]}')
