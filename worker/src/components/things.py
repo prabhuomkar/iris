@@ -524,27 +524,28 @@ class Things():
     """Run things component"""
     try:
       inference_result = self._get_inference_result(get_preview_file_name(event))
-      print('[things]', inference_result)
-      entity_oids = []
-      for cat_class in inference_result['classes']:
-        cat_class = cat_class.replace('_', ' ')
-        result = self.db['entities'].find_one_and_update(
-          {'name': cat_class, 'entityType': 'things'},
+      if len(inference_result['content_categories']) > 0 and len(inference_result['classes']) > 0:
+        print('[things]', inference_result)
+        entity_oids = []
+        for cat_class in inference_result['classes']:
+          cat_class = cat_class.replace('_', ' ')
+          result = self.db['entities'].find_one_and_update(
+            {'name': cat_class, 'entityType': 'things'},
+            {
+              '$addToSet': {'mediaItems': ObjectId(event['id'])},
+              '$set': {'name': cat_class, 'previewMediaItem': ObjectId(event['id'])}
+            },
+            upsert=True,
+            return_document=ReturnDocument.AFTER
+          )
+          entity_oids.append(result['_id'])
+        self.db['mediaitems'].update_one(
+          {'_id': ObjectId(event['id'])},
           {
-            '$addToSet': {'mediaItems': ObjectId(event['id'])},
-            '$set': {'name': cat_class, 'previewMediaItem': ObjectId(event['id'])}
+            '$set': {'contentCategories': inference_result['content_categories']},
+            '$addToSet': {'entities': {'$each': entity_oids}}
           },
-          upsert=True,
-          return_document=ReturnDocument.AFTER
         )
-        entity_oids.append(result['_id'])
-      self.db['mediaitems'].update_one(
-        {'_id': ObjectId(event['id'])},
-        {
-          '$set': {'contentCategories': inference_result['content_categories']},
-          '$addToSet': {'entities': {'$each': entity_oids}}
-        },
-      )
     except Exception as e:
       print(f'error executing things component: {str(e)}')
     finally:

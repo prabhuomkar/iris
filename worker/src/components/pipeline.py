@@ -30,7 +30,7 @@ class Pipeline():
     [thread.join() for thread in threads] # pylint: disable=expression-not-assigned
     inference_threads = []
     if 'people' in event_details['components']:
-      inference_threads.append(Thread(target=self.components['places'].run, args=(event_details,)))
+      inference_threads.append(Thread(target=self.components['people'].run, args=(event_details,)))
     if 'things' in event_details['components']:
       inference_threads.append(Thread(target=self.components['things'].run, args=(event_details,)))
     [thread.start() for thread in inference_threads] # pylint: disable=expression-not-assigned

@@ -44,20 +44,21 @@ class Places():
             if 'town' in address:
               name = address['town']
 
-          print('[places]', name)
-          result = self.db['entities'].find_one_and_update(
-            {'name': name, 'entityType': 'places'},
-            {
-              '$addToSet': {'mediaItems': ObjectId(event['id'])},
-              '$set': {'name': name, 'entityType': 'places', 'previewMediaItem': ObjectId(event['id'])}
-            },
-            upsert=True,
-            return_document=ReturnDocument.AFTER
-          )
-          self.db['mediaitems'].find_one_and_update(
-            {'_id': ObjectId(event['id'])},
-            {'$addToSet': {'entities': ObjectId(result['_id'])}},
-          )
+          if len(name) > 0:
+            print('[places]', name)
+            result = self.db['entities'].find_one_and_update(
+              {'name': name, 'entityType': 'places'},
+              {
+                '$addToSet': {'mediaItems': ObjectId(event['id'])},
+                '$set': {'name': name, 'entityType': 'places', 'previewMediaItem': ObjectId(event['id'])}
+              },
+              upsert=True,
+              return_document=ReturnDocument.AFTER
+            )
+            self.db['mediaitems'].find_one_and_update(
+              {'_id': ObjectId(event['id'])},
+              {'$addToSet': {'entities': ObjectId(result['_id'])}},
+            )
         else:
           print('no metadata available via exiftool')
     except Exception as e:
