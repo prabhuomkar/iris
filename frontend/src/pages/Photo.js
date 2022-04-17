@@ -15,8 +15,8 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import '@rmwc/list/styles';
-import { capEntityName } from '../utils';
 import {
   Loading,
   Error,
@@ -114,7 +114,6 @@ const Photo = () => {
         return prev;
       }, []);
 
-  const things = getEntity(data?.mediaItem?.entities ?? [], 'things');
   const places = getEntity(data?.mediaItem?.entities ?? [], 'places');
   const people = getEntity(data?.mediaItem?.entities ?? [], 'people');
 
@@ -128,6 +127,10 @@ const Photo = () => {
   const [editDescription, setEditDescription] = useState(
     data?.mediaItem?.description
   );
+
+  const lat = data?.mediaItem?.mediaMetadata?.location?.latitude;
+  const long = data?.mediaItem?.mediaMetadata?.location?.longitude;
+  const position = [lat, long];
 
   return (
     <>
@@ -198,14 +201,6 @@ const Photo = () => {
                 </ListItemText>
               </ListItem>
             </>
-            {data.mediaItem && data.mediaItem?.contentCategories && (
-              <ListItem>
-                <ListItemGraphic icon="category" />
-                <ListItemText>
-                  {data.mediaItem?.contentCategories.join(', ')}
-                </ListItemText>
-              </ListItem>
-            )}
             {data.mediaItem?.entities && (
               <>
                 <List>
@@ -219,14 +214,6 @@ const Photo = () => {
                       </div>
                     </>
                   )}
-                  {things && things.length > 0 && (
-                    <ListItem>
-                      <ListItemGraphic icon={entityTypeIcon('things')} />
-                      <ListItemText>
-                        {capEntityName(things.join(', '))}
-                      </ListItemText>
-                    </ListItem>
-                  )}
                   {places && places.length > 0 && (
                     <ListItem>
                       <ListItemGraphic icon={entityTypeIcon('places')} />
@@ -236,7 +223,6 @@ const Photo = () => {
                 </List>
               </>
             )}
-
             <List twoLine>
               <ListItem>
                 <ListItemGraphic icon="today" />
@@ -308,6 +294,19 @@ const Photo = () => {
                         </ListItemSecondaryText>
                       </ListItemText>
                     </ListItem>
+                    {lat && long && (
+                      <MapContainer center={position} zoom={13}>
+                        <TileLayer
+                          attribution=""
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={position}>
+                          <Popup>
+                            <br />
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
+                    )}
                   </>
                 )}
             </List>
