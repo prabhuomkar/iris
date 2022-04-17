@@ -499,26 +499,13 @@ class Things():
 
   def _get_inference_result(self, filename):
     """Run pytorch model inference and return top results"""
-    output = self.model(self._get_inference_input(filename))
-    # get top categories
-    probabilities = torch.nn.functional.softmax(output[0], dim=0)
-    with open('checkpoints/things-model-result-mapping.txt', 'r') as f: # pylint: disable=unspecified-encoding
-      categories = [s.strip() for s in f.readlines()]
-    # show required categories
-    top5_prob, top5_catid = torch.topk(probabilities, 5)
-    result_classes = []
-    for i in range(top5_prob.size(0)):
-      if top5_prob[i].item() > 0.90:
-        result_classes.append(categories[top5_catid[i]])
-    # get content categories
-    content_categories = []
-    for ic_class in result_classes:
-      category = self.MODEL_RESULT_MAPPING[ic_class]
-      content_categories.append(category)
-    return {
-      "content_categories": list(set(content_categories)),
-      "classes": list(set(result_classes))
-    }
+    result_class = self.model(self._get_inference_input(filename))
+    if result_class is not None:
+      return {
+        "content_categories": [self.MODEL_RESULT_MAPPING[result_class]] if result_class in self.MODEL_RESULT_MAPPING else None,
+        "classes": [result_class]
+      }
+    return {}
 
   def run(self, event):
     """Run things component"""
