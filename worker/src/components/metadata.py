@@ -24,7 +24,7 @@ class Metadata():
 
   def _get_creation_time(self, metadata_datetime):
     """Returns valid datetime from metadata creation time"""
-    return datetime.datetime.strptime(metadata_datetime, self.metadata_datetime_format).replace(tzinfo=datetime.timezone.utc).isoformat()
+    return datetime.datetime.strptime(metadata_datetime, self.metadata_datetime_format).replace(tzinfo=datetime.timezone.utc)
 
   def _extract_metadata(self, metadata):
     """Extracts metadata which is required to persist in database"""
