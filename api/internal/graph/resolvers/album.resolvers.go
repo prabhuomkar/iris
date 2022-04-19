@@ -117,19 +117,10 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 		return nil, errInvalidMediaItemsForAlbum
 	}
 
-	var previewMediaItem models.MediaItem
-
-	err := r.DB.Collection(models.ColMediaItems).FindOne(ctx, bson.D{{Key: "_id", Value: mediaItems[0]}}).Decode(&previewMediaItem)
-	if err != nil {
-		log.Printf("error getting album preview mediaitem: %+v", err)
-
-		return nil, err
-	}
-
 	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
-		{Key: "previewMediaItem", Value: previewMediaItem.PreviewURL},
+		{Key: "previewMediaItem", Value: mediaItems[0]},
 		{Key: "mediaItems", Value: mediaItems},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
