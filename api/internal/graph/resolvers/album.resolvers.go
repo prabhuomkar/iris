@@ -129,7 +129,7 @@ func (r *mutationResolver) CreateAlbum(ctx context.Context, input models.CreateA
 	result, err := r.DB.Collection(models.ColAlbums).InsertOne(ctx, bson.D{
 		{Key: "name", Value: input.Name},
 		{Key: "description", Value: input.Description},
-		{Key: "previewUrl", Value: previewMediaItem.PreviewURL},
+		{Key: "previewMediaItem", Value: previewMediaItem.PreviewURL},
 		{Key: "mediaItems", Value: mediaItems},
 		{Key: "createdAt", Value: time.Now()},
 		{Key: "updatedAt", Value: time.Now()},
