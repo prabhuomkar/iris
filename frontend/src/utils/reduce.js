@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-const reducePhotos = (data) => {
-  let output = data.reduce((ob, cur) => {
+const reduce_photos = (data) => {
+  let reduced = data.reduce((ob, cur) => {
     let occurs = ob.reduce((n, item, i) => {
       return moment(item.mediaMetadata?.creationTime || item.createdAt).format(
         'D MMMM YYYY'
@@ -26,7 +26,7 @@ const reducePhotos = (data) => {
     }
     return ob;
   }, []);
-  return output;
+  return reduced;
 };
 
-export default reducePhotos;
+export default reduce_photos;

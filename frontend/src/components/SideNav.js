@@ -16,7 +16,6 @@ const SideNav = (props) => {
       items: [
         { id: 'Photos', link_to: '', icon: 'image' },
         { id: 'Explore', link_to: 'explore', icon: 'search' },
-        { id: 'Sharing', link_to: 'sharing', icon: 'people' },
       ],
     },
 
@@ -25,7 +24,6 @@ const SideNav = (props) => {
       items: [
         { id: 'Favourites', link_to: 'favourites', icon: 'star_rate' },
         { id: 'Albums', link_to: 'albums', icon: 'photo_album' },
-        { id: 'Utilities', link_to: 'utilities', icon: 'filter_none' },
         { id: 'Trash', link_to: 'trash', icon: 'delete' },
       ],
     },
@@ -37,12 +35,10 @@ const SideNav = (props) => {
         <List>
           {sideNavItems.map((section) => (
             <div key={section.subtitle}>
-              {section.subtitle ? (
+              {section.subtitle && (
                 <DrawerSubtitle className="drawer-subtitle">
                   {section.subtitle}
                 </DrawerSubtitle>
-              ) : (
-                <></>
               )}
               {section.items.map((item) => (
                 <NavLink

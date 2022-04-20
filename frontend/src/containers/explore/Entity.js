@@ -13,7 +13,7 @@ import { TextField } from '@rmwc/textfield';
 import { Loading, Error } from '../../components';
 import { CircularProgress } from '@rmwc/circular-progress';
 import { gql, useQuery, useMutation } from '@apollo/client';
-import { capEntityName } from '../../utils';
+import { capitalize } from '../../utils';
 import '@rmwc/list/styles';
 import '@rmwc/textfield/styles';
 import '@rmwc/circular-progress/styles';
@@ -88,7 +88,7 @@ const Entity = () => {
                         defaultValue={
                           editEntity
                             ? editEntity
-                            : capEntityName(data.entity?.name)
+                            : capitalize(data.entity?.name)
                         }
                         onChange={(e) => setEditEntity(e.target.value)}
                         style={{ height: '36px' }}
@@ -123,9 +123,7 @@ const Entity = () => {
                 <>
                   {data.entity?.entityType === 'people' ? (
                     <>
-                      {editEntity
-                        ? editEntity
-                        : capEntityName(data.entity.name)}
+                      {editEntity ? editEntity : capitalize(data.entity.name)}
                       &nbsp;&nbsp;&nbsp;
                       <Button
                         icon="edit"
@@ -135,7 +133,7 @@ const Entity = () => {
                       />
                     </>
                   ) : (
-                    <>{capEntityName(data.entity?.name)}</>
+                    <>{capitalize(data.entity?.name)}</>
                   )}
                 </>
               )}

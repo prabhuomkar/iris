@@ -10,7 +10,7 @@ import {
   ImageListSupporting,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import { Loading, Error } from '../components';
+import { Loading, Error } from '../../components';
 
 const GET_ALBUMS = gql`
   query getAlbums {

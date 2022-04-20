@@ -1,4 +1,4 @@
-const capEntityName = (things) => {
+const capitalize = (things) => {
   if (things !== '' && things !== ' ') {
     const words = things.trim().split(' ');
 
@@ -10,4 +10,4 @@ const capEntityName = (things) => {
   }
 };
 
-export default capEntityName;
+export default capitalize;

@@ -1,5 +1,5 @@
-import reducePhotos from './reducePhotos';
-import capEntityName from './capEntityName';
-import sortPhotos from './sortPhotos';
+import reduce_photos from './reduce';
+import sort_photos from './sort';
+import capitalize from './capitalize';
 
-export { reducePhotos, capEntityName, sortPhotos };
+export { reduce_photos, sort_photos, capitalize };

@@ -8,7 +8,7 @@ import {
   ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import { capEntityName } from '../utils';
+import { capitalize } from '../utils';
 
 const PeopleList = (data) => {
   let history = useHistory();
@@ -46,7 +46,7 @@ const PeopleList = (data) => {
                   display: 'flex',
                 }}
               >
-                {capEntityName(src.name)}
+                {capitalize(src.name)}
               </ImageListLabel>
             </ImageListSupporting>
           </ImageListItem>

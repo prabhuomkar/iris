@@ -7,9 +7,9 @@ import { gql, useQuery } from '@apollo/client';
 import { Grid, GridCell } from '@rmwc/grid';
 import { Icon } from '@rmwc/icon';
 import '@rmwc/grid/styles';
-import { Loading, Error, UpdateAlbum } from '../components';
-import { reducePhotos, sortPhotos } from '../utils';
-import { AlbumsContext } from '../App';
+import { Loading, Error, UpdateAlbum } from '../../components';
+import { reduce_photos, sort_photos } from '../../utils';
+import { AlbumsContext } from '../../App';
 
 const GET_MEDIA_ITEMS = gql`
   query getMediaItems {
@@ -127,41 +127,45 @@ const Photos = () => {
                   </GridCell>
                 </Grid>
               )}
-              {sortPhotos(reducePhotos(data.mediaItems.nodes)).map((image) => {
-                return (
-                  <div key={image.createdAt}>
-                    <Grid>
-                      <GridCell desktop={10} tablet={6} phone={3}>
-                        {moment(image.createdAt).format('MMMM D, YYYY')}
-                      </GridCell>
-                    </Grid>
-                    <Grid>
-                      {image.previewUrl.map((img, index) => {
-                        return (
-                          <GridCell
-                            key={image.id[index]}
-                            desktop={2}
-                            tablet={4}
-                            phone={12}
-                          >
-                            <Photo
-                              imageId={image.id[index]}
-                              previewUrl={img}
-                              imageList={
-                                match?.isExact ? addImageList : imageList
-                              }
-                              setImageList={
-                                match?.isExact ? setAddImageList : setImageList
-                              }
-                              match={match?.isExact}
-                            />
-                          </GridCell>
-                        );
-                      })}
-                    </Grid>
-                  </div>
-                );
-              })}
+              {sort_photos(reduce_photos(data.mediaItems.nodes)).map(
+                (image) => {
+                  return (
+                    <div key={image.createdAt}>
+                      <Grid>
+                        <GridCell desktop={10} tablet={6} phone={3}>
+                          {moment(image.createdAt).format('MMMM D, YYYY')}
+                        </GridCell>
+                      </Grid>
+                      <Grid>
+                        {image.previewUrl.map((img, index) => {
+                          return (
+                            <GridCell
+                              key={image.id[index]}
+                              desktop={2}
+                              tablet={4}
+                              phone={12}
+                            >
+                              <Photo
+                                imageId={image.id[index]}
+                                previewUrl={img}
+                                imageList={
+                                  match?.isExact ? addImageList : imageList
+                                }
+                                setImageList={
+                                  match?.isExact
+                                    ? setAddImageList
+                                    : setImageList
+                                }
+                                match={match?.isExact}
+                              />
+                            </GridCell>
+                          );
+                        })}
+                      </Grid>
+                    </div>
+                  );
+                }
+              )}
             </>
           )}
         </>

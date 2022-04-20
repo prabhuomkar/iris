@@ -14,8 +14,8 @@ import {
 import { Button } from '@rmwc/button';
 import { Grid, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
-import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../components';
-import { AlbumsContext } from '../App';
+import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../../components';
+import { AlbumsContext } from '../../App';
 
 const GET_ALBUM = gql`
   query getAlbum($id: String!) {

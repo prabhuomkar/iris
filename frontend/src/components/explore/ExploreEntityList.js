@@ -10,7 +10,7 @@ import {
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
 import '@rmwc/image-list/styles';
-import { capEntityName } from '../../utils';
+import { capitalize } from '../../utils';
 
 const ExploreEntityList = ({ data, type }) => {
   let history = useHistory();
@@ -55,10 +55,10 @@ const ExploreEntityList = ({ data, type }) => {
                     display: 'flex',
                   }}
                 >
-                  {capEntityName(src.name)}
+                  {capitalize(src.name)}
                 </ImageListLabel>
               ) : (
-                <ImageListLabel>{capEntityName(src.name)}</ImageListLabel>
+                <ImageListLabel>{capitalize(src.name)}</ImageListLabel>
               )}
             </ImageListSupporting>
           </ImageListItem>

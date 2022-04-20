@@ -4,14 +4,13 @@ import {
   Photo,
   Photos,
   Search,
-  Upcoming,
   PageNotFound,
   Favourites,
   Trash,
   Albums,
   Album,
-} from '../pages';
-import { Explore, People, Places, Things, Entity } from '../pages/explore';
+} from '../containers';
+import { Explore, People, Places, Things, Entity } from '../containers/explore';
 
 const Content = () => {
   return (
@@ -32,9 +31,6 @@ const Content = () => {
         <Route exact path="/album/:id/add" component={Photos} />
         <Route path="/search" component={Search} />
         {/* static */}
-        <Route exact path="/sharing" component={Upcoming} />
-        <Route exact path="/utilities" component={Upcoming} />
-        <Route exact path="/archive" component={Upcoming} />
         <Route exact path="/trash" component={Trash} />
         <Route component={PageNotFound} />
       </Switch>

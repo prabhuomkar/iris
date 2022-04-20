@@ -15,15 +15,16 @@ import {
   ListItemSecondaryText,
   ListItemText,
 } from '@rmwc/list';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import '@rmwc/list/styles';
-import { capEntityName } from '../utils';
+import { capitalize } from '../../utils';
 import {
   Loading,
   Error,
   PeopleList,
   FavouriteAction,
   DeleteAction,
-} from '../components';
+} from '../../components';
 const prettyBytes = require('pretty-bytes');
 
 const GET_MEDIA_ITEM = gql`
@@ -223,7 +224,7 @@ const Photo = () => {
                     <ListItem>
                       <ListItemGraphic icon={entityTypeIcon('things')} />
                       <ListItemText>
-                        {capEntityName(things.join(', '))}
+                        {capitalize(things.join(', '))}
                       </ListItemText>
                     </ListItem>
                   )}
@@ -308,6 +309,33 @@ const Photo = () => {
                         </ListItemSecondaryText>
                       </ListItemText>
                     </ListItem>
+                    {data?.mediaItem?.mediaMetadata?.location?.latitude &&
+                      data?.mediaItem?.mediaMetadata?.location?.longitude && (
+                        <MapContainer
+                          center={[
+                            data?.mediaItem?.mediaMetadata?.location?.latitude,
+                            data?.mediaItem?.mediaMetadata?.location?.longitude,
+                          ]}
+                          zoom={13}
+                        >
+                          <TileLayer
+                            attribution=""
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          />
+                          <Marker
+                            position={[
+                              data?.mediaItem?.mediaMetadata?.location
+                                ?.latitude,
+                              data?.mediaItem?.mediaMetadata?.location
+                                ?.longitude,
+                            ]}
+                          >
+                            <Popup>
+                              <br />
+                            </Popup>
+                          </Marker>
+                        </MapContainer>
+                      )}
                   </>
                 )}
             </List>
