@@ -1,0 +1,26 @@
+@import '../../utils/variables';
+
+.top-app-bar {
+  background-color: $primary-color;
+  border-bottom: 1px solid #e0e0e0;
+
+  .header-title {
+    text-decoration: none;
+    color: #812ce5 !important;
+  }
+}
+
+.search-bar-section {
+  width: 100%;
+
+  .search-bar {
+    height: 40px;
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .search-bar {
+    display: none;
+  }
+}

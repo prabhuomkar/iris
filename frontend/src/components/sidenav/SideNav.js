@@ -6,6 +6,7 @@ import { List, ListItem, ListDivider } from '@rmwc/list';
 import { Icon } from '@rmwc/icon';
 import '@rmwc/drawer/styles';
 import '@rmwc/list/styles';
+import './style.scss';
 
 const SideNav = (props) => {
   const { open } = props;

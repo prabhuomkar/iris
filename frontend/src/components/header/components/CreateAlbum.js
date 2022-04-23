@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 import { TopAppBarActionItem } from '@rmwc/top-app-bar';
 import { Snackbar } from '@rmwc/snackbar';
-import { Error } from '..';
+import { Error } from '../..';
 
 const CREATE_ALBUM = gql`
   mutation createAlbum($mediaItems: [String]) {

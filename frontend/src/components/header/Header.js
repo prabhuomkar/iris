@@ -11,11 +11,11 @@ import {
 } from '@rmwc/top-app-bar';
 import '@rmwc/top-app-bar/styles';
 import { NavLink } from 'react-router-dom';
-import SearchBar from './SearchBar';
 import Upload from './Upload';
-import CreateAlbum from './CreateAlbum';
+import { CreateAlbum, SearchBar } from './components';
 import UpdateAlbum from '../UpdateAlbum';
 import { AlbumsContext } from '../../App';
+import './style.scss';
 
 const Header = ({ toggleSideNav }) => {
   const location = useLocation();
@@ -32,7 +32,7 @@ const Header = ({ toggleSideNav }) => {
             <TopAppBarNavigationIcon icon="menu" onClick={toggleSideNav} />
             <TopAppBarTitle>
               <NavLink exact to="/" className="header-title">
-                <span>iris</span>
+                iris
               </NavLink>
             </TopAppBarTitle>
           </TopAppBarSection>
@@ -51,10 +51,6 @@ const Header = ({ toggleSideNav }) => {
             />
             &nbsp;&nbsp;
             <Upload />
-            {/*
-            <TopAppBarActionItem icon="help" />
-            <TopAppBarActionItem icon="settings" />
-            */}
           </TopAppBarSection>
         </TopAppBarRow>
       </TopAppBar>

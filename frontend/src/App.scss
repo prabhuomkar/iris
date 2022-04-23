@@ -1,10 +1,4 @@
-$font: 'Inter', sans-serif !important;
-$primary-color: #ffffff;
-$secondary-color: #812ce5;
-$font-color: #000000;
-$link-color: #4800b2;
-$primary-light-color: #eadafb;
-$primary-dark-color: #4800b2;
+@import './utils/variables';
 
 body {
   margin: 0;
@@ -44,109 +38,6 @@ p {
   color: $link-color;
 }
 
-.top-app-bar {
-  background-color: $primary-color;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.header-title {
-  display: flex;
-  text-decoration: none;
-  color: #812ce5 !important;
-  align-content: space-between;
-}
-
-.icon {
-  position: relative;
-  font-size: 30px;
-  margin-right: 5px;
-  top: 6px;
-}
-
-/* sidenav styles start */
-.drawer {
-  position: fixed;
-  margin: 1px 0px !important;
-}
-
-.drawer-content {
-  padding: 0px 10px;
-}
-
-.list-item {
-  margin: 5px 0px !important;
-}
-
-.drawer-subtitle {
-  font-size: 12px;
-  font-weight: bold;
-  margin: 5px 0px 10px 15px;
-  text-transform: uppercase;
-  color: #9e9e9e !important;
-}
-
-.side-nav-icon {
-  color: #757575;
-  margin-right: 16px;
-}
-
-.nav-link {
-  text-decoration: none;
-  display: block;
-  color: black;
-}
-
-.nav-link:hover {
-  background: $primary-light-color;
-  color: $primary-dark-color !important;
-  border-radius: 4px;
-}
-
-.nav-link:active {
-  background: $primary-light-color;
-  border-radius: 4px;
-}
-
-.activated {
-  border-radius: 4px;
-  background: $primary-light-color;
-}
-
-.activated > * {
-  color: $primary-dark-color !important;
-  font-weight: bold;
-}
-
-.activated .side-nav-icon {
-  color: $primary-dark-color !important;
-}
-/* sidenav styles end */
-
-.search-bar-section {
-  width: 100%;
-}
-
-.search-bar > .mdc-text-field__input {
-  padding-top: 16px;
-}
-
-.search-bar {
-  border-radius: 4px !important;
-  background-color: #f1f3f4 !important;
-  height: 40px;
-  width: 100%;
-}
-
-.search-bar:focus {
-  outline: none !important;
-}
-
-@media only screen and (max-width: 600px) {
-  .search-bar-section {
-    max-width: 180px;
-  }
-}
-
 .grid-cols > .mdc-layout-grid__inner {
   display: flex;
   justify-content: space-between;
@@ -168,8 +59,14 @@ p {
   grid-gap: 12px !important;
 }
 
+/*
 .mdc-dialog .mdc-dialog__scrim {
   background: transparent;
+}
+*/
+
+.mdc-drawer--dismissible.mdc-drawer--open {
+  z-index: 1;
 }
 
 .mdc-dialog__surface {

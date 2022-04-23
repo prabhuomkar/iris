@@ -1,5 +1,5 @@
 import Content from './Content';
-import SideNav from './SideNav';
+import SideNav from './sidenav/SideNav';
 import Header from './header/Header';
 import Loading from './Loading';
 import Error from './Error';
