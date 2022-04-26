@@ -5,7 +5,7 @@ import { gql, useMutation } from '@apollo/client';
 import { TopAppBarActionItem } from '@rmwc/top-app-bar';
 import { Snackbar } from '@rmwc/snackbar';
 import { Button } from '@rmwc/button';
-import { Error } from '.';
+import { Error } from '..';
 
 const UPDATE_ALBUM = gql`
   mutation updateAlbumMediaItems(

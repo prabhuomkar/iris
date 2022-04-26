@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@rmwc/button';
+import { UploadDialog } from './components';
 import '@rmwc/button/styles';
-import UploadDialog from '../UploadDialog';
 
 const Upload = () => {
   const [open, setOpen] = useState(false);

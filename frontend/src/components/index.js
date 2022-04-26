@@ -1,16 +1,11 @@
 import Content from './Content';
-import SideNav from './sidenav/SideNav';
-import Header from './header/Header';
 import Loading from './Loading';
 import Error from './Error';
-import ExploreEntityList from './explore/ExploreEntityList';
-import ExploreEntity from './explore/ExploreEntity';
-import PeopleList from './PeopleList';
-import FavouriteAction from './FavouriteAction';
-import DeleteAction from './DeleteAction';
-import DeleteAlbumDialog from './DeleteAlbumDialog';
-import EditAlbum from './EditAlbum';
-import UpdateAlbum from './UpdateAlbum';
+import { Header } from './header';
+import { SideNav } from './sidenav';
+import { ExploreEntityList, ExploreEntity } from './explore';
+import { PeopleList, FavouriteAction, DeleteAction } from './photo';
+import { DeleteAlbumDialog, EditAlbum, UpdateAlbum } from './album';
 
 export {
   Content,

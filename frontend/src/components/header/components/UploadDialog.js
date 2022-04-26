@@ -47,12 +47,7 @@ const UploadDialog = ({ open, setOpen }) => {
     >
       <DialogTitle>Upload Photo</DialogTitle>
       <DialogContent>
-        <input
-          type="file"
-          accept="image/*"
-          required
-          onChange={onChange}
-        />
+        <input type="file" accept="image/*" required onChange={onChange} />
         <br />
         <br />
         <span style={{ fontSize: '15px', color: '#FF5722' }}>

@@ -16,8 +16,7 @@ const FavouriteAction = ({ liked, id }) => {
     setFav(liked);
   }, [liked]);
 
-  const [favourite, { loading: favLoading }] =
-    useMutation(FAVOURITE);
+  const [favourite, { loading: favLoading }] = useMutation(FAVOURITE);
 
   const handleFavButtonClick = (photoId, action) => {
     favourite({

@@ -8,7 +8,7 @@ import {
   ImageListLabel,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import { capitalize } from '../utils';
+import { capitalize } from '../../utils';
 
 const PeopleList = (data) => {
   let history = useHistory();

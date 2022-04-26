@@ -13,7 +13,7 @@ import '@rmwc/top-app-bar/styles';
 import { NavLink } from 'react-router-dom';
 import Upload from './Upload';
 import { CreateAlbum, SearchBar } from './components';
-import UpdateAlbum from '../UpdateAlbum';
+import UpdateAlbum from '../album/UpdateAlbum';
 import { AlbumsContext } from '../../App';
 import './style.scss';
 
