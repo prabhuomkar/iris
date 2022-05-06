@@ -10,7 +10,8 @@ import {
   ImageListSupporting,
   ImageListImageAspectContainer,
 } from '@rmwc/image-list';
-import { Loading, Error } from '../../components';
+import { Loading, Error, AlbumAction } from '../../components';
+import './style.scss';
 
 const GET_ALBUMS = gql`
   query getAlbums {
@@ -29,23 +30,17 @@ const GET_ALBUMS = gql`
 `;
 
 const Albums = () => {
-  const { error: albumsError, data: albumsData } = useQuery(GET_ALBUMS, {
+  const { error, data } = useQuery(GET_ALBUMS, {
     fetchPolicy: 'no-cache',
   });
-  if (albumsError) return <Error />;
-
+  if (error) return <Error />;
   let history = useHistory();
-  const styleFav = {
-    radius: '4px',
-    width: '180px',
-    margin: '0px 6px 8px 6px',
-  };
 
   return (
     <>
-      {albumsData && albumsData.albums && albumsData.albums.nodes ? (
+      {data && data.albums && data.albums.nodes ? (
         <>
-          {albumsData.albums && albumsData.albums.totalCount === 0 ? (
+          {data.albums && data.albums.totalCount === 0 ? (
             <>
               <Grid>
                 <GridCell desktop={4} tablet={4} phone={4}></GridCell>
@@ -70,35 +65,42 @@ const Albums = () => {
               <Grid>
                 <GridCell desktop={12} tablet={12} phone={12}>
                   <ImageList>
-                    {albumsData.albums.nodes.map((album) => (
-                      <ImageListItem key={album.id} style={styleFav}>
-                        <ImageListImageAspectContainer>
-                          {album.mediaItems?.totalCount !== 0 ? (
-                            <ImageListImage
-                              src={`${album.previewUrl}?width=200&height=200`}
-                              style={{
-                                cursor: 'pointer',
-                                borderRadius: '4px',
-                              }}
-                              onClick={() => history.push(`/album/${album.id}`)}
-                            />
-                          ) : (
-                            <ImageListImage
-                              style={{
-                                cursor: 'pointer',
-                                borderRadius: '4px',
-                              }}
-                              onClick={() => history.push(`/album/${album.id}`)}
-                            />
-                          )}
-                        </ImageListImageAspectContainer>
+                    {data.albums.nodes.map((album) => (
+                      <ImageListItem key={album.id} className="image-list-item">
+                        <div className="image-list-item-container">
+                          <ImageListImageAspectContainer>
+                            <div className="image-aspect-container">
+                              <AlbumAction
+                                albumId={album?.id}
+                                albumName={album?.name}
+                              />
+                            </div>
+                            {album.mediaItems?.totalCount !== 0 ? (
+                              <ImageListImage
+                                src={`${album.previewUrl}?width=200&height=200`}
+                                className="image-list-image"
+                                onClick={() =>
+                                  history.push(`/album/${album.id}`)
+                                }
+                              />
+                            ) : (
+                              <ImageListImage
+                                className="image-list-image"
+                                onClick={() =>
+                                  history.push(`/album/${album.id}`)
+                                }
+                              />
+                            )}
+                          </ImageListImageAspectContainer>
+                        </div>
                         <ImageListSupporting className="album-list-info">
                           <ImageListLabel>
                             {album.name}
-                            <br />
-                            <small style={{ color: '#424242' }}>
-                              {album.mediaItems?.totalCount} items
-                            </small>
+                            <div>
+                              <small style={{ color: '#424242' }}>
+                                {album.mediaItems?.totalCount} items
+                              </small>
+                            </div>
                           </ImageListLabel>
                         </ImageListSupporting>
                       </ImageListItem>

@@ -5,7 +5,7 @@ import { Header } from './header';
 import { SideNav } from './sidenav';
 import { ExploreEntityList, ExploreEntity } from './explore';
 import { PeopleList, FavouriteAction, DeleteAction } from './photo';
-import { DeleteAlbumDialog, EditAlbum, UpdateAlbum } from './album';
+import { DeleteAlbum, EditAlbum, UpdateAlbum, AlbumAction } from './album';
 
 export {
   Content,
@@ -18,7 +18,8 @@ export {
   PeopleList,
   FavouriteAction,
   DeleteAction,
-  DeleteAlbumDialog,
+  DeleteAlbum,
   EditAlbum,
   UpdateAlbum,
+  AlbumAction,
 };

@@ -14,6 +14,7 @@
     "@rmwc/image-list": "^7.0.3",
     "@rmwc/linear-progress": "^7.0.3",
     "@rmwc/list": "^7.0.3",
+    "@rmwc/menu": "^7.0.3",
     "@rmwc/snackbar": "^7.0.3",
     "@rmwc/textfield": "^7.0.3",
     "@rmwc/theme": "^7.0.3",

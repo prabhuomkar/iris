@@ -1,0 +1,27 @@
+.image-list-item {
+  width: 200px;
+  margin: 0px 6px 8px 6px;
+
+  .image-list-item-container {
+    position: relative;
+
+    .image-aspect-container {
+      position: absolute;
+      cursor: pointer;
+      z-index: 1;
+      top: 5px;
+      right: 0;
+    }
+  }
+}
+
+.image-list-image {
+  cursor: pointer;
+  border-radius: 6px !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .image-list-item {
+    width: 100%;
+  }
+}

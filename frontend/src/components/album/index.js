@@ -1,5 +1,4 @@
-import DeleteAlbumDialog from './DeleteAlbumDialog';
-import EditAlbum from './EditAlbum';
+import { DeleteAlbum, AlbumAction, EditAlbum } from './actions';
 import UpdateAlbum from './UpdateAlbum';
 
-export { DeleteAlbumDialog, EditAlbum, UpdateAlbum };
+export { DeleteAlbum, EditAlbum, UpdateAlbum, AlbumAction };

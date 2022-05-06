@@ -13,7 +13,7 @@ const DELETE_ALBUM = gql`
   }
 `;
 
-const DeleteAlbumDialog = ({ open, setOpen, albumName, albumId }) => {
+const DeleteAlbum = ({ openDelete, setOpenDelete, albumId, albumName }) => {
   const history = useHistory();
   const [deleteAlbum, { data: delData, loading: delLoading, error: delError }] =
     useMutation(DELETE_ALBUM);
@@ -33,9 +33,9 @@ const DeleteAlbumDialog = ({ open, setOpen, albumName, albumId }) => {
 
   return (
     <Dialog
-      open={open}
+      open={openDelete}
       onClose={() => {
-        setOpen(false);
+        setOpenDelete(false);
       }}
     >
       <DialogTitle>
@@ -62,11 +62,11 @@ const DeleteAlbumDialog = ({ open, setOpen, albumName, albumId }) => {
   );
 };
 
-DeleteAlbumDialog.propTypes = {
-  open: PropTypes.bool,
-  setOpen: PropTypes.func,
+DeleteAlbum.propTypes = {
+  openDelete: PropTypes.bool,
+  setOpenDelete: PropTypes.func,
   albumId: PropTypes.string,
   albumName: PropTypes.string,
 };
 
-export default DeleteAlbumDialog;
+export default DeleteAlbum;

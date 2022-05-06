@@ -14,7 +14,7 @@ import {
 import { Button } from '@rmwc/button';
 import { Grid, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
-import { Loading, Error, DeleteAlbumDialog, EditAlbum } from '../../components';
+import { Loading, Error, DeleteAlbum, EditAlbum } from '../../components';
 import { AlbumsContext } from '../../App';
 
 const GET_ALBUM = gql`
@@ -130,7 +130,7 @@ const Album = () => {
                       style={{ cursor: 'pointer', color: '#424242' }}
                       icon={{ icon: 'delete', size: 'small' }}
                     />
-                    <DeleteAlbumDialog
+                    <DeleteAlbum
                       open={open}
                       setOpen={setOpen}
                       albumName={data.album.name}
@@ -187,7 +187,7 @@ const Album = () => {
                       style={{ cursor: 'pointer', color: '#424242' }}
                       icon={{ icon: 'delete', size: 'small' }}
                     />
-                    <DeleteAlbumDialog
+                    <DeleteAlbum
                       open={open}
                       setOpen={setOpen}
                       albumName={data.album.name}

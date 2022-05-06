@@ -3,6 +3,7 @@
 .top-app-bar {
   background-color: $primary-color;
   border-bottom: 1px solid #e0e0e0;
+  z-index: 1;
 
   .header-title {
     text-decoration: none;
